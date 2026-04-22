@@ -85,6 +85,11 @@ class LoopAppManager: NSObject {
     private var resetLoopManager: ResetLoopManager!
     private var deeplinkManager: DeeplinkManager!
 
+    // B.2.c: phone↔watch WCSession coordinator. Activated during launchManagers().
+    // Public so SwiftUI views (e.g., WatchConnectionStatusRow) can observe it.
+    @MainActor private(set) lazy var phoneWatchCoordinator: PhoneWatchSessionCoordinator =
+        PhoneWatchSessionCoordinator(transport: WCSessionPhoneWatchTransport())
+
     private var overrideHistory = UserDefaults.appGroup?.overrideHistory ?? TemporaryScheduleOverrideHistory.init()
 
     private var state: State = .initialize
@@ -267,6 +272,13 @@ class LoopAppManager: NSObject {
             .map { $0 && $1 }
             .assign(to: \.automaticDosingStatus.automaticDosingEnabled, on: self)
             .store(in: &cancellables)
+
+        // B.2.c: start the phone↔watch coordinator. WCSession activation begins
+        // immediately; heartbeats begin firing every 30s. Log-only stub handlers
+        // for now (B.2.d/e supply real behavior).
+        Task { @MainActor in
+            self.phoneWatchCoordinator.start()
+        }
 
         state = state.next
     }

@@ -427,6 +427,14 @@
 		C11B9D5E286778D000500CF8 /* LoopKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C11B9D5D286778D000500CF8 /* LoopKitUI.framework */; };
 		C11B9D62286779C000500CF8 /* MockKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C11B9D60286779C000500CF8 /* MockKit.framework */; };
 		C11B9D63286779C000500CF8 /* MockKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C11B9D60286779C000500CF8 /* MockKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		WB2CA1000000000001 /* PhoneWatchTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F1 /* PhoneWatchTransport.swift */; };
+		WB2CA1000000000002 /* PhoneWatchSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F2 /* PhoneWatchSessionCoordinator.swift */; };
+		WB2CA1000000000003 /* HeartbeatScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F3 /* HeartbeatScheduler.swift */; };
+		WB2CA1000000000004 /* PhoneWatchTransportMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F4 /* PhoneWatchTransportMock.swift */; };
+		WB2CA1000000000005 /* PhoneWatchSessionCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F5 /* PhoneWatchSessionCoordinatorTests.swift */; };
+		WB2CA1000000000010 /* OmniBLE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; };
+		WB2CA1000000000011 /* OmniBLE.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		WB2CA1000000000012 /* OmniBLE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; };
 		C11B9D64286779C000500CF8 /* MockKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C11B9D61286779C000500CF8 /* MockKitUI.framework */; };
 		C11B9D65286779C000500CF8 /* MockKitUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C11B9D61286779C000500CF8 /* MockKitUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C11BD0552523CFED00236B08 /* SimpleBolusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11BD0542523CFED00236B08 /* SimpleBolusViewModel.swift */; };
@@ -715,6 +723,7 @@
 				C1F00C78285A8256006302C5 /* SwiftCharts in Embed Frameworks */,
 				C19C8BBF28651E3D0056D5E4 /* LoopKit.framework in Embed Frameworks */,
 				43D9FFD721EAE05D00AF44BF /* LoopCore.framework in Embed Frameworks */,
+				WB2CA1000000000011 /* OmniBLE.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1243,6 +1252,12 @@
 		C11AA5C7258736CF00BDE12F /* DerivedAssetsBase.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = DerivedAssetsBase.xcassets; sourceTree = "<group>"; };
 		C11B9D5D286778D000500CF8 /* LoopKitUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopKitUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C11B9D60286779C000500CF8 /* MockKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MockKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		WB2CA10000000000F0 /* OmniBLE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = OmniBLE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		WB2CA10000000000F1 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransport.swift; sourceTree = "<group>"; };
+		WB2CA10000000000F2 /* PhoneWatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSessionCoordinator.swift; sourceTree = "<group>"; };
+		WB2CA10000000000F3 /* HeartbeatScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartbeatScheduler.swift; sourceTree = "<group>"; };
+		WB2CA10000000000F4 /* PhoneWatchTransportMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransportMock.swift; sourceTree = "<group>"; };
+		WB2CA10000000000F5 /* PhoneWatchSessionCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSessionCoordinatorTests.swift; sourceTree = "<group>"; };
 		C11B9D61286779C000500CF8 /* MockKitUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MockKitUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C11BD0542523CFED00236B08 /* SimpleBolusViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleBolusViewModel.swift; sourceTree = "<group>"; };
 		C1201E2B23ECDBD0002DA84A /* WatchContextRequestUserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContextRequestUserInfo.swift; sourceTree = "<group>"; };
@@ -1448,6 +1463,7 @@
 				C19C8BC328651EAE0056D5E4 /* LoopTestingKit.framework in Frameworks */,
 				C1735B1E2A0809830082BB8A /* ZIPFoundation in Frameworks */,
 				C19C8BCE28651F520056D5E4 /* LoopKitUI.framework in Frameworks */,
+				WB2CA1000000000010 /* OmniBLE.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1485,6 +1501,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C15A8C492A7305B1009D736B /* SwiftCharts in Frameworks */,
+				WB2CA1000000000012 /* OmniBLE.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2038,8 +2055,19 @@
 				A96DAC2B2838F31200D94E38 /* SharedLogging.swift */,
 				7E69CFFB2A16A77E00203CBD /* ResetLoopManager.swift */,
 				84AA81E42A4A3981000B658B /* DeeplinkManager.swift */,
+				WB2CA10000000000A0 /* WatchHandoff */,
 			);
 			path = Managers;
+			sourceTree = "<group>";
+		};
+		WB2CA10000000000A0 /* WatchHandoff */ = {
+			isa = PBXGroup;
+			children = (
+				WB2CA10000000000F1 /* PhoneWatchTransport.swift */,
+				WB2CA10000000000F2 /* PhoneWatchSessionCoordinator.swift */,
+				WB2CA10000000000F3 /* HeartbeatScheduler.swift */,
+			);
+			path = WatchHandoff;
 			sourceTree = "<group>";
 		};
 		43F78D2C1C8FC58F002152D1 /* LoopTests */ = {
@@ -2056,8 +2084,18 @@
 				A9DAE7CF2332D77F006AE942 /* LoopTests.swift */,
 				8968B113240C55F10074BB48 /* LoopSettingsTests.swift */,
 				E93E86AC24DDE02C00FF40C8 /* Mock Stores */,
+				WB2CA10000000000A1 /* WatchHandoff */,
 			);
 			path = LoopTests;
+			sourceTree = "<group>";
+		};
+		WB2CA10000000000A1 /* WatchHandoff */ = {
+			isa = PBXGroup;
+			children = (
+				WB2CA10000000000F4 /* PhoneWatchTransportMock.swift */,
+				WB2CA10000000000F5 /* PhoneWatchSessionCoordinatorTests.swift */,
+			);
+			path = WatchHandoff;
 			sourceTree = "<group>";
 		};
 		4F70C1DF1DE8DCA7006380B7 /* Loop Status Extension */ = {
@@ -2391,6 +2429,7 @@
 				C11B9D60286779C000500CF8 /* MockKit.framework */,
 				C11B9D61286779C000500CF8 /* MockKitUI.framework */,
 				C11B9D5D286778D000500CF8 /* LoopKitUI.framework */,
+				WB2CA10000000000F0 /* OmniBLE.framework */,
 				C19C8C20286776C20056D5E4 /* LoopKit.framework */,
 				C19C8BC728651F0A0056D5E4 /* MockKit.framework */,
 				C19C8BC228651EAE0056D5E4 /* LoopTestingKit.framework */,
@@ -3378,6 +3417,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				WB2CA1000000000001 /* PhoneWatchTransport.swift in Sources */,
+				WB2CA1000000000002 /* PhoneWatchSessionCoordinator.swift in Sources */,
+				WB2CA1000000000003 /* HeartbeatScheduler.swift in Sources */,
 				C17824A51E1AD4D100D9D25C /* ManualBolusRecommendation.swift in Sources */,
 				897A5A9624C2175B00C4E71D /* BolusEntryView.swift in Sources */,
 				4F70C2131DE90339006380B7 /* StatusExtensionContext.swift in Sources */,
@@ -3721,6 +3763,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				WB2CA1000000000004 /* PhoneWatchTransportMock.swift in Sources */,
+				WB2CA1000000000005 /* PhoneWatchSessionCoordinatorTests.swift in Sources */,
 				A9DF02CB24F72B9E00B7C988 /* CriticalEventLogTests.swift in Sources */,
 				1D80313D24746274002810DF /* AlertStoreTests.swift in Sources */,
 				C1777A6625A125F100595963 /* ManualEntryDoseViewModelTests.swift in Sources */,
