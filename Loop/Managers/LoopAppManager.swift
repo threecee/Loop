@@ -277,6 +277,7 @@ class LoopAppManager: NSObject {
         // immediately; heartbeats begin firing every 30s. Log-only stub handlers
         // for now (B.2.d/e supply real behavior).
         Task { @MainActor in
+            PhoneWatchSessionCoordinator.shared = self.phoneWatchCoordinator
             self.phoneWatchCoordinator.start()
         }
 

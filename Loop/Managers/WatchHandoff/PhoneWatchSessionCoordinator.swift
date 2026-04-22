@@ -13,6 +13,12 @@ import Combine
 
 @MainActor
 final class PhoneWatchSessionCoordinator: ObservableObject {
+    /// Shared accessor populated by LoopAppManager at launch. SwiftUI views that
+    /// don't have direct access to LoopAppManager (e.g., SettingsView, which
+    /// receives its view model from above) read this accessor to observe state.
+    /// Optional; may be nil during initial app boot or in test contexts.
+    static weak var shared: PhoneWatchSessionCoordinator?
+
     @Published private(set) var lastHeartbeatReceivedAt: Date?
     @Published private(set) var lastHeartbeatSentAt: Date?
     @Published private(set) var isCounterpartReachable: Bool = false

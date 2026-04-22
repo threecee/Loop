@@ -320,6 +320,8 @@ extension SettingsView {
         Section {
             pumpSection
             cgmSection
+            // B.2.c: phone↔watch connection status (long-press for debug echo)
+            WatchConnectionStatusRowContainer()
         }
     }
     
