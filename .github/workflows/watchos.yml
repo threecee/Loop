@@ -1,0 +1,64 @@
+name: Build matrix (iOS)
+
+on:
+  push:
+    branches: [watchos-support]
+  pull_request:
+    branches: [watchos-support, dev, main]
+  workflow_dispatch:
+
+# Loop can't build on its own — it's the iOS app consumed via LoopWorkspace.
+# We clone the consumer LoopWorkspace (personal branch, threecee fork) and
+# point its Loop submodule at the commit that triggered this workflow, then
+# drive the build through the workspace. Mirrors the OmniBLE CI pattern.
+#
+# NOTE: Loop has a pre-existing LoopCore-watchOS build failure (deployment
+# target mismatch with LoopKit) that's not B.2.c's concern. This workflow
+# builds -scheme Loop for iOS, which attempts LoopCore-watchOS as a transitive
+# dep. If this consistently fails until the upstream deployment target is
+# bumped, the workflow reflects the pre-existing state — not a regression.
+
+env:
+  WORKSPACE_REPO: threecee/LoopWorkspace
+  WORKSPACE_BRANCH: personal
+
+jobs:
+  build:
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "iOS build"
+            destination: "generic/platform=iOS"
+    name: ${{ matrix.name }}
+    steps:
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Checkout LoopWorkspace (consumer)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.WORKSPACE_REPO }}
+          ref: ${{ env.WORKSPACE_BRANCH }}
+          submodules: recursive
+          path: LoopWorkspace
+
+      - name: Point Loop submodule at this commit
+        working-directory: LoopWorkspace/Loop
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "${{ github.sha }}" || git fetch --no-tags origin "${{ github.ref }}"
+          git checkout --force "${{ github.sha }}"
+          git log --oneline -1
+
+      - name: Build Loop for ${{ matrix.destination }}
+        working-directory: LoopWorkspace
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -workspace LoopWorkspace.xcworkspace \
+            -scheme Loop \
+            -destination "${{ matrix.destination }}" \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty || (cat && exit 1)
