@@ -81,6 +81,8 @@ public struct SettingsView: View {
                         configurationSection
                     }
                     deviceSettingsSection
+                    // B.2.d: Watch Handoff configuration + state
+                    watchHandoffSection
                     if FeatureFlags.allowExperimentalFeatures {
                         favoriteFoodsSection
                     }
@@ -323,6 +325,11 @@ extension SettingsView {
             // B.2.c: phone↔watch connection status (long-press for debug echo)
             WatchConnectionStatusRowContainer()
         }
+    }
+
+    // B.2.d: Watch Handoff section (state, mode picker, manual triggers, log)
+    private var watchHandoffSection: some View {
+        WatchHandoffSectionContainer()
     }
     
     @ViewBuilder
