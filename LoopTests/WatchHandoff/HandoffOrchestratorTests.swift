@@ -1,0 +1,126 @@
+//
+//  HandoffOrchestratorTests.swift
+//  LoopTests
+//
+
+import XCTest
+import Combine
+import OmniBLE
+@testable import Loop
+
+@MainActor
+final class HandoffOrchestratorTests: XCTestCase {
+
+    private var coordinatorTransport: MockPhoneWatchTransport!
+    private var coordinator: PhoneWatchSessionCoordinator!
+    private var orchestrator: HandoffOrchestrator!
+    private var clock: Date!
+
+    override func setUp() async throws {
+        clock = Date(timeIntervalSince1970: 1_700_000_000)
+        coordinatorTransport = MockPhoneWatchTransport()
+        coordinator = PhoneWatchSessionCoordinator(
+            transport: coordinatorTransport,
+            appBuildNumber: "TEST",
+            clock: { [unowned self] in self.clock }
+        )
+        coordinator.start()
+
+        let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
+        orchestrator = HandoffOrchestrator(
+            coordinator: coordinator,
+            stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone),
+            policyEngine: HandoffPolicyEngine(
+                coordinator: stub,
+                settings: HandoffSettings(),
+                clock: { [unowned self] in self.clock },
+                emit: { _ in }
+            ),
+            shadowScheduler: ShadowStateScheduler(
+                clock: { [unowned self] in self.clock },
+                fire: { }
+            ),
+            userDefaults: UserDefaults(suiteName: "test.handoff.\(UUID())")!
+        )
+    }
+
+    override func tearDown() async throws {
+        orchestrator?.stop()
+        coordinator?.stop()
+    }
+
+    func testInitialStateIsPhoneDriver() {
+        XCTAssertEqual(orchestrator.handoffState, .phoneDriver)
+    }
+
+    func testUserRequestHandoffToWatchTransitionsState() {
+        orchestrator.userRequestHandoff(to: .watch)
+        XCTAssertTrue(orchestrator.handoffState.isTransitioning)
+    }
+
+    func testIncomingModeSwitchAdvancesStateMachine() {
+        let id = UUID()
+        let ms = PhoneWatchModeSwitch(
+            protocolVersion: 1, sentAt: clock,
+            requestedBy: .watch, targetMode: .watchDriver, transitionId: id)
+        orchestrator.handleIncoming(message: .modeSwitch(ms))
+        XCTAssertTrue(orchestrator.handoffState.isTransitioning)
+    }
+
+    func testIncomingConfirmationCompletesHandoff() {
+        let id = UUID()
+        let request = PhoneWatchModeSwitch(
+            protocolVersion: 1, sentAt: clock,
+            requestedBy: .watch, targetMode: .watchDriver, transitionId: id)
+        orchestrator.handleIncoming(message: .modeSwitch(request))
+        XCTAssertTrue(orchestrator.handoffState.isTransitioning)
+
+        let confirm = PhoneWatchModeSwitch(
+            protocolVersion: 1, sentAt: clock,
+            requestedBy: .phone, targetMode: .watchDriver, transitionId: id)
+        orchestrator.handleIncoming(message: .modeSwitch(confirm))
+        XCTAssertEqual(orchestrator.handoffState, .watchDriver)
+    }
+
+    func testUpdateSettingsPersistsToUserDefaults() {
+        let suiteName = "test.handoff-\(UUID())"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        orchestrator.userDefaults = defaults
+        let newSettings = HandoffSettings(mode: .automatic)
+        orchestrator.updateSettings(newSettings)
+        let loaded = HandoffSettings.load(from: defaults)
+        XCTAssertEqual(loaded.mode, .automatic)
+    }
+
+    func testDismissRecoveringReturnsToLastKnownOwner() {
+        orchestrator.injectStateMachine(HandoffStateMachine(
+            initialState: .recovering(reason: .timeoutWaitingForConfirmation,
+                                       lastKnownOwner: .phone),
+            role: .phone))
+        orchestrator.dismissRecovering()
+        XCTAssertEqual(orchestrator.handoffState, .phoneDriver)
+    }
+
+    func testIncomingPairingHandoffCachesPayload() throws {
+        let raw: [String: Any] = ["address": UInt32(0x12345678)]
+        let serialized = try PropertyListSerialization.data(
+            fromPropertyList: raw, format: .binary, options: 0)
+        let payload = OmniBLEHandoffPayload(
+            podSerial: "TESTPOD",
+            serializedPodState: serialized,
+            lastBolusSequence: 7,
+            lastBasalScheduleId: nil,
+            createdAt: Date(timeIntervalSince1970: 1_700_000_000)
+        )
+        let payloadData = try JSONEncoder().encode(payload)
+        let ph = PhoneWatchPairingHandoff(
+            protocolVersion: 1, sentAt: clock,
+            podId: "TESTPOD", pairingPayload: payloadData,
+            validUntil: clock.addingTimeInterval(60),
+            transitionId: UUID())
+
+        orchestrator.handleIncoming(message: .pairingHandoff(ph))
+        XCTAssertNotNil(orchestrator.cachedPayload)
+        XCTAssertEqual(orchestrator.cachedPayload?.podSerial, "TESTPOD")
+    }
+}

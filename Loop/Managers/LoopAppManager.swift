@@ -14,6 +14,7 @@ import LoopKitUI
 import MockKit
 import HealthKit
 import WidgetKit
+import OmniBLE
 
 #if targetEnvironment(simulator)
 enum SimulatorError: Error {
@@ -89,6 +90,11 @@ class LoopAppManager: NSObject {
     // Public so SwiftUI views (e.g., WatchConnectionStatusRow) can observe it.
     @MainActor private(set) lazy var phoneWatchCoordinator: PhoneWatchSessionCoordinator =
         PhoneWatchSessionCoordinator(transport: WCSessionPhoneWatchTransport())
+
+    // B.2.d: bonding-handoff orchestrator. Started during launchManagers() after
+    // the coordinator. Public so SwiftUI views (Settings → Watch Handoff) can
+    // observe it.
+    @MainActor private(set) var phoneWatchHandoffOrchestrator: HandoffOrchestrator?
 
     private var overrideHistory = UserDefaults.appGroup?.overrideHistory ?? TemporaryScheduleOverrideHistory.init()
 
@@ -279,6 +285,28 @@ class LoopAppManager: NSObject {
         Task { @MainActor in
             PhoneWatchSessionCoordinator.shared = self.phoneWatchCoordinator
             self.phoneWatchCoordinator.start()
+
+            // B.2.d: instantiate and start handoff orchestrator + policy + scheduler.
+            let appGroupDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)
+                ?? UserDefaults.standard
+            let handoffSettings = HandoffSettings.load(from: appGroupDefaults)
+            let stateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .phone)
+            let policyEngine = HandoffPolicyEngine(
+                coordinator: self.phoneWatchCoordinator,
+                settings: handoffSettings,
+                emit: { _ in /* wired via orchestrator */ }
+            )
+            let scheduler = ShadowStateScheduler(fire: { /* wired via orchestrator */ })
+            let orchestrator = HandoffOrchestrator(
+                coordinator: self.phoneWatchCoordinator,
+                stateMachine: stateMachine,
+                policyEngine: policyEngine,
+                shadowScheduler: scheduler,
+                userDefaults: appGroupDefaults
+            )
+            HandoffOrchestrator.shared = orchestrator
+            orchestrator.start()
+            self.phoneWatchHandoffOrchestrator = orchestrator
         }
 
         state = state.next

@@ -28,6 +28,16 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
     private let clock: () -> Date
     private var heartbeat: HeartbeatScheduler?
 
+    /// B.2.d: orchestrator subscribes to incoming non-heartbeat messages
+    /// (modeSwitch / pairingHandoff). The coordinator continues to handle
+    /// heartbeat internally; modeSwitch / pairingHandoff are forwarded.
+    var onHandoffMessage: ((PhoneWatchMessage) -> Void)?
+
+    /// B.2.d: convenience reachability surface for HandoffPolicyEngine.
+    var isReachable: Bool {
+        return isCounterpartReachable
+    }
+
     var isConnected: Bool {
         guard let when = lastHeartbeatReceivedAt else { return false }
         return clock().timeIntervalSince(when) < 90
@@ -54,6 +64,16 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
     func stop() {
         heartbeat?.stop()
         heartbeat = nil
+    }
+
+    /// B.2.d: queue a mode-switch message (transferUserInfo, fire-and-forget).
+    func sendModeSwitch(_ ms: PhoneWatchModeSwitch) {
+        transport.queueMessage(.modeSwitch(ms))
+    }
+
+    /// B.2.d: queue a pairing-handoff message (transferUserInfo).
+    func sendPairingHandoff(_ ph: PhoneWatchPairingHandoff) {
+        transport.queueMessage(.pairingHandoff(ph))
     }
 
     func sendHeartbeat() {
@@ -99,9 +119,13 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
         case .modeSwitch(let ms):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ms.protocolVersion) else { return }
             NSLog("PhoneWatchSessionCoordinator: received mode switch \(ms.targetMode.rawValue) (transition \(ms.transitionId))")
+            // B.2.d: forward to orchestrator (if subscribed).
+            onHandoffMessage?(message)
         case .pairingHandoff(let ph):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ph.protocolVersion) else { return }
             NSLog("PhoneWatchSessionCoordinator: received pairing handoff for pod \(ph.podId) (\(ph.pairingPayload.count) bytes)")
+            // B.2.d: forward to orchestrator (if subscribed).
+            onHandoffMessage?(message)
         }
     }
 }
