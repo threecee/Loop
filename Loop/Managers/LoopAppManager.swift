@@ -88,8 +88,9 @@ class LoopAppManager: NSObject {
 
     // B.2.c: phone↔watch WCSession coordinator. Activated during launchManagers().
     // Public so SwiftUI views (e.g., WatchConnectionStatusRow) can observe it.
-    @MainActor private(set) lazy var phoneWatchCoordinator: PhoneWatchSessionCoordinator =
-        PhoneWatchSessionCoordinator(transport: WCSessionPhoneWatchTransport())
+    // B.2.c.1: no longer lazy — constructed explicitly in launchManagers() so
+    // the transport instance can be shared with WatchDataManager.
+    @MainActor private(set) var phoneWatchCoordinator: PhoneWatchSessionCoordinator!
 
     // B.2.d: bonding-handoff orchestrator. Started during launchManagers() after
     // the coordinator. Public so SwiftUI views (Settings → Watch Handoff) can
@@ -282,9 +283,16 @@ class LoopAppManager: NSObject {
         // B.2.c: start the phone↔watch coordinator. WCSession activation begins
         // immediately; heartbeats begin firing every 30s. Log-only stub handlers
         // for now (B.2.d/e supply real behavior).
+        // B.2.c.1: construct shared transport, hand to both WatchDataManager
+        // (which holds the WCSession delegate role) and the coordinator.
         Task { @MainActor in
-            PhoneWatchSessionCoordinator.shared = self.phoneWatchCoordinator
-            self.phoneWatchCoordinator.start()
+            let phoneWatchTransport = WCSessionPhoneWatchTransport()
+            self.deviceDataManager.watchManager.phoneWatchTransport = phoneWatchTransport
+
+            let phoneWatchCoordinator = PhoneWatchSessionCoordinator(transport: phoneWatchTransport)
+            PhoneWatchSessionCoordinator.shared = phoneWatchCoordinator
+            self.phoneWatchCoordinator = phoneWatchCoordinator
+            phoneWatchCoordinator.start()
 
             // B.2.d: instantiate and start handoff orchestrator + policy + scheduler.
             let appGroupDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)

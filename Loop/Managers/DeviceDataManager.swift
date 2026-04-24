@@ -229,7 +229,7 @@ final class DeviceDataManager {
 
     // MARK: - WatchKit
 
-    private var watchManager: WatchDataManager!
+    var watchManager: WatchDataManager!
 
     // MARK: - Status Extension
 

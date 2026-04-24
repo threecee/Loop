@@ -3,8 +3,12 @@
 //  Loop (iOS)
 //
 //  WCSession-backed transport for PhoneWatchMessage on the iOS side.
-//  Mirrors LoopWatchApp's PhoneWatchTransport — the two must agree on
-//  encoding/decoding conventions.
+//  Mirrors WatchApp Extension's PhoneWatchTransport.
+//
+//  B.2.c.1: This transport NO LONGER conforms to WCSessionDelegate.
+//  WatchDataManager owns the WCSession.default delegate role and forwards
+//  incoming `messageData` and `phoneWatchMessage` userInfo to this transport
+//  via handleIncomingMessageData(_:replyHandler:).
 //
 
 import Foundation
@@ -20,7 +24,7 @@ public protocol PhoneWatchTransport: AnyObject {
     var onIncomingMessage: ((PhoneWatchMessage) -> Void)? { get set }
 }
 
-public final class WCSessionPhoneWatchTransport: NSObject, PhoneWatchTransport, WCSessionDelegate {
+public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
     public var onIncomingMessage: ((PhoneWatchMessage) -> Void)?
 
     private let session: WCSession
@@ -31,13 +35,9 @@ public final class WCSessionPhoneWatchTransport: NSObject, PhoneWatchTransport, 
 
     public init(session: WCSession = .default) {
         self.session = session
-        super.init()
         encoder.dateEncodingStrategy = .iso8601
         decoder.dateDecodingStrategy = .iso8601
-        if WCSession.isSupported() {
-            session.delegate = self
-            session.activate()
-        }
+        // No delegate assignment, no activate(). WatchDataManager owns both.
     }
 
     public func sendMessage(_ message: PhoneWatchMessage,
@@ -74,34 +74,16 @@ public final class WCSessionPhoneWatchTransport: NSObject, PhoneWatchTransport, 
         }
     }
 
-    // MARK: - WCSessionDelegate (iOS-specific)
-
-    public func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
-    public func sessionDidBecomeInactive(_ session: WCSession) {}
-    public func sessionDidDeactivate(_ session: WCSession) {
-        session.activate()
-    }
-
-    public func session(_ session: WCSession, didReceiveMessageData messageData: Data, replyHandler: @escaping (Data) -> Void) {
-        handleIncoming(data: messageData, replyHandler: replyHandler)
-    }
-
-    public func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
-        guard let data = userInfo["phoneWatchMessage"] as? Data else { return }
-        handleIncoming(data: data, replyHandler: nil)
-    }
-
-    private func handleIncoming(data: Data, replyHandler: ((Data) -> Void)?) {
+    /// Public hook called by WatchDataManager when a `WCSession` callback
+    /// arrives that the host has identified as PhoneWatchMessage traffic.
+    /// `replyHandler` is non-nil only for `didReceiveMessageData` paths.
+    public func handleIncomingMessageData(_ data: Data, replyHandler: ((Data) -> Void)?) {
         do {
             let message = try decoder.decode(PhoneWatchMessage.self, from: data)
             onIncomingMessage?(message)
-            if let replyHandler = replyHandler {
-                replyHandler(data)
-            }
+            replyHandler?(data)  // echo as default reply
         } catch {
-            if let replyHandler = replyHandler {
-                replyHandler(Data())
-            }
+            replyHandler?(Data())
         }
     }
 }

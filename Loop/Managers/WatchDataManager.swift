@@ -14,6 +14,11 @@ import LoopCore
 
 final class WatchDataManager: NSObject {
 
+    // B.2.c.1: shared transport for the new B.2.c-d phoneWatchMessage traffic.
+    // WatchDataManager keeps WCSession.default delegate role; this transport
+    // is a passive forwardee. Set by LoopAppManager on construction.
+    var phoneWatchTransport: WCSessionPhoneWatchTransport?
+
     private unowned let deviceManager: DeviceDataManager
     
     init(deviceManager: DeviceDataManager, healthStore: HKHealthStore) {
@@ -417,6 +422,16 @@ final class WatchDataManager: NSObject {
 
 extension WatchDataManager: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        // B.2.c.1: forward new B.2.c-d phoneWatchMessage traffic to the transport.
+        // (Watch typically uses sendMessageData for heartbeats; this branch is
+        // belt-and-suspenders for any future use of sendMessage.)
+        if let data = message["phoneWatchMessage"] as? Data {
+            phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: { replyData in
+                replyHandler(["phoneWatchMessage": replyData])
+            })
+            return
+        }
+
         switch message["name"] as? String {
         case PotentialCarbEntryUserInfo.name?:
             if let potentialCarbEntry = PotentialCarbEntryUserInfo(rawValue: message)?.carbEntry {
@@ -489,8 +504,24 @@ extension WatchDataManager: WCSessionDelegate {
         }
     }
 
+    /// B.2.c.1: forward heartbeat traffic from watch to the new transport.
+    /// (sendMessageData payloads — the heartbeat path.)
+    func session(_ session: WCSession, didReceiveMessageData messageData: Data, replyHandler: @escaping (Data) -> Void) {
+        guard let transport = phoneWatchTransport else {
+            replyHandler(Data())
+            return
+        }
+        transport.handleIncomingMessageData(messageData, replyHandler: replyHandler)
+    }
+
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
-        assertionFailure("We currently don't expect any userInfo messages transferred from the watch side")
+        // B.2.c.1: handle queued/transferred B.2.c-d userInfo messages.
+        if let data = userInfo["phoneWatchMessage"] as? Data {
+            phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: nil)
+            return
+        }
+        // (No legacy didReceiveUserInfo handling on iOS — phone-side legacy
+        // traffic uses didReceiveMessage and didReceiveApplicationContext.)
     }
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
