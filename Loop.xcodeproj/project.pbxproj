@@ -609,6 +609,18 @@
 		E9C58A7E24DB529A00487A17 /* dynamic_glucose_effect_partially_observed.json in Resources */ = {isa = PBXBuildFile; fileRef = E9C58A7924DB529A00487A17 /* dynamic_glucose_effect_partially_observed.json */; };
 		E9C58A7F24DB529A00487A17 /* counteraction_effect_falling_glucose.json in Resources */ = {isa = PBXBuildFile; fileRef = E9C58A7A24DB529A00487A17 /* counteraction_effect_falling_glucose.json */; };
 		E9C58A8024DB529A00487A17 /* insulin_effect.json in Resources */ = {isa = PBXBuildFile; fileRef = E9C58A7B24DB529A00487A17 /* insulin_effect.json */; };
+		9817C257844B492E94927FEF /* GlucoseReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB043638C14C2799375D54 /* GlucoseReading.swift */; };
+		FFB618C2C280468C86D228FB /* GlucoseCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AF9E04978641A187D17125 /* GlucoseCache.swift */; };
+		F80D5B397E144FA5BC24D470 /* SharedStateBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED129A39903141C6880F7BB7 /* SharedStateBridge.swift */; };
+		62E7554AE77F4726836D0DE5 /* GlucoseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */; };
+		14A04B3CF1A046FAADB1B0E1 /* HealthKitWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E5016DC5224543A68420DC /* HealthKitWriter.swift */; };
+		AAC65206E62D4840A5D600D5 /* ExtendedRuntimeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EA43E989364C63872E9437 /* ExtendedRuntimeCoordinator.swift */; };
+		BF40433D97314FABA577D1B6 /* PhoneWatchTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */; };
+		7E9C8F5FB0274B0AA1C6B149 /* PhoneWatchSessionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12B03AD8B83943FFBEE8722A /* PhoneWatchSessionCoordinator.swift */; };
+		2FE4F4E4DBCC44AFABCE2735 /* HeartbeatScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A97A9759A44726A9FBEDEC /* HeartbeatScheduler.swift */; };
+		CB151124CFD54014AACC19B4 /* HandoffPolicyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9366A91624FB4D489DD2E784 /* HandoffPolicyEngine.swift */; };
+		AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */; };
+		049A1126B9804AFFBB289978 /* HandoffOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1450,6 +1462,18 @@
 		F5E0BDD827E1D71E0033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Main.strings; sourceTree = "<group>"; };
 		F5E0BDDA27E1D71F0033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F5E0BDE327E1D7230033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4DEB043638C14C2799375D54 /* GlucoseReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GlucoseReading.swift"; path = "WatchApp Extension/Sensor/GlucoseReading.swift"; sourceTree = SOURCE_ROOT; };
+		89AF9E04978641A187D17125 /* GlucoseCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GlucoseCache.swift"; path = "WatchApp Extension/Sensor/GlucoseCache.swift"; sourceTree = SOURCE_ROOT; };
+		ED129A39903141C6880F7BB7 /* SharedStateBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SharedStateBridge.swift"; path = "WatchApp Extension/Sensor/SharedStateBridge.swift"; sourceTree = SOURCE_ROOT; };
+		A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GlucoseReader.swift"; path = "WatchApp Extension/Sensor/GlucoseReader.swift"; sourceTree = SOURCE_ROOT; };
+		A8E5016DC5224543A68420DC /* HealthKitWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HealthKitWriter.swift"; path = "WatchApp Extension/Sensor/HealthKitWriter.swift"; sourceTree = SOURCE_ROOT; };
+		60EA43E989364C63872E9437 /* ExtendedRuntimeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ExtendedRuntimeCoordinator.swift"; path = "WatchApp Extension/Lifecycle/ExtendedRuntimeCoordinator.swift"; sourceTree = SOURCE_ROOT; };
+		389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "PhoneWatchTransport.swift"; path = "WatchApp Extension/PhoneWatch/PhoneWatchTransport.swift"; sourceTree = SOURCE_ROOT; };
+		12B03AD8B83943FFBEE8722A /* PhoneWatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "PhoneWatchSessionCoordinator.swift"; path = "WatchApp Extension/PhoneWatch/PhoneWatchSessionCoordinator.swift"; sourceTree = SOURCE_ROOT; };
+		A9A97A9759A44726A9FBEDEC /* HeartbeatScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HeartbeatScheduler.swift"; path = "WatchApp Extension/PhoneWatch/HeartbeatScheduler.swift"; sourceTree = SOURCE_ROOT; };
+		9366A91624FB4D489DD2E784 /* HandoffPolicyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HandoffPolicyEngine.swift"; path = "WatchApp Extension/Handoff/HandoffPolicyEngine.swift"; sourceTree = SOURCE_ROOT; };
+		C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ShadowStateScheduler.swift"; path = "WatchApp Extension/Handoff/ShadowStateScheduler.swift"; sourceTree = SOURCE_ROOT; };
+		B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HandoffOrchestrator.swift"; path = "WatchApp Extension/Handoff/HandoffOrchestrator.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1829,6 +1853,10 @@
 				43A943831B926B7B0051FA24 /* Supporting Files */,
 				891B508324342BCA005DA578 /* View Models */,
 				895788A3242E6947002CB114 /* Views */,
+				4F26F497AABC4BD3892E5224 /* Sensor */,
+				C0D90DA6F09F41F8ACA8D1BF /* Lifecycle */,
+				8AF24B0CE7C845F694F5C2BB /* PhoneWatch */,
+				F08D133C35ED4AB09F27A7E1 /* Handoff */,
 			);
 			path = "WatchApp Extension";
 			sourceTree = "<group>";
@@ -2743,6 +2771,46 @@
 				E9C58A7724DB529A00487A17 /* momentum_effect_bouncing.json */,
 			);
 			path = Fixtures;
+			sourceTree = "<group>";
+		};
+		4F26F497AABC4BD3892E5224 /* Sensor */ = {
+			isa = PBXGroup;
+			children = (
+				4DEB043638C14C2799375D54 /* GlucoseReading.swift */,
+				89AF9E04978641A187D17125 /* GlucoseCache.swift */,
+				ED129A39903141C6880F7BB7 /* SharedStateBridge.swift */,
+				A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */,
+				A8E5016DC5224543A68420DC /* HealthKitWriter.swift */,
+			);
+			path = Sensor;
+			sourceTree = "<group>";
+		};
+		C0D90DA6F09F41F8ACA8D1BF /* Lifecycle */ = {
+			isa = PBXGroup;
+			children = (
+				60EA43E989364C63872E9437 /* ExtendedRuntimeCoordinator.swift */,
+			);
+			path = Lifecycle;
+			sourceTree = "<group>";
+		};
+		8AF24B0CE7C845F694F5C2BB /* PhoneWatch */ = {
+			isa = PBXGroup;
+			children = (
+				389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */,
+				12B03AD8B83943FFBEE8722A /* PhoneWatchSessionCoordinator.swift */,
+				A9A97A9759A44726A9FBEDEC /* HeartbeatScheduler.swift */,
+			);
+			path = PhoneWatch;
+			sourceTree = "<group>";
+		};
+		F08D133C35ED4AB09F27A7E1 /* Handoff */ = {
+			isa = PBXGroup;
+			children = (
+				9366A91624FB4D489DD2E784 /* HandoffPolicyEngine.swift */,
+				C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */,
+				B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */,
+			);
+			path = Handoff;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3775,6 +3843,18 @@
 				43517917230A0E1A0072ECC0 /* WKInterfaceLabel.swift in Sources */,
 				A9347F3224E7522400C99C34 /* CarbBackfillRequestUserInfo.swift in Sources */,
 				895788B3242E69A2002CB114 /* ActionButton.swift in Sources */,
+				9817C257844B492E94927FEF /* GlucoseReading.swift in Sources */,
+				FFB618C2C280468C86D228FB /* GlucoseCache.swift in Sources */,
+				F80D5B397E144FA5BC24D470 /* SharedStateBridge.swift in Sources */,
+				62E7554AE77F4726836D0DE5 /* GlucoseReader.swift in Sources */,
+				14A04B3CF1A046FAADB1B0E1 /* HealthKitWriter.swift in Sources */,
+				AAC65206E62D4840A5D600D5 /* ExtendedRuntimeCoordinator.swift in Sources */,
+				BF40433D97314FABA577D1B6 /* PhoneWatchTransport.swift in Sources */,
+				7E9C8F5FB0274B0AA1C6B149 /* PhoneWatchSessionCoordinator.swift in Sources */,
+				2FE4F4E4DBCC44AFABCE2735 /* HeartbeatScheduler.swift in Sources */,
+				CB151124CFD54014AACC19B4 /* HandoffPolicyEngine.swift in Sources */,
+				AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */,
+				049A1126B9804AFFBB289978 /* HandoffOrchestrator.swift in Sources */,
 				894F6DD3243BCBDB00CCE676 /* Environment+SizeClass.swift in Sources */,
 				E98A55F524EEE15A0008715D /* OnOffSelectionController.swift in Sources */,
 				4328E01A1CFBE1DA00E199AA /* ActionHUDController.swift in Sources */,
