@@ -14,10 +14,19 @@ import os
 import os.log
 import UserNotifications
 import LoopKit
+import OmniBLE
 
 
 final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     private(set) lazy var loopManager = LoopDataManager()
+
+    // B.2.c.1: hosted B.2.a-d stack
+    private(set) var phoneWatchTransport: WCSessionPhoneWatchTransport?
+    private(set) var phoneWatchCoordinator: PhoneWatchSessionCoordinator?
+    private(set) var handoffOrchestrator: HandoffOrchestrator?
+    private(set) var glucoseReader: GlucoseReader?
+    private(set) var healthKitWriter: HealthKitWriter?
+    private(set) var extendedRuntimeCoordinator: ExtendedRuntimeCoordinator?
 
     private let log = OSLog(category: "ExtensionDelegate")
 
@@ -60,12 +69,65 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         })
 
         session.activate()
+
+        // B.2.c.1: bootstrap B.2.a-d stack alongside loopManager.
+        bootstrapPhoneWatchStack()
     }
 
     deinit {
         for notification in notifications {
             NotificationCenter.default.removeObserver(notification)
         }
+    }
+
+    /// B.2.c.1: construct and start the B.2.a-d stack. Called from init() after
+    /// session.activate(). Each component is independent; failure to construct
+    /// any one shouldn't prevent the others from running.
+    private func bootstrapPhoneWatchStack() {
+        // B.2.c — WCSession transport + coordinator + heartbeat
+        let transport = WCSessionPhoneWatchTransport()
+        let coordinator = PhoneWatchSessionCoordinator(transport: transport)
+        coordinator.start()
+        self.phoneWatchTransport = transport
+        self.phoneWatchCoordinator = coordinator
+
+        // B.2.a — HealthKit writer + G7 reader (G7 reader needs phone-side state via SharedStateBridge)
+        let writer = HealthKitWriter()
+        Task { try? await writer.requestAuthorization() }
+        self.healthKitWriter = writer
+
+        let glucoseReader = GlucoseReader()
+        if let bridge = SharedStateBridge.forAppGroup("group.com.threecee.loopGroup"),
+           let rawState = bridge.loadG7RawState() {
+            glucoseReader.attach(rawState: rawState)
+        } else {
+            log.default("B.2.c.1: no G7 raw state in shared App Group — pair sensor in Loop iOS first")
+        }
+        self.glucoseReader = glucoseReader
+
+        // B.2.b — extended runtime session for prolonged BLE
+        let runtime = ExtendedRuntimeCoordinator()
+        self.extendedRuntimeCoordinator = runtime
+
+        // B.2.d — handoff orchestrator (subscribes to coordinator's onHandoffMessage)
+        let appGroupDefaults = UserDefaults(suiteName: "group.com.threecee.loopGroup") ?? UserDefaults.standard
+        let settings = HandoffSettings.load(from: appGroupDefaults)
+        let policyEngine = HandoffPolicyEngine(
+            coordinator: coordinator,
+            settings: settings,
+            emit: { _ in }  // wired via orchestrator; placeholder avoids capture cycles at init
+        )
+        let scheduler = ShadowStateScheduler(fire: {})  // orchestrator re-wires via setFire in start()
+        let stateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
+        let orchestrator = HandoffOrchestrator(
+            coordinator: coordinator,
+            stateMachine: stateMachine,
+            policyEngine: policyEngine,
+            shadowScheduler: scheduler,
+            userDefaults: appGroupDefaults
+        )
+        orchestrator.start()
+        self.handoffOrchestrator = orchestrator
     }
 
     func applicationDidFinishLaunching() {
@@ -213,6 +275,12 @@ extension ExtensionDelegate: WCSessionDelegate {
 
     // This method is called on a background thread of your app
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
+        // B.2.c.1: forward new B.2.c-d phoneWatchMessage userInfo to the transport
+        if let data = userInfo["phoneWatchMessage"] as? Data {
+            phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: nil)
+            return
+        }
+
         let name = userInfo["name"] as? String ?? "WatchContext"
 
         log.default("didReceiveUserInfo: %{public}@", name)
@@ -241,6 +309,16 @@ extension ExtensionDelegate: WCSessionDelegate {
         default:
             break
         }
+    }
+
+    /// B.2.c.1: legacy ExtensionDelegate didn't implement this; B.2.c uses
+    /// sendMessageData for heartbeats. Forward to the new transport.
+    func session(_ session: WCSession, didReceiveMessageData messageData: Data, replyHandler: @escaping (Data) -> Void) {
+        guard let transport = phoneWatchTransport else {
+            replyHandler(Data())
+            return
+        }
+        transport.handleIncomingMessageData(messageData, replyHandler: replyHandler)
     }
 }
 
