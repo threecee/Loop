@@ -444,6 +444,10 @@
 		WB2CA1000000000010 /* OmniBLE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; };
 		WB2CA1000000000011 /* OmniBLE.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		WB2CA1000000000012 /* OmniBLE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; };
+		1C36B68452D54780B14928B8 /* OmniBLE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; };
+		7836FCE780F547C190A5EA1F /* OmniBLE.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6B6036285E654E899F014EC7 /* G7SensorKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 217DB84601C04D2EAE8FD956 /* G7SensorKit.framework */; };
+		DFCE6F6BC8CF414C91D452C9 /* G7SensorKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 217DB84601C04D2EAE8FD956 /* G7SensorKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C11B9D64286779C000500CF8 /* MockKitUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C11B9D61286779C000500CF8 /* MockKitUI.framework */; };
 		C11B9D65286779C000500CF8 /* MockKitUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C11B9D61286779C000500CF8 /* MockKitUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C11BD0552523CFED00236B08 /* SimpleBolusViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11BD0542523CFED00236B08 /* SimpleBolusViewModel.swift */; };
@@ -745,6 +749,8 @@
 			files = (
 				43C05CB221EBD88A006FB252 /* LoopCore.framework in Embed Frameworks */,
 				C19C8C1F28663B040056D5E4 /* LoopKit.framework in Embed Frameworks */,
+				7836FCE780F547C190A5EA1F /* OmniBLE.framework in Embed Frameworks */,
+				DFCE6F6BC8CF414C91D452C9 /* G7SensorKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1261,6 +1267,7 @@
 		C11AA5C7258736CF00BDE12F /* DerivedAssetsBase.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = DerivedAssetsBase.xcassets; sourceTree = "<group>"; };
 		C11B9D5D286778D000500CF8 /* LoopKitUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = LoopKitUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C11B9D60286779C000500CF8 /* MockKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MockKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		217DB84601C04D2EAE8FD956 /* G7SensorKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = G7SensorKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		WB2CA10000000000F0 /* OmniBLE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = OmniBLE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		WB2CA10000000000F1 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransport.swift; sourceTree = "<group>"; };
 		WB2CA10000000000F2 /* PhoneWatchSessionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSessionCoordinator.swift; sourceTree = "<group>"; };
@@ -1494,6 +1501,8 @@
 				4344628220A7A37F00C4BE6F /* CoreBluetooth.framework in Frameworks */,
 				C19C8C1E28663B040056D5E4 /* LoopKit.framework in Frameworks */,
 				4396BD50225159C0005AA4D3 /* HealthKit.framework in Frameworks */,
+				1C36B68452D54780B14928B8 /* OmniBLE.framework in Frameworks */,
+				6B6036285E654E899F014EC7 /* G7SensorKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2457,6 +2466,7 @@
 				C11B9D61286779C000500CF8 /* MockKitUI.framework */,
 				C11B9D5D286778D000500CF8 /* LoopKitUI.framework */,
 				WB2CA10000000000F0 /* OmniBLE.framework */,
+				217DB84601C04D2EAE8FD956 /* G7SensorKit.framework */,
 				C19C8C20286776C20056D5E4 /* LoopKit.framework */,
 				C19C8BC728651F0A0056D5E4 /* MockKit.framework */,
 				C19C8BC228651EAE0056D5E4 /* LoopTestingKit.framework */,
