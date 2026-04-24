@@ -6,6 +6,7 @@
 //  Copyright © 2015 Nathan Racklyeft. All rights reserved.
 //
 
+import SwiftUI
 import WatchConnectivity
 import WatchKit
 import HealthKit
@@ -97,7 +98,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         self.healthKitWriter = writer
 
         let glucoseReader = GlucoseReader()
-        if let bridge = SharedStateBridge.forAppGroup("group.com.threecee.loopGroup"),
+        if let bridge = SharedStateBridge.forAppGroup(HandoffSettings.appGroupIdentifier),
            let rawState = bridge.loadG7RawState() {
             glucoseReader.attach(rawState: rawState)
         } else {
@@ -110,7 +111,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         self.extendedRuntimeCoordinator = runtime
 
         // B.2.d — handoff orchestrator (subscribes to coordinator's onHandoffMessage)
-        let appGroupDefaults = UserDefaults(suiteName: "group.com.threecee.loopGroup") ?? UserDefaults.standard
+        let appGroupDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) ?? UserDefaults.standard
         let settings = HandoffSettings.load(from: appGroupDefaults)
         let policyEngine = HandoffPolicyEngine(
             coordinator: coordinator,
@@ -142,12 +143,14 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
             WCSession.default.activate()
         }
 
+        extendedRuntimeCoordinator?.onScenePhaseChange(.active)
         NotificationCenter.default.post(name: type(of: self).didBecomeActiveNotification, object: self)
     }
 
     func applicationWillResignActive() {
         UserDefaults.standard.startOnChartPage = (WKExtension.shared().visibleInterfaceController as? ChartHUDController) != nil
 
+        extendedRuntimeCoordinator?.onScenePhaseChange(.background)
         NotificationCenter.default.post(name: type(of: self).willResignActiveNotification, object: self)
     }
 
