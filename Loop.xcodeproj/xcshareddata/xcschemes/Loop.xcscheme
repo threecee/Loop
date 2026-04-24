@@ -72,6 +72,16 @@
                ReferencedContainer = "container:Loop.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "6BFA1604CBAF49B382A541D6"
+               BuildableName = "WatchApp ExtensionTests.xctest"
+               BlueprintName = "WatchApp ExtensionTests"
+               ReferencedContainer = "container:Loop.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
