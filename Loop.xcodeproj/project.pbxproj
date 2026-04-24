@@ -621,6 +621,18 @@
 		CB151124CFD54014AACC19B4 /* HandoffPolicyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9366A91624FB4D489DD2E784 /* HandoffPolicyEngine.swift */; };
 		AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */; };
 		049A1126B9804AFFBB289978 /* HandoffOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */; };
+		A9392BFD9EE241CC8C4776D0 /* ExtendedRuntimeCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2859EFF609E844A5BF478FD1 /* ExtendedRuntimeCoordinatorTests.swift */; };
+		2FFC656074A640528A5BB726 /* GlucoseCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */; };
+		DA8BE8D6A71243569D73BDD2 /* GlucoseReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB788C8906424B87D0D8DF /* GlucoseReaderTests.swift */; };
+		7696A6ECE4D349F7917C50BA /* GlucoseReadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABA68CD9C72F40D7972637CA /* GlucoseReadingTests.swift */; };
+		AF24CEA23D3F475C93EC8AB4 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */; };
+		48F2DBD3AE984404B89EDD58 /* HandoffPolicyEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F24DCAB37AC4B38A4C082D6 /* HandoffPolicyEngineTests.swift */; };
+		963CAA955EC64CD5B6F8E46F /* HealthKitWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */; };
+		D63090702D924C2C9AEBB689 /* PhoneWatchSessionCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD84A081E0E14A27AE019F82 /* PhoneWatchSessionCoordinatorTests.swift */; };
+		164451DC31904139A9EF0871 /* PhoneWatchTransportMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641CF02F2FBE4B84B4CC202D /* PhoneWatchTransportMock.swift */; };
+		4E52BE6D4676405C85EC6CF0 /* ShadowStateSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2B417993644643920F4455 /* ShadowStateSchedulerTests.swift */; };
+		69AACEC5CC8F42D288AD3070 /* SharedStateBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */; };
+		E1EE31C5CC644875853D8B6B /* WatchApp Extension.appex in Frameworks */ = {isa = PBXBuildFile; fileRef = 43A9437E1B926B7B0051FA24 /* WatchApp Extension.appex */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -707,6 +719,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = E9B07F7B253BBA6500BAD8F8;
 			remoteInfo = "Loop Intent Extension";
+		};
+		2A9BC33BDDD64ABBBA747E21 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43776F841B8022E90074EA36 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 43A9437D1B926B7B0051FA24;
+			remoteInfo = "WatchApp Extension";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -1474,6 +1493,17 @@
 		9366A91624FB4D489DD2E784 /* HandoffPolicyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HandoffPolicyEngine.swift"; path = "WatchApp Extension/Handoff/HandoffPolicyEngine.swift"; sourceTree = SOURCE_ROOT; };
 		C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ShadowStateScheduler.swift"; path = "WatchApp Extension/Handoff/ShadowStateScheduler.swift"; sourceTree = SOURCE_ROOT; };
 		B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HandoffOrchestrator.swift"; path = "WatchApp Extension/Handoff/HandoffOrchestrator.swift"; sourceTree = SOURCE_ROOT; };
+		2859EFF609E844A5BF478FD1 /* ExtendedRuntimeCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ExtendedRuntimeCoordinatorTests.swift"; path = "WatchApp ExtensionTests/ExtendedRuntimeCoordinatorTests.swift"; sourceTree = SOURCE_ROOT; };
+		3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GlucoseCacheTests.swift"; path = "WatchApp ExtensionTests/GlucoseCacheTests.swift"; sourceTree = SOURCE_ROOT; };
+		E4EB788C8906424B87D0D8DF /* GlucoseReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GlucoseReaderTests.swift"; path = "WatchApp ExtensionTests/GlucoseReaderTests.swift"; sourceTree = SOURCE_ROOT; };
+		ABA68CD9C72F40D7972637CA /* GlucoseReadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "GlucoseReadingTests.swift"; path = "WatchApp ExtensionTests/GlucoseReadingTests.swift"; sourceTree = SOURCE_ROOT; };
+		13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HandoffOrchestratorTests.swift"; path = "WatchApp ExtensionTests/HandoffOrchestratorTests.swift"; sourceTree = SOURCE_ROOT; };
+		3F24DCAB37AC4B38A4C082D6 /* HandoffPolicyEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HandoffPolicyEngineTests.swift"; path = "WatchApp ExtensionTests/HandoffPolicyEngineTests.swift"; sourceTree = SOURCE_ROOT; };
+		0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "HealthKitWriterTests.swift"; path = "WatchApp ExtensionTests/HealthKitWriterTests.swift"; sourceTree = SOURCE_ROOT; };
+		FD84A081E0E14A27AE019F82 /* PhoneWatchSessionCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "PhoneWatchSessionCoordinatorTests.swift"; path = "WatchApp ExtensionTests/PhoneWatchSessionCoordinatorTests.swift"; sourceTree = SOURCE_ROOT; };
+		641CF02F2FBE4B84B4CC202D /* PhoneWatchTransportMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "PhoneWatchTransportMock.swift"; path = "WatchApp ExtensionTests/PhoneWatchTransportMock.swift"; sourceTree = SOURCE_ROOT; };
+		DC2B417993644643920F4455 /* ShadowStateSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "ShadowStateSchedulerTests.swift"; path = "WatchApp ExtensionTests/ShadowStateSchedulerTests.swift"; sourceTree = SOURCE_ROOT; };
+		DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SharedStateBridgeTests.swift"; path = "WatchApp ExtensionTests/SharedStateBridgeTests.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1590,6 +1620,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1EE31C5CC644875853D8B6B /* WatchApp Extension.appex in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1761,6 +1792,7 @@
 				C18A491122FCC20B00FDA733 /* Scripts */,
 				4FF4D0FA1E1834BD00846527 /* Common */,
 				43776F8E1B8022E90074EA36 /* Loop */,
+				8F1BBD887A2C4ACEAA438DE0 /* WatchApp ExtensionTests */,
 				4F70C1DF1DE8DCA7006380B7 /* Loop Status Extension */,
 				43D9FFD021EAE05D00AF44BF /* LoopCore */,
 				4F75288C1DFE1DC600C322D6 /* LoopUI */,
@@ -2813,6 +2845,24 @@
 			path = Handoff;
 			sourceTree = "<group>";
 		};
+		8F1BBD887A2C4ACEAA438DE0 /* WatchApp ExtensionTests */ = {
+			isa = PBXGroup;
+			children = (
+				2859EFF609E844A5BF478FD1 /* ExtendedRuntimeCoordinatorTests.swift */,
+				3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */,
+				E4EB788C8906424B87D0D8DF /* GlucoseReaderTests.swift */,
+				ABA68CD9C72F40D7972637CA /* GlucoseReadingTests.swift */,
+				13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */,
+				3F24DCAB37AC4B38A4C082D6 /* HandoffPolicyEngineTests.swift */,
+				0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */,
+				FD84A081E0E14A27AE019F82 /* PhoneWatchSessionCoordinatorTests.swift */,
+				641CF02F2FBE4B84B4CC202D /* PhoneWatchTransportMock.swift */,
+				DC2B417993644643920F4455 /* ShadowStateSchedulerTests.swift */,
+				DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */,
+			);
+			path = "WatchApp ExtensionTests";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -3063,6 +3113,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				964E086AA40347A8967AB244 /* PBXTargetDependency */,
 			);
 			name = "WatchApp ExtensionTests";
 			productName = "WatchApp ExtensionTests";
@@ -4042,6 +4093,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9392BFD9EE241CC8C4776D0 /* ExtendedRuntimeCoordinatorTests.swift in Sources */,
+				2FFC656074A640528A5BB726 /* GlucoseCacheTests.swift in Sources */,
+				DA8BE8D6A71243569D73BDD2 /* GlucoseReaderTests.swift in Sources */,
+				7696A6ECE4D349F7917C50BA /* GlucoseReadingTests.swift in Sources */,
+				AF24CEA23D3F475C93EC8AB4 /* HandoffOrchestratorTests.swift in Sources */,
+				48F2DBD3AE984404B89EDD58 /* HandoffPolicyEngineTests.swift in Sources */,
+				963CAA955EC64CD5B6F8E46F /* HealthKitWriterTests.swift in Sources */,
+				D63090702D924C2C9AEBB689 /* PhoneWatchSessionCoordinatorTests.swift in Sources */,
+				164451DC31904139A9EF0871 /* PhoneWatchTransportMock.swift in Sources */,
+				4E52BE6D4676405C85EC6CF0 /* ShadowStateSchedulerTests.swift in Sources */,
+				69AACEC5CC8F42D288AD3070 /* SharedStateBridgeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4107,6 +4169,11 @@
 			isa = PBXTargetDependency;
 			target = E9B07F7B253BBA6500BAD8F8 /* Loop Intent Extension */;
 			targetProxy = E9B07F92253BBA6500BAD8F8 /* PBXContainerItemProxy */;
+		};
+		964E086AA40347A8967AB244 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 43A9437D1B926B7B0051FA24 /* WatchApp Extension */;
+			targetProxy = 2A9BC33BDDD64ABBBA747E21 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -5075,7 +5142,7 @@
 		3F8389C05165411195C4D113 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/WatchApp Extension.appex/WatchApp Extension";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -5089,7 +5156,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				TEST_HOST = "";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WatchApp Extension.appex/WatchApp Extension";
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
@@ -5097,7 +5164,7 @@
 		B511601CB6D249188F7F036B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/WatchApp Extension.appex/WatchApp Extension";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -5111,7 +5178,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				TEST_HOST = "";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WatchApp Extension.appex/WatchApp Extension";
 				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
