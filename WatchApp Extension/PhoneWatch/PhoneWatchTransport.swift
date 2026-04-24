@@ -69,9 +69,25 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
     public func queueMessage(_ message: PhoneWatchMessage) {
         do {
             let payload = try encoder.encode(message)
-            session.transferUserInfo(["phoneWatchMessage": payload])
+            if session.isReachable {
+                // Counterpart is foregrounded/reachable — use real-time delivery.
+                // transferUserInfo is for background-deferred delivery and is
+                // silently undelivered in iOS Simulator while both apps are
+                // foregrounded, so handoff messages would never arrive.
+                // sendMessageData with a no-op reply handler delivers immediately.
+                session.sendMessageData(payload, replyHandler: { _ in
+                    // No-op: this is a fire-and-forget message; ack data ignored.
+                }) { [weak self] _ in
+                    // Send failed (counterpart became unreachable mid-flight) —
+                    // fall back to queued transfer for background delivery.
+                    self?.session.transferUserInfo(["phoneWatchMessage": payload])
+                }
+            } else {
+                // Counterpart not reachable — use background-queued transfer.
+                session.transferUserInfo(["phoneWatchMessage": payload])
+            }
         } catch {
-            // Queue failures are non-fatal for fire-and-forget messages.
+            // Encoding failures are non-fatal for fire-and-forget messages.
         }
     }
 
