@@ -34,7 +34,13 @@ final class HandoffOrchestrator: ObservableObject {
 
     private var cancellables: Set<AnyCancellable> = []
     private var scheduledTimers: [UUID: Task<Void, Never>] = [:]
-    private var lastReceivedPayload: OmniBLEHandoffPayload?
+
+    // B.2.e: BLE ownership coordinator
+    private let ownership: OmniBLEOwnership
+
+    /// B.2.e: replaces the previous `lastReceivedPayload` field — accessor
+    /// now forwards to ownership's cache (single source of truth).
+    var cachedPayload: OmniBLEHandoffPayload? { ownership.cachedPayload }
 
     /// Forwarded from the state machine. Capped at 10 (state machine enforces).
     var transitionLog: [HandoffTransitionRecord] {
@@ -54,6 +60,12 @@ final class HandoffOrchestrator: ObservableObject {
         self.userDefaults = userDefaults
         self.handoffState = stateMachine.state
         self.settings = HandoffSettings.load(from: userDefaults)
+        self.ownership = OmniBLEOwnership(
+            role: .watch,
+            pumpManager: nil,    // lazy: built on first .watchDriver transition
+            appGroupDefaults: userDefaults,
+            initialState: stateMachine.state
+        )
     }
 
     func start() {
@@ -106,14 +118,10 @@ final class HandoffOrchestrator: ObservableObject {
             // Cache the payload for future takeover.
             if let decoded = try? JSONDecoder().decode(OmniBLEHandoffPayload.self,
                                                        from: ph.pairingPayload) {
-                lastReceivedPayload = decoded
+                ownership.cachePayload(decoded)   // B.2.e (replaces lastReceivedPayload assignment)
             }
         }
     }
-
-    /// Most-recently received OmniBLEHandoffPayload, if any. Consumed by B.2.e
-    /// when actually taking over the BLE session.
-    var cachedPayload: OmniBLEHandoffPayload? { lastReceivedPayload }
 
     /// Test-only injection point.
     func injectStateMachine(_ machine: HandoffStateMachine) {
@@ -127,11 +135,7 @@ final class HandoffOrchestrator: ObservableObject {
             case .sendModeSwitch(let ms):
                 coordinator.sendModeSwitch(ms)
             case .sendPairingHandoff(let ph):
-                // Replace the state machine's placeholder pairingPayload with a
-                // real OmniBLEHandoffPayload built from current PodState. B.2.e
-                // wires up an actual PodState provider; for B.2.d we ship an
-                // empty/default payload (UI is the verification surface).
-                coordinator.sendPairingHandoff(ph)
+                coordinator.sendPairingHandoff(fillPayload(ph))   // B.2.e
             case .scheduleTimeout(let id, let delay):
                 scheduleTimeout(id: id, after: delay)
             case .stopIssuingPodCommands:
@@ -142,7 +146,38 @@ final class HandoffOrchestrator: ObservableObject {
                 break  // state machine maintains its own log
             case .notifyUI(let state):
                 handoffState = state
+                // B.2.e: lazy-instantiate OmniBLEPumpManager on first .watchDriver
+                if case .watchDriver = state, ownership.pumpManager == nil {
+                    let pm = OmniBLEPumpManager(state: .watchSideDefault)
+                    ownership.setPumpManager(pm)
+                }
+                ownership.update(state: state)   // B.2.e
             }
+        }
+    }
+
+    /// B.2.e: Fills the pairing-handoff payload with the current PodState
+    /// (serialized via OmniBLEHandoffPayload's PropertyListSerialization helper)
+    /// before the message goes out over WCSession.
+    private func fillPayload(_ template: PhoneWatchPairingHandoff) -> PhoneWatchPairingHandoff {
+        guard let pumpManager = ownership.pumpManager as? OmniBLEPumpManager,
+              let podState = pumpManager.state.podState
+        else {
+            return template   // empty payload — counterpart will see no LTK
+        }
+        do {
+            let payload = try OmniBLEHandoffPayload(podState: podState)
+            let serialized = try payload.encoded()
+            return PhoneWatchPairingHandoff(
+                protocolVersion: template.protocolVersion,
+                sentAt: template.sentAt,
+                podId: template.podId,
+                pairingPayload: serialized,
+                validUntil: template.validUntil,
+                transitionId: template.transitionId
+            )
+        } catch {
+            return template
         }
     }
 
