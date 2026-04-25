@@ -61,13 +61,13 @@ struct WatchHandoffSection: View {
                     orchestrator.updateSettings(settings)
                 }
             )) {
-                Text("Manual only (recommended — BETA)").tag(HandoffMode.manual)
+                Text("Manual only").tag(HandoffMode.manual)
                 Text("Manual + auto-revert").tag(HandoffMode.manualWithAutoRevert)
                 Text("Automatic").tag(HandoffMode.automatic)
             }
             .pickerStyle(.inline)
             if orchestrator.settings.mode != .manual {
-                Text("⚠ BETA — does not yet drive pod over BLE")
+                Text("⚠ Hardware verification pending — works in Simulator; real-pod take-over not yet field-tested")
                     .font(.caption2)
                     .foregroundStyle(.orange)
             }
