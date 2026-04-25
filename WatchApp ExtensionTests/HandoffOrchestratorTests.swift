@@ -59,26 +59,35 @@ final class HandoffOrchestratorTests: XCTestCase {
         XCTAssertTrue(orchestrator.handoffState.isTransitioning)
     }
 
-    func testIncomingModeSwitchAdvancesStateMachine() {
-        // Watch starts in phoneDriver; phone sends a mode switch declaring watch should drive.
-        let id = UUID()
+    func testIncomingModeSwitchSelfCompletesToWatchDriver() {
+        // Was: testIncomingModeSwitchAdvancesStateMachine (asserted intermediate
+        //   .handoffPending state). After B.2.e Phase 1 the receiver self-completes
+        //   in one event, so the state machine lands on .watchDriver immediately.
         let ms = PhoneWatchModeSwitch(
-            protocolVersion: 1, sentAt: clock,
-            requestedBy: .watch, targetMode: .watchDriver, transitionId: id)
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: clock,
+            requestedBy: .phone,
+            targetMode: .watchDriver,
+            transitionId: UUID()
+        )
         orchestrator.handleIncoming(message: .modeSwitch(ms))
-        XCTAssertTrue(orchestrator.handoffState.isTransitioning)
+        if case .watchDriver = orchestrator.handoffState {} else {
+            XCTFail("Expected .watchDriver after receiver self-completes; got \(orchestrator.handoffState)")
+        }
     }
 
     func testIncomingConfirmationCompletesHandoff() {
-        // Step 1: get into handoffPending(phoneToWatch) with known id
+        // After B.2.e Phase 1: the first modeSwitch self-completes the receiver to
+        // .watchDriver; a second modeSwitch with the same transitionId is a no-op
+        // (default case). Final state is still .watchDriver.
         let id = UUID()
         let request = PhoneWatchModeSwitch(
             protocolVersion: 1, sentAt: clock,
             requestedBy: .watch, targetMode: .watchDriver, transitionId: id)
         orchestrator.handleIncoming(message: .modeSwitch(request))
-        XCTAssertTrue(orchestrator.handoffState.isTransitioning)
+        XCTAssertEqual(orchestrator.handoffState, .watchDriver)
 
-        // Step 2: receive the confirmation
+        // Step 2: receive the confirmation (now a no-op since already in .watchDriver)
         let confirm = PhoneWatchModeSwitch(
             protocolVersion: 1, sentAt: clock,
             requestedBy: .phone, targetMode: .watchDriver, transitionId: id)
