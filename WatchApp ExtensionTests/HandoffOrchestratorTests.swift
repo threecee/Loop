@@ -125,6 +125,7 @@ final class HandoffOrchestratorTests: XCTestCase {
             serializedPodState: serialized,
             lastBolusSequence: 7,
             lastBasalScheduleId: nil,
+            validUntil: Date.distantFuture,
             createdAt: Date(timeIntervalSince1970: 1_700_000_000)
         )
         let payloadData = try JSONEncoder().encode(payload)
