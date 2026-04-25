@@ -40,7 +40,8 @@ final class HandoffOrchestratorTests: XCTestCase {
                 clock: { [unowned self] in self.clock },
                 fire: { }
             ),
-            userDefaults: UserDefaults(suiteName: "test.handoff.\(UUID())")!
+            userDefaults: UserDefaults(suiteName: "test.handoff.\(UUID())")!,
+            pumpManager: nil
         )
     }
 

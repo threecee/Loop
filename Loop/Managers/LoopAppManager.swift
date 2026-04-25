@@ -310,7 +310,8 @@ class LoopAppManager: NSObject {
                 stateMachine: stateMachine,
                 policyEngine: policyEngine,
                 shadowScheduler: scheduler,
-                userDefaults: appGroupDefaults
+                userDefaults: appGroupDefaults,
+                pumpManager: deviceDataManager.pumpManager as? OmniBLEPumpManager   // B.2.e
             )
             HandoffOrchestrator.shared = orchestrator
             orchestrator.start()
