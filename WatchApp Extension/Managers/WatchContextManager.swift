@@ -1,9 +1,15 @@
 //
-//  LoopDataManager.swift
+//  WatchContextManager.swift
 //  WatchApp Extension
 //
 //  Created by Bharat Mediratta on 6/21/18.
 //  Copyright © 2018 LoopKit Authors. All rights reserved.
+//
+//  Renamed from LoopDataManager in B.3.a Phase 2 prep to free up the
+//  LoopDataManager name for the iOS algorithm orchestrator (added to
+//  the WatchApp Extension target). This class fetches and caches
+//  phone-driven WatchContext via WatchConnectivity; it does NOT run
+//  the closed-loop algorithm.
 //
 
 import Foundation
@@ -14,7 +20,7 @@ import WatchConnectivity
 import os.log
 
 
-class LoopDataManager {
+class WatchContextManager {
     let carbStore: CarbStore
 
     let glucoseStore: GlucoseStore
@@ -40,7 +46,7 @@ class LoopDataManager {
         }
     }
 
-    private let log = OSLog(category: "LoopDataManager")
+    private let log = OSLog(category: "WatchContextManager")
 
     // Main queue only
     private(set) var activeContext: WatchContext? {
@@ -84,11 +90,11 @@ class LoopDataManager {
     }
 }
 
-extension LoopDataManager {
+extension WatchContextManager {
     static let didUpdateContextNotification = Notification.Name(rawValue: "com.loopkit.notification.ContextUpdated")
 }
 
-extension LoopDataManager {
+extension WatchContextManager {
     func updateContext(_ context: WatchContext) {
         dispatchPrecondition(condition: .onQueue(.main))
 
@@ -105,7 +111,7 @@ extension LoopDataManager {
 
         if needsDidUpdateContextNotification && !WCSession.default.hasContentPending {
             needsDidUpdateContextNotification = false
-            NotificationCenter.default.post(name: LoopDataManager.didUpdateContextNotification, object: self)
+            NotificationCenter.default.post(name: WatchContextManager.didUpdateContextNotification, object: self)
         }
     }
 
@@ -183,13 +189,13 @@ extension LoopDataManager {
     }
 }
 
-extension LoopDataManager {
+extension WatchContextManager {
     var displayGlucoseUnit: HKUnit {
         activeContext?.displayGlucoseUnit ?? .milligramsPerDeciliter
     }
 }
 
-extension LoopDataManager {
+extension WatchContextManager {
     func generateChartData(completion: @escaping (GlucoseChartData?) -> Void) {
         guard let activeContext = activeContext else {
             completion(nil)

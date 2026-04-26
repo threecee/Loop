@@ -67,7 +67,7 @@ final class CarbAndBolusFlowViewModel: ObservableObject {
         self.dismiss = dismiss
 
         contextUpdateObservation = NotificationCenter.default.addObserver(
-            forName: LoopDataManager.didUpdateContextNotification,
+            forName: WatchContextManager.didUpdateContextNotification,
             object: loopManager,
             queue: nil
         ) { [weak self] _ in

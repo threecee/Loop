@@ -54,7 +54,7 @@ class CarbEntryListController: WKInterfaceController, IdentifiableClass {
                     self?.reloadCarbEntries()
                 }
             },
-            NotificationCenter.default.addObserver(forName: LoopDataManager.didUpdateContextNotification, object: loopManager, queue: nil) { [weak self] (note) in
+            NotificationCenter.default.addObserver(forName: WatchContextManager.didUpdateContextNotification, object: loopManager, queue: nil) { [weak self] (note) in
                 DispatchQueue.main.async {
                     self?.updateActiveCarbs()
                     self?.loopManager.requestCarbBackfill()

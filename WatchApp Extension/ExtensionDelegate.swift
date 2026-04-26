@@ -19,7 +19,7 @@ import OmniBLE
 
 
 final class ExtensionDelegate: NSObject, WKExtensionDelegate {
-    private(set) lazy var loopManager = LoopDataManager()
+    private(set) lazy var loopManager = WatchContextManager()
 
     // B.2.c.1: hosted B.2.a-d stack
     private(set) var phoneWatchTransport: WCSessionPhoneWatchTransport?
@@ -63,7 +63,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
             }
         })
 
-        notifications.append(NotificationCenter.default.addObserver(forName: LoopDataManager.didUpdateContextNotification, object: loopManager, queue: nil) { [weak self] (_) in
+        notifications.append(NotificationCenter.default.addObserver(forName: WatchContextManager.didUpdateContextNotification, object: loopManager, queue: nil) { [weak self] (_) in
             DispatchQueue.main.async {
                 self?.loopManagerDidUpdateContext()
             }

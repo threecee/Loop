@@ -25,7 +25,7 @@ class HUDInterfaceController: WKInterfaceController {
         update()
 
         if activeContextObserver == nil {
-            activeContextObserver = NotificationCenter.default.addObserver(forName: LoopDataManager.didUpdateContextNotification, object: loopManager, queue: nil) { [weak self] _ in
+            activeContextObserver = NotificationCenter.default.addObserver(forName: WatchContextManager.didUpdateContextNotification, object: loopManager, queue: nil) { [weak self] _ in
                 DispatchQueue.main.async {
                     self?.update()
                 }
