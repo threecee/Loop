@@ -136,6 +136,9 @@ final class HandoffOrchestrator: ObservableObject {
                 coordinator.sendModeSwitch(ms)
             case .sendPairingHandoff(let ph):
                 coordinator.sendPairingHandoff(fillPayload(ph))   // B.2.e
+            case .sendSettingsSync:
+                // Phase 1 added the case; transport wiring is future work.
+                NSLog("HandoffOrchestrator: sendSettingsSync (transport wiring is future work)")
             case .scheduleTimeout(let id, let delay):
                 scheduleTimeout(id: id, after: delay)
             case .stopIssuingPodCommands:
