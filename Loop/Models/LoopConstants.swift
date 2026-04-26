@@ -8,6 +8,7 @@
 
 import Foundation
 import HealthKit
+import LoopAlgorithmCore
 import LoopKit
 import UIKit
 
@@ -49,8 +50,10 @@ enum LoopConstants {
    
     static let retrospectiveCorrectionEnabled = true
     
-    // Percentage of recommended dose to apply as bolus when using automatic bolus dosing strategy
-    static let bolusPartialApplicationFactor = 0.4
+    // Percentage of recommended dose to apply as bolus when using automatic bolus dosing strategy.
+    // Single source of truth lives in LoopAlgorithmCore (used by both iOS LoopDataManager and the
+    // future watch-side WatchAlgorithmDriver via ConstantApplicationFactorStrategy).
+    static let bolusPartialApplicationFactor = ConstantApplicationFactorStrategy.bolusPartialApplicationFactor
 
     /// Loop completion aging category limits
     static let completionFreshLimit = TimeInterval(minutes: 6)
