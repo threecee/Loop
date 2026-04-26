@@ -120,6 +120,10 @@ final class HandoffOrchestrator: ObservableObject {
                                                        from: ph.pairingPayload) {
                 ownership.cachePayload(decoded)   // B.2.e (replaces lastReceivedPayload assignment)
             }
+        case .settingsSync:
+            // Handled upstream by PhoneWatchSessionCoordinator (stored in
+            // WatchSettingsCache.shared). No state-machine event to fire.
+            break
         }
     }
 
@@ -137,8 +141,9 @@ final class HandoffOrchestrator: ObservableObject {
             case .sendPairingHandoff(let ph):
                 coordinator.sendPairingHandoff(fillPayload(ph))   // B.2.e
             case .sendSettingsSync:
-                // Phase 1 added the case; transport wiring is future work.
-                NSLog("HandoffOrchestrator: sendSettingsSync (transport wiring is future work)")
+                // Settings sync is phone → watch only. The watch-side state
+                // machine never emits this; no-op for completeness.
+                break
             case .scheduleTimeout(let id, let delay):
                 scheduleTimeout(id: id, after: delay)
             case .stopIssuingPodCommands:

@@ -76,6 +76,11 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
         transport.queueMessage(.pairingHandoff(ph))
     }
 
+    /// B.3.a Phase 6: queue a settings-sync message (transferUserInfo).
+    func sendSettingsSync(_ sync: PhoneWatchSettingsSync) {
+        transport.queueMessage(.settingsSync(sync))
+    }
+
     func sendHeartbeat() {
         let hb = PhoneWatchHeartbeat(
             protocolVersion: PhoneWatchProtocol.currentVersion,
@@ -126,6 +131,10 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             NSLog("PhoneWatchSessionCoordinator: received pairing handoff for pod \(ph.podId) (\(ph.pairingPayload.count) bytes)")
             // B.2.d: forward to orchestrator (if subscribed).
             onHandoffMessage?(message)
+        case .settingsSync:
+            // Settings sync is phone → watch only; the phone never receives one.
+            // No-op to avoid a compiler warning on the exhaustive switch.
+            break
         }
     }
 }

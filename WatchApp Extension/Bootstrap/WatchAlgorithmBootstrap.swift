@@ -10,7 +10,8 @@
 //  before its dependencies have fully initialized (e.g., before WCSession
 //  has delivered the first phone-side settings sync).
 //
-//  B.3.a Phase 5.
+//  B.3.a Phase 5. Phase 6: settingsProvider now returns `WatchSettingsSnapshot?`
+//  OR `PhoneWatchSettingsSync?` (via the overload below).
 //
 
 #if !os(iOS)
@@ -48,6 +49,17 @@ final class WatchAlgorithmBootstrap {
          settingsProvider: @escaping () -> WatchSettingsSnapshot?) {
         self.storesProvider = storesProvider
         self.settingsProvider = settingsProvider
+    }
+
+    /// B.3.a Phase 6 convenience init: takes a `PhoneWatchSettingsSync`
+    /// provider and converts to `WatchSettingsSnapshot` internally.
+    init(storesProvider: @escaping () -> WatchAlgorithmStores?,
+         syncProvider: @escaping () -> PhoneWatchSettingsSync?) {
+        self.storesProvider = storesProvider
+        self.settingsProvider = {
+            guard let sync = syncProvider() else { return nil }
+            return WatchSettingsSnapshot(fromSync: sync)
+        }
     }
 
     /// Updates the bootstrap in response to a handoff-state change.

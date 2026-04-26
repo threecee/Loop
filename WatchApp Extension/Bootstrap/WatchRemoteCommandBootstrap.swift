@@ -47,6 +47,19 @@ final class WatchRemoteCommandBootstrap {
         self.settingsProvider = settingsProvider
     }
 
+    /// B.3.a Phase 6 convenience init: takes a `PhoneWatchSettingsSync`
+    /// provider and converts to `WatchSettingsSnapshot` internally.
+    init(storesProvider: @escaping () -> WatchAlgorithmStores?,
+         supportingStoresProvider: @escaping () -> WatchRemoteCommandStores?,
+         syncProvider: @escaping () -> PhoneWatchSettingsSync?) {
+        self.storesProvider = storesProvider
+        self.supportingStoresProvider = supportingStoresProvider
+        self.settingsProvider = {
+            guard let sync = syncProvider() else { return nil }
+            return WatchSettingsSnapshot(fromSync: sync)
+        }
+    }
+
     /// Updates the bootstrap in response to a handoff-state change.
     func update(handoffState: HandoffState) {
         switch handoffState {

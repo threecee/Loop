@@ -107,6 +107,11 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             NSLog("PhoneWatchSessionCoordinator: received pairing handoff for pod \(ph.podId) (\(ph.pairingPayload.count) bytes)")
             // B.2.d: forward to orchestrator (if subscribed).
             onHandoffMessage?(message)
+        case .settingsSync(let sync):
+            guard PhoneWatchProtocol.shouldAccept(incomingVersion: sync.protocolVersion) else { return }
+            NSLog("PhoneWatchSessionCoordinator: received settings sync (protocolVersion=\(sync.protocolVersion))")
+            // B.3.a Phase 6: store in the shared cache so bootstraps can read it.
+            WatchSettingsCache.shared.update(sync)
         }
     }
 }

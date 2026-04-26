@@ -35,6 +35,11 @@ final class HandoffOrchestrator: ObservableObject {
     // B.2.e: BLE ownership coordinator
     private let ownership: OmniBLEOwnership
 
+    /// B.3.a Phase 6: returns the current settings snapshot for sync to the
+    /// watch. Injected at init via closure so the orchestrator stays decoupled
+    /// from LoopDataManager / ServicesManager. Returns nil when not yet ready.
+    private let settingsSyncProvider: (() -> PhoneWatchSettingsSync?)?
+
     /// B.2.e: replaces the previous `lastReceivedPayload` field — accessor
     /// now forwards to ownership's cache (single source of truth).
     var cachedPayload: OmniBLEHandoffPayload? { ownership.cachedPayload }
@@ -50,7 +55,8 @@ final class HandoffOrchestrator: ObservableObject {
          shadowScheduler: ShadowStateScheduler,
          userDefaults: UserDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)
             ?? UserDefaults.standard,
-         pumpManager: OmniBLEPodOwner? = nil) {
+         pumpManager: OmniBLEPodOwner? = nil,
+         settingsSyncProvider: (() -> PhoneWatchSettingsSync?)? = nil) {
         self.coordinator = coordinator
         self.stateMachine = stateMachine
         self.policyEngine = policyEngine
@@ -64,6 +70,7 @@ final class HandoffOrchestrator: ObservableObject {
             appGroupDefaults: userDefaults,
             initialState: stateMachine.state
         )
+        self.settingsSyncProvider = settingsSyncProvider
     }
 
     func start() {
@@ -77,6 +84,13 @@ final class HandoffOrchestrator: ObservableObject {
         }
         policyEngine.start()
         shadowScheduler.start()
+
+        // B.3.a Phase 6 — trigger point 1: emit settings on WCSession connect.
+        // The coordinator's `start()` has already been called by the time the
+        // orchestrator starts, so we fire once immediately on a background tick
+        // to avoid blocking init while also racing any pending WCSession
+        // activation. Fire-and-forget; the watch will update its cache.
+        Task { @MainActor [weak self] in self?.emitSettingsSync() }
     }
 
     func stop() {
@@ -115,7 +129,18 @@ final class HandoffOrchestrator: ObservableObject {
                                                        from: ph.pairingPayload) {
                 ownership.cachePayload(decoded)   // B.2.e (replaces lastReceivedPayload assignment)
             }
+        case .settingsSync:
+            // Settings sync is phone → watch only; phone ignores inbound.
+            break
         }
+    }
+
+    /// B.3.a Phase 6: emit settings sync via trigger point 2 (settings change).
+    /// Caller (e.g., LoopAppManager observer) is responsible for invoking this
+    /// whenever the app's LoopSettings change. Fire-and-forget; debounce is the
+    /// caller's responsibility if needed.
+    func notifySettingsChanged() {
+        emitSettingsSync()
     }
 
     /// Test-only injection point.
@@ -131,9 +156,10 @@ final class HandoffOrchestrator: ObservableObject {
                 coordinator.sendModeSwitch(ms)
             case .sendPairingHandoff(let ph):
                 coordinator.sendPairingHandoff(fillPayload(ph))   // B.2.e
-            case .sendSettingsSync:
-                // Phase 1 added the case; transport wiring is future work.
-                NSLog("HandoffOrchestrator: sendSettingsSync (transport wiring is future work)")
+            case .sendSettingsSync(let sync):
+                // B.3.a Phase 6: deliver the concrete sync message the state
+                // machine already built (it carries the snapshot value).
+                coordinator.sendSettingsSync(sync)
             case .scheduleTimeout(let id, let delay):
                 scheduleTimeout(id: id, after: delay)
             case .stopIssuingPodCommands:
@@ -144,9 +170,23 @@ final class HandoffOrchestrator: ObservableObject {
                 break
             case .notifyUI(let state):
                 handoffState = state
+                // B.3.a Phase 6 — trigger point 3: emit on handoff transition
+                // entering .handoffPending (the watch will become the driver).
+                if case .handoffPending(direction: .phoneToWatch, _, _) = state {
+                    emitSettingsSync()
+                }
                 ownership.update(state: state)   // B.2.e
             }
         }
+    }
+
+    /// B.3.a Phase 6: builds a `PhoneWatchSettingsSync` from the provider
+    /// closure and queues it via the coordinator. No-op when the provider
+    /// returns nil (settings not yet available) or when not wired.
+    func emitSettingsSync() {
+        guard let provider = settingsSyncProvider,
+              let sync = provider() else { return }
+        coordinator.sendSettingsSync(sync)
     }
 
     private func scheduleTimeout(id: UUID, after delay: TimeInterval) {

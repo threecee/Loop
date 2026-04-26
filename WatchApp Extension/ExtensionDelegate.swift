@@ -36,9 +36,9 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     private(set) var watchRemoteCommandBootstrap: WatchRemoteCommandBootstrap?
     private(set) var backgroundPollScheduler: BackgroundPollScheduler?
 
-    /// Phase 5 settings snapshot — Phase 6 replaces with `PhoneWatchSettingsSync`.
-    /// Kept on `self` so bootstraps re-read the current value via closure.
-    private var watchSettingsSnapshot: WatchSettingsSnapshot = WatchSettingsSnapshot()
+    // Phase 6 note: settings are now read directly from `WatchSettingsCache.shared`
+    // via closure injection in bootstrapWatchSelfDrivingStack. The Phase 5
+    // `watchSettingsSnapshot` field has been removed.
 
     /// Phase 5 supporting stores for `RemoteDataServicesManager`. Built lazily
     /// the first time the watch becomes the driver and retained for the
@@ -164,14 +164,17 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     /// `handoffState` publisher so each transition fans out to both
     /// bootstraps.
     private func bootstrapWatchSelfDrivingStack(orchestrator: HandoffOrchestrator) {
+        // B.3.a Phase 6: read settings from `WatchSettingsCache.shared` which is
+        // populated by `PhoneWatchSessionCoordinator` when a `.settingsSync`
+        // message arrives from the phone.
         let algorithmBootstrap = WatchAlgorithmBootstrap(
             storesProvider: { [weak self] in self?.makeAlgorithmStoresIfPossible() },
-            settingsProvider: { [weak self] in self?.watchSettingsSnapshot }
+            syncProvider: { WatchSettingsCache.shared.current }
         )
         let remoteBootstrap = WatchRemoteCommandBootstrap(
             storesProvider: { [weak self] in self?.makeAlgorithmStoresIfPossible() },
             supportingStoresProvider: { [weak self] in self?.makeSupportingStoresIfPossible() },
-            settingsProvider: { [weak self] in self?.watchSettingsSnapshot }
+            syncProvider: { WatchSettingsCache.shared.current }
         )
         let pollScheduler = BackgroundPollScheduler(
             shouldPoll: { [weak remoteBootstrap] in remoteBootstrap?.manager != nil },

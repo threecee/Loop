@@ -32,6 +32,7 @@ import HealthKit
 import LoopAlgorithmCore
 import LoopKit
 import LoopCore
+import OmniBLE  // for PhoneWatchSettingsSync (Phase 6)
 import os.log
 #if canImport(WatchKit)
 import WatchKit
@@ -40,18 +41,15 @@ import WatchKit
 import ClockKit
 #endif
 
-// MARK: - Settings snapshot placeholder
-//
-// Phase 6 will introduce `PhoneWatchSettingsSync` (real WCSession-driven sync).
-// Phase 5 ships this thin stand-in so the bootstrap chain has something to
-// pass into the driver and `WatchRemoteCommandBootstrap`.
+// MARK: - Settings snapshot
 
 /// A read-only snapshot of the most recent settings the watch has received
-/// from the phone. Phase 5 stub; Phase 6 replaces with the real sync class.
+/// from the phone. Used by `WatchAlgorithmDriver` adapters and by the
+/// Phase 5 bootstraps. Phase 6 populates via `PhoneWatchSettingsSync` (see
+/// `init(fromSync:)` below); Phase 5 tests still construct it directly.
 final class WatchSettingsSnapshot {
 
-    /// The most recent `LoopSettings` synced from the phone. Defaults to a
-    /// blank `LoopSettings()` until Phase 6 wires the actual transport.
+    /// The most recent `LoopSettings` synced from the phone.
     let loopSettings: LoopSettings
 
     /// The most recent `StoredSettings` snapshot synced from the phone.
@@ -79,6 +77,62 @@ final class WatchSettingsSnapshot {
         self.nightscoutConfig = nightscoutConfig
         self.automaticDosingEnabled = automaticDosingEnabled
         self.isAutomaticDosingAllowed = isAutomaticDosingAllowed
+    }
+
+    /// B.3.a Phase 6: construct from a real `PhoneWatchSettingsSync` received
+    /// over WCSession. Converts the transport struct into the richer local
+    /// type that `WatchAlgorithmDriver` adapters expect.
+    init(fromSync sync: PhoneWatchSettingsSync) {
+        let basalSchedule = sync.basalScheduleItems.isEmpty ? nil
+            : BasalRateSchedule(dailyItems: sync.basalScheduleItems, timeZone: TimeZone.current)
+        let isfSchedule = sync.insulinSensitivityScheduleItems.isEmpty ? nil
+            : InsulinSensitivitySchedule(unit: .milligramsPerDeciliter,
+                                         dailyItems: sync.insulinSensitivityScheduleItems,
+                                         timeZone: TimeZone.current)
+        let carbSchedule = sync.carbRatioScheduleItems.isEmpty ? nil
+            : CarbRatioSchedule(unit: .gram(),
+                                dailyItems: sync.carbRatioScheduleItems,
+                                timeZone: TimeZone.current)
+        let targetSchedule = sync.glucoseTargetRangeScheduleItems.isEmpty ? nil
+            : GlucoseRangeSchedule(unit: .milligramsPerDeciliter,
+                                   dailyItems: sync.glucoseTargetRangeScheduleItems,
+                                   timeZone: TimeZone.current)
+        let suspendThreshold: GlucoseThreshold? = sync.suspendThresholdMgdL.map {
+            GlucoseThreshold(unit: .milligramsPerDeciliter, value: $0)
+        }
+
+        var ls = LoopSettings()
+        ls.basalRateSchedule = basalSchedule
+        ls.insulinSensitivitySchedule = isfSchedule
+        ls.carbRatioSchedule = carbSchedule
+        ls.glucoseTargetRangeSchedule = targetSchedule
+        ls.maximumBolus = sync.maximumBolusUnits
+        ls.maximumBasalRatePerHour = sync.maximumBasalRatePerHourUnits
+        ls.suspendThreshold = suspendThreshold
+        self.loopSettings = ls
+
+        self.storedSettings = StoredSettings(
+            glucoseTargetRangeSchedule: targetSchedule,
+            maximumBasalRatePerHour: sync.maximumBasalRatePerHourUnits,
+            maximumBolus: sync.maximumBolusUnits,
+            suspendThreshold: suspendThreshold,
+            basalRateSchedule: basalSchedule,
+            insulinSensitivitySchedule: isfSchedule,
+            carbRatioSchedule: carbSchedule
+        )
+
+        if let ns = sync.nightscoutConfig {
+            self.nightscoutConfig = NightscoutConfig(siteURL: ns.url, apiSecret: ns.apiSecret)
+        } else {
+            self.nightscoutConfig = nil
+        }
+
+        // Phase 6 doesn't sync automaticDosingEnabled/isAutomaticDosingAllowed
+        // yet (the PhoneWatchSettingsSync struct doesn't include them). Default
+        // to false, which is conservative (watch will not auto-dose unless
+        // a future sync adds these fields).
+        self.automaticDosingEnabled = false
+        self.isAutomaticDosingAllowed = false
     }
 
     struct NightscoutConfig {

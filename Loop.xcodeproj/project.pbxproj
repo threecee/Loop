@@ -89,6 +89,7 @@
 		2C47787E7286BF548617916E /* HKUnit+LocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C482251645A52AFF8E9DF32 /* HKUnit+LocalizedString.swift */; };
 		2CCA6A8E7E60C1A9E04A5D8F /* BackgroundPollScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DBACE90FE46C046D7C944F5 /* BackgroundPollScheduler.swift */; };
 		2FE4F4E4DBCC44AFABCE2735 /* HeartbeatScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A97A9759A44726A9FBEDEC /* HeartbeatScheduler.swift */; };
+		6969CD7061C34FB1B52A2520 /* WatchSettingsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FBF47F733B45829957F54F /* WatchSettingsCache.swift */; };
 		2FFC656074A640528A5BB726 /* GlucoseCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */; };
 		38427E2F72593F1C7CAE926E /* LoopAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C56AC3C4371558534B519CC /* LoopAlgorithmRunner.swift */; };
 		38DF13981D282D91F0AE31B8 /* LoopAlgorithmCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F65A857180A0FF1A84C30F8 /* LoopAlgorithmCore.swift */; };
@@ -274,6 +275,7 @@
 		4FF4D1011E18375000846527 /* WatchContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF4D0FF1E18374700846527 /* WatchContext.swift */; };
 		503149FBE22CF89F3553A3A7 /* WatchRemoteCommandBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AA4AFC96E2BE1D43C5BD62 /* WatchRemoteCommandBootstrap.swift */; };
 		61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */; };
+		F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */; };
 		623575103230CD309CD8E120 /* LoopAlgorithmCore-watchOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9F68F63F200483A5D11B40F2 /* LoopAlgorithmCore-watchOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		62E7554AE77F4726836D0DE5 /* GlucoseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */; };
 		65A87A4BEFD4945EF357AC02 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FFCF21EAE05D00AF44BF /* LoopCore.framework */; };
@@ -673,6 +675,7 @@
 		WB2D000000000100024 /* HandoffPolicyEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100004 /* HandoffPolicyEngineTests.swift */; };
 		WB2D000000000100025 /* ShadowStateSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100005 /* ShadowStateSchedulerTests.swift */; };
 		WB2D000000000100026 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100006 /* HandoffOrchestratorTests.swift */; };
+		WB2D000000000100027 /* SettingsSyncEmissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100007 /* SettingsSyncEmissionTests.swift */; };
 		WB2D00000000010002B /* WatchHandoffSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010000B /* WatchHandoffSection.swift */; };
 		WB2D00000000010002C /* WatchHandoffEventLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010000C /* WatchHandoffEventLogView.swift */; };
 /* End PBXBuildFile section */
@@ -944,6 +947,7 @@
 		2859EFF609E844A5BF478FD1 /* ExtendedRuntimeCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtendedRuntimeCoordinatorTests.swift; path = "WatchApp ExtensionTests/ExtendedRuntimeCoordinatorTests.swift"; sourceTree = SOURCE_ROOT; };
 		3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseCacheTests.swift; path = "WatchApp ExtensionTests/GlucoseCacheTests.swift"; sourceTree = SOURCE_ROOT; };
 		327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase5_BootstrapsTest.swift; path = Phase5_BootstrapsTest.swift; sourceTree = "<group>"; };
+		F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase6_SettingsSyncReceptionTests.swift; path = Phase6_SettingsSyncReceptionTests.swift; sourceTree = "<group>"; };
 		334165BFE423BFA4E9650446 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneWatchTransport.swift; path = "WatchApp Extension/PhoneWatch/PhoneWatchTransport.swift"; sourceTree = SOURCE_ROOT; };
 		3D03C6DA2AACE6AC00FDE5D2 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Intents.strings; sourceTree = "<group>"; };
@@ -1313,6 +1317,7 @@
 		A9A056B224B93C62007CF06D /* CriticalEventLogExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CriticalEventLogExportView.swift; sourceTree = "<group>"; };
 		A9A056B424B94123007CF06D /* CriticalEventLogExportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CriticalEventLogExportViewModel.swift; sourceTree = "<group>"; };
 		A9A97A9759A44726A9FBEDEC /* HeartbeatScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HeartbeatScheduler.swift; path = "WatchApp Extension/PhoneWatch/HeartbeatScheduler.swift"; sourceTree = SOURCE_ROOT; };
+		A1FBF47F733B45829957F54F /* WatchSettingsCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchSettingsCache.swift; path = "WatchApp Extension/PhoneWatch/WatchSettingsCache.swift"; sourceTree = SOURCE_ROOT; };
 		A9B607AF247F000F00792BE4 /* UserNotifications+Loop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserNotifications+Loop.swift"; sourceTree = "<group>"; };
 		A9B996EF27235191002DC09C /* LoopWarning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopWarning.swift; sourceTree = "<group>"; };
 		A9B996F127238705002DC09C /* DosingDecisionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DosingDecisionStore.swift; sourceTree = "<group>"; };
@@ -1594,6 +1599,7 @@
 		WB2D000000000100004 /* HandoffPolicyEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffPolicyEngineTests.swift; sourceTree = "<group>"; };
 		WB2D000000000100005 /* ShadowStateSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowStateSchedulerTests.swift; sourceTree = "<group>"; };
 		WB2D000000000100006 /* HandoffOrchestratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffOrchestratorTests.swift; sourceTree = "<group>"; };
+		WB2D000000000100007 /* SettingsSyncEmissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSyncEmissionTests.swift; sourceTree = "<group>"; };
 		WB2D00000000010000B /* WatchHandoffSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchHandoffSection.swift; sourceTree = "<group>"; };
 		WB2D00000000010000C /* WatchHandoffEventLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchHandoffEventLogView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2677,6 +2683,7 @@
 				389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */,
 				12B03AD8B83943FFBEE8722A /* PhoneWatchSessionCoordinator.swift */,
 				A9A97A9759A44726A9FBEDEC /* HeartbeatScheduler.swift */,
+				A1FBF47F733B45829957F54F /* WatchSettingsCache.swift */,
 			);
 			path = PhoneWatch;
 			sourceTree = "<group>";
@@ -2709,6 +2716,7 @@
 				631C894D174F9241F016AEA9 /* NightscoutServiceLoadingTest.swift */,
 				B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */,
 				327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */,
+				F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */,
 			);
 			path = "WatchApp ExtensionTests";
 			sourceTree = "<group>";
@@ -3047,6 +3055,7 @@
 				WB2D000000000100004 /* HandoffPolicyEngineTests.swift */,
 				WB2D000000000100005 /* ShadowStateSchedulerTests.swift */,
 				WB2D000000000100006 /* HandoffOrchestratorTests.swift */,
+				WB2D000000000100007 /* SettingsSyncEmissionTests.swift */,
 			);
 			path = WatchHandoff;
 			sourceTree = "<group>";
@@ -3897,6 +3906,7 @@
 				6D1200C021BC36840A3A5727 /* NightscoutServiceLoadingTest.swift in Sources */,
 				BCE0D1D6CD31C643DD469207 /* Phase4_RemoteDataServicesManagerImportTest.swift in Sources */,
 				61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */,
+				F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4199,6 +4209,7 @@
 				BF40433D97314FABA577D1B6 /* PhoneWatchTransport.swift in Sources */,
 				7E9C8F5FB0274B0AA1C6B149 /* PhoneWatchSessionCoordinator.swift in Sources */,
 				2FE4F4E4DBCC44AFABCE2735 /* HeartbeatScheduler.swift in Sources */,
+				6969CD7061C34FB1B52A2520 /* WatchSettingsCache.swift in Sources */,
 				CB151124CFD54014AACC19B4 /* HandoffPolicyEngine.swift in Sources */,
 				AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */,
 				049A1126B9804AFFBB289978 /* HandoffOrchestrator.swift in Sources */,
@@ -4269,6 +4280,7 @@
 				WB2D000000000100024 /* HandoffPolicyEngineTests.swift in Sources */,
 				WB2D000000000100025 /* ShadowStateSchedulerTests.swift in Sources */,
 				WB2D000000000100026 /* HandoffOrchestratorTests.swift in Sources */,
+				WB2D000000000100027 /* SettingsSyncEmissionTests.swift in Sources */,
 				A9DF02CB24F72B9E00B7C988 /* CriticalEventLogTests.swift in Sources */,
 				1D80313D24746274002810DF /* AlertStoreTests.swift in Sources */,
 				C1777A6625A125F100595963 /* ManualEntryDoseViewModelTests.swift in Sources */,
