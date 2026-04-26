@@ -119,8 +119,10 @@ final class RemoteDataServicesManager {
     let uploadGroup = DispatchGroup()
 
     private let log = OSLog(category: "RemoteDataServicesManager")
-    
+
+#if os(iOS)
     private let alertStore: AlertStore
+#endif
 
     private let carbStore: CarbStore
 
@@ -138,6 +140,7 @@ final class RemoteDataServicesManager {
 
     private let overrideHistory: TemporaryScheduleOverrideHistory
 
+#if os(iOS)
     init(
         alertStore: AlertStore,
         carbStore: CarbStore,
@@ -160,9 +163,35 @@ final class RemoteDataServicesManager {
         self.overrideHistory = overrideHistory
         self.lockedFailedUploads = Locked([])
     }
+#else
+    // watchOS: AlertStore is a Loop-iOS-only type; alert upload is not
+    // performed on the watch. Only the remote-command receiving path is used.
+    init(
+        carbStore: CarbStore,
+        doseStore: DoseStore,
+        dosingDecisionStore: DosingDecisionStore,
+        glucoseStore: GlucoseStore,
+        cgmEventStore: CgmEventStore,
+        settingsStore: SettingsStore,
+        overrideHistory: TemporaryScheduleOverrideHistory,
+        insulinDeliveryStore: InsulinDeliveryStore
+    ) {
+        self.carbStore = carbStore
+        self.doseStore = doseStore
+        self.dosingDecisionStore = dosingDecisionStore
+        self.glucoseStore = glucoseStore
+        self.cgmEventStore = cgmEventStore
+        self.insulinDeliveryStore = insulinDeliveryStore
+        self.settingsStore = settingsStore
+        self.overrideHistory = overrideHistory
+        self.lockedFailedUploads = Locked([])
+    }
+#endif
 
     private func uploadExistingData(to remoteDataService: RemoteDataService) {
+#if os(iOS)
         uploadAlertData(to: remoteDataService)
+#endif
         uploadCarbData(to: remoteDataService)
         uploadDoseData(to: remoteDataService)
         uploadDosingDecisionData(to: remoteDataService)
@@ -187,7 +216,9 @@ final class RemoteDataServicesManager {
         for type in uploadTypes {
             switch type {
             case .alert:
+#if os(iOS)
                 remoteDataServices.forEach { self.uploadAlertData(to: $0) }
+#endif
             case .carb:
                 remoteDataServices.forEach { self.uploadCarbData(to: $0) }
             case .dose:
@@ -224,6 +255,7 @@ final class RemoteDataServicesManager {
     }
 }
 
+#if os(iOS)
 extension RemoteDataServicesManager {
     private func uploadAlertData(to remoteDataService: RemoteDataService) {
         uploadGroup.enter()
@@ -258,6 +290,7 @@ extension RemoteDataServicesManager {
         }
     }
 }
+#endif
 
 extension RemoteDataServicesManager {
     private func uploadCarbData(to remoteDataService: RemoteDataService) {

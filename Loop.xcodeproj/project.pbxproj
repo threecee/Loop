@@ -365,6 +365,7 @@
 		A058B8F672117B537373B501 /* BolusDosingDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB75F0252BE320004C7D3F /* BolusDosingDecision.swift */; };
 		A098A2A8D291F4C3DF9F01EF /* LoopAlgorithmRunnerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69081C1DFF394B528C7ABD90 /* LoopAlgorithmRunnerDelegate.swift */; };
 		A30EF5E6D41B1D9EF0B5720C /* PredictionInputEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438D42F81D7C88BC003244B0 /* PredictionInputEffect.swift */; };
+		A69496E50A6A725D3276234C /* RemoteDataServicesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432E73CA1D24B3D6009AD15D /* RemoteDataServicesManager.swift */; };
 		A6F3FFE541FFBA7F565A0477 /* NightscoutServiceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB297036FF4DD6B83889E05 /* NightscoutServiceKit.framework */; };
 		A90EF53C25DEF06200F32D61 /* PluginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16DA84122E8E112008624C2 /* PluginManager.swift */; };
 		A90EF54425DEF0A000F32D61 /* OSLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4374B5EE209D84BE00D17AA8 /* OSLog.swift */; };
@@ -472,6 +473,7 @@
 		B66D1F3C2E6A5D6600471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F3A2E6A5D6600471149 /* Localizable.xcstrings */; };
 		B66D1F3E2E6A5D6600471149 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F3D2E6A5D6600471149 /* Localizable.xcstrings */; };
 		B66D1F402E6A5D6600471149 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F3F2E6A5D6600471149 /* InfoPlist.xcstrings */; };
+		BCE0D1D6CD31C643DD469207 /* Phase4_RemoteDataServicesManagerImportTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */; };
 		BD6F6DAB5780A11DD05B8ADB /* NightscoutServiceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB297036FF4DD6B83889E05 /* NightscoutServiceKit.framework */; };
 		BF40433D97314FABA577D1B6 /* PhoneWatchTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */; };
 		BFBB35CB4405597DC0103C18 /* ConstantApplicationFactorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC389F92A2B62470066E2E8 /* ConstantApplicationFactorStrategy.swift */; };
@@ -1327,6 +1329,7 @@
 		A9F703762489D8AA00C98AD8 /* PersistentDeviceLog+SimulatedCoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersistentDeviceLog+SimulatedCoreData.swift"; sourceTree = "<group>"; };
 		A9FB75F0252BE320004C7D3F /* BolusDosingDecision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BolusDosingDecision.swift; sourceTree = "<group>"; };
 		ABA68CD9C72F40D7972637CA /* GlucoseReadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseReadingTests.swift; path = "WatchApp ExtensionTests/GlucoseReadingTests.swift"; sourceTree = SOURCE_ROOT; };
+		B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WatchApp ExtensionTests/Phase4_RemoteDataServicesManagerImportTest.swift"; sourceTree = SOURCE_ROOT; };
 		B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HandoffOrchestrator.swift; path = "WatchApp Extension/Handoff/HandoffOrchestrator.swift"; sourceTree = SOURCE_ROOT; };
 		B4001CED28CBBC82002FB414 /* AlertManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManagementView.swift; sourceTree = "<group>"; };
 		B40D07C6251A89D500C1C6D7 /* GlucoseDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseDisplay.swift; sourceTree = "<group>"; };
@@ -2670,6 +2673,7 @@
 				DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */,
 				E01203786D1373BA05C3B25C /* LoopAlgorithmCoreImportTest.swift */,
 				631C894D174F9241F016AEA9 /* NightscoutServiceLoadingTest.swift */,
+				B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */,
 			);
 			path = "WatchApp ExtensionTests";
 			sourceTree = "<group>";
@@ -3843,6 +3847,7 @@
 				69AACEC5CC8F42D288AD3070 /* SharedStateBridgeTests.swift in Sources */,
 				7AA69427DFC38A90721A7A9D /* LoopAlgorithmCoreImportTest.swift in Sources */,
 				6D1200C021BC36840A3A5727 /* NightscoutServiceLoadingTest.swift in Sources */,
+				BCE0D1D6CD31C643DD469207 /* Phase4_RemoteDataServicesManagerImportTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4154,6 +4159,7 @@
 				4F11D3C320DD84DB006E072C /* GlucoseBackfillRequestUserInfo.swift in Sources */,
 				435400351C9F878D00D5819C /* SetBolusUserInfo.swift in Sources */,
 				895788B2242E69A2002CB114 /* CircularAccessoryButtonStyle.swift in Sources */,
+				A69496E50A6A725D3276234C /* RemoteDataServicesManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
