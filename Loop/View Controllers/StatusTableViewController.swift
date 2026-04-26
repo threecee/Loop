@@ -10,6 +10,7 @@ import UIKit
 import HealthKit
 import SwiftUI
 import Intents
+import LoopAlgorithmCore
 import LoopCore
 import LoopKit
 import LoopKitUI

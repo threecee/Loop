@@ -8,6 +8,7 @@
 
 import XCTest
 import HealthKit
+import LoopAlgorithmCore
 import LoopKit
 @testable import LoopCore
 @testable import Loop

@@ -7,6 +7,7 @@
 //
 
 import HealthKit
+import LoopAlgorithmCore
 import LoopCore
 import LoopKit
 import LoopKitUI

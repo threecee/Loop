@@ -11,6 +11,7 @@ import HealthKit
 import LocalAuthentication
 import Intents
 import os.log
+import LoopAlgorithmCore
 import LoopCore
 import LoopKit
 import LoopKitUI

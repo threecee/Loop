@@ -1,15 +1,19 @@
 //
 //  LoopError.swift
-//  Loop
+//  LoopAlgorithmCore
 //
 //  Created by Nate Racklyeft on 6/28/16.
 //  Copyright © 2016 Nathan Racklyeft. All rights reserved.
+//
+//  NOTE: The extension that provides `var issue: StoredDosingDecision.Issue`
+//  (which uses app-only StoredDosingDecisionIssue) lives in
+//  Loop/Loop/Extensions/LoopError+Issue.swift (Loop iOS app target only).
 //
 
 import Foundation
 import LoopKit
 
-enum ConfigurationErrorDetail: String, Codable {
+public enum ConfigurationErrorDetail: String, Codable {
     case pumpManager
     case basalRateSchedule
     case carbRatioSchedule
@@ -17,8 +21,8 @@ enum ConfigurationErrorDetail: String, Codable {
     case insulinSensitivitySchedule
     case maximumBasalRatePerHour
     case maximumBolus
-    
-    func localized() -> String {
+
+    public func localized() -> String {
         switch self {
         case .pumpManager:
             return NSLocalizedString("Pump Manager", comment: "Details for configuration error when pump manager is missing")
@@ -38,15 +42,15 @@ enum ConfigurationErrorDetail: String, Codable {
     }
 }
 
-enum MissingDataErrorDetail: String, Codable {
+public enum MissingDataErrorDetail: String, Codable {
     case glucose
     case momentumEffect
     case carbEffect
     case insulinEffect
     case activeInsulin
     case insulinEffectIncludingPendingInsulin
-    
-    var localizedDetail: String {
+
+    public var localizedDetail: String {
         switch self {
         case .glucose:
             return NSLocalizedString("Glucose data not available", comment: "Description of error when glucose data is missing")
@@ -62,8 +66,8 @@ enum MissingDataErrorDetail: String, Codable {
             return NSLocalizedString("Insulin effects", comment: "Details for missing data error when insulin effects including pending insulin are missing")
         }
     }
-    
-    var localizedRecovery: String? {
+
+    public var localizedRecovery: String? {
         switch self {
         case .glucose:
             return NSLocalizedString("Check your CGM data source", comment: "Recovery suggestion when glucose data is missing")
@@ -77,7 +81,7 @@ enum MissingDataErrorDetail: String, Codable {
     }
 }
 
-enum LoopError: Error {
+public enum LoopError: Error {
     // Missing or unexpected configuration values
     case configurationError(ConfigurationErrorDetail)
 
@@ -107,62 +111,6 @@ enum LoopError: Error {
 
     // Some other error
     case unknownError(Error)
-}
-
-extension LoopError {
-    var issue: StoredDosingDecision.Issue {
-        return StoredDosingDecision.Issue(id: issueId, details: issueDetails)
-    }
-
-    var issueId: String {
-        switch self {
-        case .configurationError:
-            return "configurationError"
-        case .connectionError:
-            return "connectionError"
-        case .missingDataError:
-            return "missingDataError"
-        case .glucoseTooOld:
-            return "glucoseTooOld"
-        case .invalidFutureGlucose:
-            return "invalidFutureGlucose"
-        case .pumpDataTooOld:
-            return "pumpDataTooOld"
-        case .recommendationExpired:
-            return "recommendationExpired"
-        case .pumpSuspended:
-            return "pumpSuspended"
-        case .pumpManagerError:
-            return "pumpManagerError"
-        case .unknownError:
-            return "unknownError"
-        }
-    }
-
-    var issueDetails: [String: String] {
-        var details: [String: String] = [:]
-        switch self {
-        case .configurationError(let detail):
-            details["detail"] = detail.rawValue
-        case .missingDataError(let detail):
-            details["detail"] = detail.rawValue
-        case .glucoseTooOld(let date):
-            details["date"] = StoredDosingDecisionIssue.description(for: date)
-        case .invalidFutureGlucose(let date):
-            details["date"] = StoredDosingDecisionIssue.description(for: date)
-        case .pumpDataTooOld(let date):
-            details["date"] = StoredDosingDecisionIssue.description(for: date)
-        case .recommendationExpired(let date):
-            details["date"] = StoredDosingDecisionIssue.description(for: date)
-        case .pumpManagerError(let pumpManagerError):
-            details = pumpManagerError.issueDetails
-        case .unknownError(let error):
-            details["error"] = StoredDosingDecisionIssue.description(for: error)
-        default:
-            break
-        }
-        return details
-    }
 }
 
 extension LoopError: LocalizedError {

@@ -8,6 +8,7 @@
 
 import BackgroundTasks
 import HealthKit
+import LoopAlgorithmCore
 import LoopKit
 import LoopKitUI
 import LoopCore
