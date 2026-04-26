@@ -14,7 +14,9 @@ import Intents
 import os
 import os.log
 import UserNotifications
+import Combine
 import LoopKit
+import LoopCore
 import OmniBLE
 
 
@@ -29,10 +31,33 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     private(set) var healthKitWriter: HealthKitWriter?
     private(set) var extendedRuntimeCoordinator: ExtendedRuntimeCoordinator?
 
+    // B.3.a Phase 5: watch self-driving bootstraps
+    private(set) var watchAlgorithmBootstrap: WatchAlgorithmBootstrap?
+    private(set) var watchRemoteCommandBootstrap: WatchRemoteCommandBootstrap?
+    private(set) var backgroundPollScheduler: BackgroundPollScheduler?
+
+    /// Phase 5 settings snapshot — Phase 6 replaces with `PhoneWatchSettingsSync`.
+    /// Kept on `self` so bootstraps re-read the current value via closure.
+    private var watchSettingsSnapshot: WatchSettingsSnapshot = WatchSettingsSnapshot()
+
+    /// Phase 5 supporting stores for `RemoteDataServicesManager`. Built lazily
+    /// the first time the watch becomes the driver and retained for the
+    /// lifetime of the process.
+    private var lazyRemoteCommandStores: WatchRemoteCommandStores?
+
+    /// Phase 5 dosing-decision store, built lazily for the algorithm runner.
+    /// Watch doesn't currently persist dosing decisions to a real cache;
+    /// uses an in-memory persistence controller.
+    private var lazyDosingDecisionStore: DosingDecisionStore?
+
+    /// Phase 5 dose store, built lazily.
+    private var lazyDoseStore: DoseStore?
+
     private let log = OSLog(category: "ExtensionDelegate")
 
     private var observers: [NSKeyValueObservation] = []
     private var notifications: [NSObjectProtocol] = []
+    private var handoffStateCancellable: AnyCancellable?
 
     static func shared() -> ExtensionDelegate {
         return WKExtension.shared().extensionDelegate
@@ -129,6 +154,100 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         )
         orchestrator.start()
         self.handoffOrchestrator = orchestrator
+
+        // B.3.a Phase 5: watch self-driving bootstraps
+        bootstrapWatchSelfDrivingStack(orchestrator: orchestrator)
+    }
+
+    /// B.3.a Phase 5: construct the algorithm + remote-command bootstraps and
+    /// the background poll scheduler, then subscribe to the orchestrator's
+    /// `handoffState` publisher so each transition fans out to both
+    /// bootstraps.
+    private func bootstrapWatchSelfDrivingStack(orchestrator: HandoffOrchestrator) {
+        let algorithmBootstrap = WatchAlgorithmBootstrap(
+            storesProvider: { [weak self] in self?.makeAlgorithmStoresIfPossible() },
+            settingsProvider: { [weak self] in self?.watchSettingsSnapshot }
+        )
+        let remoteBootstrap = WatchRemoteCommandBootstrap(
+            storesProvider: { [weak self] in self?.makeAlgorithmStoresIfPossible() },
+            supportingStoresProvider: { [weak self] in self?.makeSupportingStoresIfPossible() },
+            settingsProvider: { [weak self] in self?.watchSettingsSnapshot }
+        )
+        let pollScheduler = BackgroundPollScheduler(
+            shouldPoll: { [weak remoteBootstrap] in remoteBootstrap?.manager != nil },
+            performPoll: { [weak remoteBootstrap] in remoteBootstrap?.triggerPollIfActive() }
+        )
+
+        self.watchAlgorithmBootstrap = algorithmBootstrap
+        self.watchRemoteCommandBootstrap = remoteBootstrap
+        self.backgroundPollScheduler = pollScheduler
+
+        // Fan handoff-state changes out to both bootstraps. Re-publishes are
+        // idempotent so we don't need to dedup on `removeDuplicates`.
+        handoffStateCancellable = orchestrator.$handoffState
+            .receive(on: DispatchQueue.main)
+            .sink { state in
+                algorithmBootstrap.update(handoffState: state)
+                remoteBootstrap.update(handoffState: state)
+            }
+
+        // Note: the first background-refresh schedule call must happen after
+        // applicationDidFinishLaunching, otherwise WKExtension throws
+        // "WKExtensionDelegate (null)". See `applicationDidFinishLaunching`.
+    }
+
+    /// Phase 5 watch-side stores assembly. CarbStore + GlucoseStore are
+    /// reused from `WatchContextManager`; DoseStore + DosingDecisionStore
+    /// are built lazily on first access.
+    private func makeAlgorithmStoresIfPossible() -> WatchAlgorithmStores? {
+        let cacheStore = PersistenceController.controllerInLocalDirectory()
+        if lazyDoseStore == nil {
+            lazyDoseStore = DoseStore(
+                cacheStore: cacheStore,
+                cacheLength: .hours(24),
+                insulinModelProvider: PresetInsulinModelProvider(defaultRapidActingModel: nil),
+                longestEffectDuration: ExponentialInsulinModelPreset.rapidActingAdult.effectDuration,
+                basalProfile: nil,
+                insulinSensitivitySchedule: nil,
+                overrideHistory: nil,
+                lastPumpEventsReconciliation: nil,
+                provenanceIdentifier: HKSource.default().bundleIdentifier
+            )
+        }
+        if lazyDosingDecisionStore == nil {
+            lazyDosingDecisionStore = DosingDecisionStore(
+                store: cacheStore,
+                expireAfter: .hours(24)
+            )
+        }
+        guard let doseStore = lazyDoseStore,
+              let ddStore = lazyDosingDecisionStore else {
+            return nil
+        }
+        return WatchAlgorithmStores(
+            carbStore: loopManager.carbStore,
+            doseStore: doseStore,
+            glucoseStore: loopManager.glucoseStore,
+            dosingDecisionStore: ddStore
+        )
+    }
+
+    /// Phase 5 supporting stores for `RemoteDataServicesManager`.
+    private func makeSupportingStoresIfPossible() -> WatchRemoteCommandStores? {
+        if lazyRemoteCommandStores == nil {
+            let cacheStore = PersistenceController.controllerInLocalDirectory()
+            lazyRemoteCommandStores = WatchRemoteCommandStores(
+                cgmEventStore: CgmEventStore(cacheStore: cacheStore, cacheLength: .hours(24)),
+                settingsStore: SettingsStore(store: cacheStore, expireAfter: .hours(24)),
+                overrideHistory: TemporaryScheduleOverrideHistory(),
+                insulinDeliveryStore: InsulinDeliveryStore(
+                    cacheStore: cacheStore,
+                    cacheLength: .hours(24),
+                    provenanceIdentifier: HKSource.default().bundleIdentifier
+                )
+            )
+        }
+        return lazyRemoteCommandStores
     }
 
     func applicationDidFinishLaunching() {
@@ -136,6 +255,10 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         if #available(watchOSApplicationExtension 5.0, *) {
             INRelevantShortcutStore.default.registerShortcuts()
         }
+        // B.3.a Phase 5: schedule the first background poll wake. Must happen
+        // after WKExtension has the delegate wired up, otherwise the call
+        // crashes with "WKExtensionDelegate (null)".
+        backgroundPollScheduler?.scheduleNext()
     }
 
     func applicationDidBecomeActive() {
@@ -162,6 +285,9 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
             switch task {
             case is WKApplicationRefreshBackgroundTask:
                 log.default("Processing WKApplicationRefreshBackgroundTask")
+                // B.3.a Phase 5: trigger remote-data poll cycle if the
+                // watch is currently the driver and Nightscout is configured.
+                backgroundPollScheduler?.handleWake()
                 break
             case let task as WKSnapshotRefreshBackgroundTask:
                 log.default("Processing WKSnapshotRefreshBackgroundTask")

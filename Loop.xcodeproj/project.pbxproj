@@ -87,6 +87,7 @@
 		231723D38F9452BD1D74DC58 /* LoopAlgorithmCore-watchOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9F68F63F200483A5D11B40F2 /* LoopAlgorithmCore-watchOS.framework */; };
 		296D683B690546C6B7826DDB /* LoopAlgorithmRunnerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69081C1DFF394B528C7ABD90 /* LoopAlgorithmRunnerDelegate.swift */; };
 		2C47787E7286BF548617916E /* HKUnit+LocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C482251645A52AFF8E9DF32 /* HKUnit+LocalizedString.swift */; };
+		2CCA6A8E7E60C1A9E04A5D8F /* BackgroundPollScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DBACE90FE46C046D7C944F5 /* BackgroundPollScheduler.swift */; };
 		2FE4F4E4DBCC44AFABCE2735 /* HeartbeatScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A97A9759A44726A9FBEDEC /* HeartbeatScheduler.swift */; };
 		2FFC656074A640528A5BB726 /* GlucoseCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */; };
 		38427E2F72593F1C7CAE926E /* LoopAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C56AC3C4371558534B519CC /* LoopAlgorithmRunner.swift */; };
@@ -271,6 +272,8 @@
 		4FF4D0F81E1725B000846527 /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434F54561D287FDB002A9274 /* NibLoadable.swift */; };
 		4FF4D1001E18374700846527 /* WatchContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF4D0FF1E18374700846527 /* WatchContext.swift */; };
 		4FF4D1011E18375000846527 /* WatchContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF4D0FF1E18374700846527 /* WatchContext.swift */; };
+		503149FBE22CF89F3553A3A7 /* WatchRemoteCommandBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AA4AFC96E2BE1D43C5BD62 /* WatchRemoteCommandBootstrap.swift */; };
+		61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */; };
 		623575103230CD309CD8E120 /* LoopAlgorithmCore-watchOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9F68F63F200483A5D11B40F2 /* LoopAlgorithmCore-watchOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		62E7554AE77F4726836D0DE5 /* GlucoseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */; };
 		65A87A4BEFD4945EF357AC02 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FFCF21EAE05D00AF44BF /* LoopCore.framework */; };
@@ -358,6 +361,7 @@
 		89F9119624358E6900ECCAF3 /* BolusPickerValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89F9119524358E6900ECCAF3 /* BolusPickerValues.swift */; };
 		89FE21AD24AC57E30033F501 /* Collection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89FE21AC24AC57E30033F501 /* Collection.swift */; };
 		8B50B27346166D01CB3C5CDB /* LoopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436A0DA41D236A2A00104B24 /* LoopError.swift */; };
+		94720A4691BB98B503831216 /* WatchAlgorithmBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EDAF9CDCEA3FE587F73869 /* WatchAlgorithmBootstrap.swift */; };
 		959452C233E5B601203A3BAF /* LoopAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C56AC3C4371558534B519CC /* LoopAlgorithmRunner.swift */; };
 		963CAA955EC64CD5B6F8E46F /* HealthKitWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */; };
 		9817C257844B492E94927FEF /* GlucoseReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB043638C14C2799375D54 /* GlucoseReading.swift */; };
@@ -422,6 +426,7 @@
 		AAC65206E62D4840A5D600D5 /* ExtendedRuntimeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EA43E989364C63872E9437 /* ExtendedRuntimeCoordinator.swift */; };
 		AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */; };
 		AF24CEA23D3F475C93EC8AB4 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */; };
+		B3ADC067ED5A880674615B9A /* WatchAlgorithmDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC588A87E160380BD2AA3CAB /* WatchAlgorithmDriver.swift */; };
 		B4001CEE28CBBC82002FB414 /* AlertManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4001CED28CBBC82002FB414 /* AlertManagementView.swift */; };
 		B405E35924D2A75B00DD058D /* DerivedAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A966152923EA5A37005D8B29 /* DerivedAssets.xcassets */; };
 		B405E35A24D2B1A400DD058D /* HUDAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F2C15961E09E94E00E160D4 /* HUDAssets.xcassets */; };
@@ -649,6 +654,7 @@
 		F018AC8966B1FFDF783DE88E /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9002A21EB209400AF44BF /* LoopCore.framework */; };
 		F0415E0FCEE9BB765C7D01BB /* GlucoseBasedApplicationFactorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC389F72A2B620B0066E2E8 /* GlucoseBasedApplicationFactorStrategy.swift */; };
 		F61569B1F68EBE8CFBB4E99F /* HKUnit+LocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C482251645A52AFF8E9DF32 /* HKUnit+LocalizedString.swift */; };
+		F71A7C135799A2B9347C6191 /* Base32 in Frameworks */ = {isa = PBXBuildFile; productRef = A4E0D971969D82C9A61515FA /* Base32 */; };
 		F80D5B397E144FA5BC24D470 /* SharedStateBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED129A39903141C6880F7BB7 /* SharedStateBridge.swift */; };
 		F9F549BD6A9F6BF2020BFCB9 /* CarbStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D380224EADF36005E2F50 /* CarbStoreProtocol.swift */; };
 		FFB618C2C280468C86D228FB /* GlucoseCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AF9E04978641A187D17125 /* GlucoseCache.swift */; };
@@ -937,6 +943,7 @@
 		217DB84601C04D2EAE8FD956 /* G7SensorKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = G7SensorKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2859EFF609E844A5BF478FD1 /* ExtendedRuntimeCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtendedRuntimeCoordinatorTests.swift; path = "WatchApp ExtensionTests/ExtendedRuntimeCoordinatorTests.swift"; sourceTree = SOURCE_ROOT; };
 		3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseCacheTests.swift; path = "WatchApp ExtensionTests/GlucoseCacheTests.swift"; sourceTree = SOURCE_ROOT; };
+		327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase5_BootstrapsTest.swift; path = Phase5_BootstrapsTest.swift; sourceTree = "<group>"; };
 		334165BFE423BFA4E9650446 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneWatchTransport.swift; path = "WatchApp Extension/PhoneWatch/PhoneWatchTransport.swift"; sourceTree = SOURCE_ROOT; };
 		3D03C6DA2AACE6AC00FDE5D2 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Intents.strings; sourceTree = "<group>"; };
@@ -1101,6 +1108,7 @@
 		43FCEEA8221A615B0013DD30 /* StatusChartsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusChartsManager.swift; sourceTree = "<group>"; };
 		43FCEEAC221A66780013DD30 /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
 		43FCEEB0221A863E0013DD30 /* StatusChartsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusChartsManager.swift; sourceTree = "<group>"; };
+		46EDAF9CDCEA3FE587F73869 /* WatchAlgorithmBootstrap.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmBootstrap.swift; path = WatchAlgorithmBootstrap.swift; sourceTree = "<group>"; };
 		4D3B40021D4A9DFE00BC6334 /* G4ShareSpy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = G4ShareSpy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DEB043638C14C2799375D54 /* GlucoseReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseReading.swift; path = "WatchApp Extension/Sensor/GlucoseReading.swift"; sourceTree = SOURCE_ROOT; };
 		4F08DE8E1E7BB871006741EA /* CollectionType+Loop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CollectionType+Loop.swift"; sourceTree = "<group>"; };
@@ -1198,6 +1206,7 @@
 		7D9BF14623370E8D005DCFD6 /* ro */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ro; path = ro.lproj/Localizable.strings; sourceTree = "<group>"; };
 		7E69CFFB2A16A77E00203CBD /* ResetLoopManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetLoopManager.swift; sourceTree = "<group>"; };
 		80F864E52433BF5D0026EC26 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		83AA4AFC96E2BE1D43C5BD62 /* WatchRemoteCommandBootstrap.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchRemoteCommandBootstrap.swift; path = WatchRemoteCommandBootstrap.swift; sourceTree = "<group>"; };
 		84AA81D22A4A27A3000B658B /* LoopWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopWidgets.swift; sourceTree = "<group>"; };
 		84AA81D52A4A28AF000B658B /* WidgetBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBackground.swift; sourceTree = "<group>"; };
 		84AA81D72A4A2910000B658B /* StatusWidgetTimelimeEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusWidgetTimelimeEntry.swift; sourceTree = "<group>"; };
@@ -1272,6 +1281,7 @@
 		89FE21AC24AC57E30033F501 /* Collection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collection.swift; sourceTree = "<group>"; };
 		9366A91624FB4D489DD2E784 /* HandoffPolicyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HandoffPolicyEngine.swift; path = "WatchApp Extension/Handoff/HandoffPolicyEngine.swift"; sourceTree = SOURCE_ROOT; };
 		9AD783ADA5B9343D082F61A3 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = Info.plist; path = Info.plist; sourceTree = "<group>"; };
+		9DBACE90FE46C046D7C944F5 /* BackgroundPollScheduler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BackgroundPollScheduler.swift; path = BackgroundPollScheduler.swift; sourceTree = "<group>"; };
 		9F68F63F200483A5D11B40F2 /* LoopAlgorithmCore-watchOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = "LoopAlgorithmCore-watchOS.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A20FB8776F6A88FEE34DAF43 /* LoopAlgorithmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LoopAlgorithmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A22A82FDA3554D77BC068817 /* WatchApp ExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WatchApp ExtensionTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1569,6 +1579,7 @@
 		F5E0BDD827E1D71E0033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Main.strings; sourceTree = "<group>"; };
 		F5E0BDDA27E1D71F0033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F5E0BDE327E1D7230033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FC588A87E160380BD2AA3CAB /* WatchAlgorithmDriver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmDriver.swift; path = WatchAlgorithmDriver.swift; sourceTree = "<group>"; };
 		FD84A081E0E14A27AE019F82 /* PhoneWatchSessionCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneWatchSessionCoordinatorTests.swift; path = "WatchApp ExtensionTests/PhoneWatchSessionCoordinatorTests.swift"; sourceTree = SOURCE_ROOT; };
 		WB2CA10000000000F0 /* OmniBLE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = OmniBLE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		WB2CA10000000000F1 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransport.swift; sourceTree = "<group>"; };
@@ -1652,6 +1663,7 @@
 				6B6036285E654E899F014EC7 /* G7SensorKit.framework in Frameworks */,
 				231723D38F9452BD1D74DC58 /* LoopAlgorithmCore-watchOS.framework in Frameworks */,
 				A6F3FFE541FFBA7F565A0477 /* NightscoutServiceKit.framework in Frameworks */,
+				F71A7C135799A2B9347C6191 /* Base32 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1792,6 +1804,15 @@
 				B4D4534028E5CA7900F1A8D9 /* AlertMuterTests.swift */,
 			);
 			path = Alerts;
+			sourceTree = "<group>";
+		};
+		20BD735AF87D620A97A290C6 /* Driver */ = {
+			isa = PBXGroup;
+			children = (
+				FC588A87E160380BD2AA3CAB /* WatchAlgorithmDriver.swift */,
+			);
+			name = Driver;
+			path = Driver;
 			sourceTree = "<group>";
 		};
 		3ED319892EB659E600820BCF /* Live Activity */ = {
@@ -1992,6 +2013,9 @@
 				C0D90DA6F09F41F8ACA8D1BF /* Lifecycle */,
 				8AF24B0CE7C845F694F5C2BB /* PhoneWatch */,
 				F08D133C35ED4AB09F27A7E1 /* Handoff */,
+				20BD735AF87D620A97A290C6 /* Driver */,
+				8DE36B527BF5692D99C62778 /* Bootstrap */,
+				D70F92345646BF6A14334DF2 /* BackgroundTasks */,
 			);
 			path = "WatchApp Extension";
 			sourceTree = "<group>";
@@ -2657,6 +2681,16 @@
 			path = PhoneWatch;
 			sourceTree = "<group>";
 		};
+		8DE36B527BF5692D99C62778 /* Bootstrap */ = {
+			isa = PBXGroup;
+			children = (
+				46EDAF9CDCEA3FE587F73869 /* WatchAlgorithmBootstrap.swift */,
+				83AA4AFC96E2BE1D43C5BD62 /* WatchRemoteCommandBootstrap.swift */,
+			);
+			name = Bootstrap;
+			path = Bootstrap;
+			sourceTree = "<group>";
+		};
 		8F1BBD887A2C4ACEAA438DE0 /* WatchApp ExtensionTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -2674,6 +2708,7 @@
 				E01203786D1373BA05C3B25C /* LoopAlgorithmCoreImportTest.swift */,
 				631C894D174F9241F016AEA9 /* NightscoutServiceLoadingTest.swift */,
 				B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */,
+				327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */,
 			);
 			path = "WatchApp ExtensionTests";
 			sourceTree = "<group>";
@@ -2819,6 +2854,15 @@
 				C1092BFD29F8116700AE3D1C /* apply-info-customizations.sh */,
 			);
 			path = Scripts;
+			sourceTree = "<group>";
+		};
+		D70F92345646BF6A14334DF2 /* BackgroundTasks */ = {
+			isa = PBXGroup;
+			children = (
+				9DBACE90FE46C046D7C944F5 /* BackgroundPollScheduler.swift */,
+			);
+			name = BackgroundTasks;
+			path = BackgroundTasks;
 			sourceTree = "<group>";
 		};
 		E90909CB24E34A7A00F963D2 /* high_and_rising_with_cob */ = {
@@ -3141,6 +3185,9 @@
 				1ADC950AFD96405591506C85 /* PBXTargetDependency */,
 			);
 			name = "WatchApp Extension";
+			packageProductDependencies = (
+				A4E0D971969D82C9A61515FA /* Base32 */,
+			);
 			productName = "WatchApp Extension";
 			productReference = 43A9437E1B926B7B0051FA24 /* WatchApp Extension.appex */;
 			productType = "com.apple.product-type.watchkit2-extension";
@@ -3461,6 +3508,7 @@
 				C1CCF10B2858F4F70035389C /* XCRemoteSwiftPackageReference "SwiftCharts" */,
 				C1D6EE9E2A06C7270047DE5C /* XCRemoteSwiftPackageReference "MKRingProgressView" */,
 				C1735B1C2A0809830082BB8A /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				97B74E2A49A1F03497DBB2D5 /* XCRemoteSwiftPackageReference "Base32" */,
 			);
 			productRefGroup = 43776F8D1B8022E90074EA36 /* Products */;
 			projectDirPath = "";
@@ -3848,6 +3896,7 @@
 				7AA69427DFC38A90721A7A9D /* LoopAlgorithmCoreImportTest.swift in Sources */,
 				6D1200C021BC36840A3A5727 /* NightscoutServiceLoadingTest.swift in Sources */,
 				BCE0D1D6CD31C643DD469207 /* Phase4_RemoteDataServicesManagerImportTest.swift in Sources */,
+				61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4160,6 +4209,10 @@
 				435400351C9F878D00D5819C /* SetBolusUserInfo.swift in Sources */,
 				895788B2242E69A2002CB114 /* CircularAccessoryButtonStyle.swift in Sources */,
 				A69496E50A6A725D3276234C /* RemoteDataServicesManager.swift in Sources */,
+				B3ADC067ED5A880674615B9A /* WatchAlgorithmDriver.swift in Sources */,
+				94720A4691BB98B503831216 /* WatchAlgorithmBootstrap.swift in Sources */,
+				503149FBE22CF89F3553A3A7 /* WatchRemoteCommandBootstrap.swift in Sources */,
+				2CCA6A8E7E60C1A9E04A5D8F /* BackgroundPollScheduler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5724,6 +5777,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		97B74E2A49A1F03497DBB2D5 /* XCRemoteSwiftPackageReference "Base32" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mattrubin/Base32.git";
+			requirement = {
+				branch = "1.1.2+spm";
+				kind = branch;
+			};
+		};
 		C1735B1C2A0809830082BB8A /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LoopKit/ZIPFoundation.git";
@@ -5751,6 +5812,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		A4E0D971969D82C9A61515FA /* Base32 */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 97B74E2A49A1F03497DBB2D5 /* XCRemoteSwiftPackageReference "Base32" */;
+			productName = Base32;
+		};
 		C11B9D5A286778A800500CF8 /* SwiftCharts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C1CCF10B2858F4F70035389C /* XCRemoteSwiftPackageReference "SwiftCharts" */;
