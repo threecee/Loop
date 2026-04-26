@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import LoopAlgorithmCore
 import LoopCore
 
 // MARK: - Static configuration

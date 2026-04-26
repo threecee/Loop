@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import HealthKit
+import LoopAlgorithmCore
 import LoopKit
 import LoopCore
 import WidgetKit
