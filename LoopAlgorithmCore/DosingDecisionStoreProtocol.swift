@@ -8,7 +8,7 @@
 
 import LoopKit
 
-protocol DosingDecisionStoreProtocol: AnyObject {
+public protocol DosingDecisionStoreProtocol: AnyObject {
     func storeDosingDecision(_ dosingDecision: StoredDosingDecision, completion: @escaping () -> Void)
 }
 

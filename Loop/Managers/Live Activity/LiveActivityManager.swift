@@ -7,6 +7,7 @@
 //
 
 import LoopKitUI
+import LoopAlgorithmCore
 import LoopKit
 import LoopCore
 import Foundation

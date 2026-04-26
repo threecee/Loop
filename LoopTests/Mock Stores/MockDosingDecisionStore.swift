@@ -6,6 +6,7 @@
 //  Copyright © 2020 LoopKit Authors. All rights reserved.
 //
 
+import LoopAlgorithmCore
 import LoopKit
 @testable import Loop
 

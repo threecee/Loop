@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import LoopAlgorithmCore
 import LoopKit
 import LoopKitUI
 import HealthKit

@@ -9,7 +9,7 @@
 import LoopKit
 import HealthKit
 
-protocol CarbStoreProtocol: AnyObject {
+public protocol CarbStoreProtocol: AnyObject {
     
     var preferredUnit: HKUnit! { get }
     

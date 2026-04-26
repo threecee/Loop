@@ -8,6 +8,7 @@
 
 import Foundation
 import HealthKit
+import LoopAlgorithmCore
 import LoopKit
 import LoopKitUI
 import os.log

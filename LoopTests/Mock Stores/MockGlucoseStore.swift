@@ -7,6 +7,7 @@
 //
 
 import HealthKit
+import LoopAlgorithmCore
 import LoopKit
 @testable import Loop
 

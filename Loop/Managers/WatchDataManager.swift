@@ -9,6 +9,7 @@
 import HealthKit
 import UIKit
 import WatchConnectivity
+import LoopAlgorithmCore
 import LoopKit
 import LoopCore
 

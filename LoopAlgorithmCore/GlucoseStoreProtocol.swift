@@ -9,7 +9,7 @@
 import LoopKit
 import HealthKit
 
-protocol GlucoseStoreProtocol: AnyObject {
+public protocol GlucoseStoreProtocol: AnyObject {
     
     var latestGlucose: GlucoseSampleValue? { get }
     
