@@ -127,23 +127,13 @@ extension Collection where Index == Int {
     }
 }
 
-// MARK: - LoopError → StoredDosingDecision.Issue (LAC-local, minimal)
-//
-// The richer iOS-side conversion (with structured `id` + `details`) lives in
-// Loop/Extensions/LoopError+Issue.swift and depends on iOS-only
-// `StoredDosingDecisionIssue.description`. The runner uses this minimal
-// converter to keep dosing-decision persistence working in cross-platform
-// builds; iOS LoopDataManager (Phase 2.E) can wrap the runner and substitute
-// the richer Issue when needed.
-
-extension StoredDosingDecision {
-    mutating func loopAlgorithmCore_appendError(_ error: LoopError) {
-        errors.append(StoredDosingDecision.Issue(id: String(describing: error)))
-    }
-    mutating func loopAlgorithmCore_appendErrors(_ errors: [LoopError]) {
-        errors.forEach { self.loopAlgorithmCore_appendError($0) }
-    }
-}
+// LoopError / LoopAlgorithmWarning → `StoredDosingDecision.Issue` conversion
+// is delegated through `LoopAlgorithmRunnerDelegate.loopAlgorithmRunner(_:issueFor:)`
+// so the host (iOS Loop) can plug in its richer mapping
+// (`Loop/Extensions/LoopError+Issue.swift`, `Loop/Models/LoopWarning.swift`).
+// The default protocol-extension implementation falls back to a minimal
+// stringification so cross-platform callers (watch, tests) work without
+// having to implement the hooks.
 
 // MARK: - Update reason (algorithm-internal)
 
@@ -240,7 +230,7 @@ public final class LoopAlgorithmRunner {
 
     // MARK: Cached effect timelines
 
-    private var carbEffect: [GlucoseEffect]? {
+    private(set) public var carbEffect: [GlucoseEffect]? {
         didSet {
             predictedGlucose = nil
             // Carb data may be back-dated, so re-calculate the retrospective glucose.
@@ -248,7 +238,7 @@ public final class LoopAlgorithmRunner {
         }
     }
 
-    private var insulinEffect: [GlucoseEffect]?
+    private(set) public var insulinEffect: [GlucoseEffect]?
 
     private var insulinEffectIncludingPendingInsulin: [GlucoseEffect]? {
         didSet {
@@ -256,13 +246,13 @@ public final class LoopAlgorithmRunner {
         }
     }
 
-    private var glucoseMomentumEffect: [GlucoseEffect]? {
+    private(set) public var glucoseMomentumEffect: [GlucoseEffect]? {
         didSet {
             predictedGlucose = nil
         }
     }
 
-    private var retrospectiveGlucoseEffect: [GlucoseEffect] = [] {
+    private(set) public var retrospectiveGlucoseEffect: [GlucoseEffect] = [] {
         didSet {
             predictedGlucose = nil
         }
@@ -272,7 +262,7 @@ public final class LoopAlgorithmRunner {
     /// slightly as a buffer.
     private let retrospectiveCorrectionGroupingIntervalMultiplier = 1.01
 
-    private var retrospectiveGlucoseDiscrepancies: [GlucoseEffect]? {
+    private(set) public var retrospectiveGlucoseDiscrepancies: [GlucoseEffect]? {
         didSet {
             retrospectiveGlucoseDiscrepanciesSummed = retrospectiveGlucoseDiscrepancies?.combinedSums(
                 of: LoopMath.retrospectiveCorrectionGroupingInterval * retrospectiveCorrectionGroupingIntervalMultiplier
@@ -284,28 +274,28 @@ public final class LoopAlgorithmRunner {
 
     private var suspendInsulinDeliveryEffect: [GlucoseEffect] = []
 
-    fileprivate var predictedGlucose: [PredictedGlucoseValue]? {
+    private(set) public var predictedGlucose: [PredictedGlucoseValue]? {
         didSet {
             recommendedAutomaticDose = nil
             predictedGlucoseIncludingPendingInsulin = nil
         }
     }
 
-    fileprivate var predictedGlucoseIncludingPendingInsulin: [PredictedGlucoseValue]?
+    private(set) public var predictedGlucoseIncludingPendingInsulin: [PredictedGlucoseValue]?
 
     private(set) public var recentCarbEntries: [StoredCarbEntry]?
 
-    fileprivate var recommendedAutomaticDose: (recommendation: AutomaticDoseRecommendation, date: Date)?
+    private(set) public var recommendedAutomaticDose: (recommendation: AutomaticDoseRecommendation, date: Date)?
 
     private(set) public var carbsOnBoard: CarbValue?
 
-    fileprivate var lastRequestedBolus: DoseEntry?
+    public internal(set) var lastRequestedBolus: DoseEntry?
 
     private(set) public var lastLoopError: LoopError?
 
     /// A timeline of average velocity of glucose change counteracting
     /// predicted insulin effects.
-    fileprivate var insulinCounteractionEffects: [GlucoseEffectVelocity] = [] {
+    private(set) public var insulinCounteractionEffects: [GlucoseEffectVelocity] = [] {
         didSet {
             carbEffect = nil
             carbsOnBoard = nil
@@ -387,13 +377,75 @@ public final class LoopAlgorithmRunner {
 
         // The original LoopDataManager wires three NotificationCenter
         // observers (carbEntriesDidChange, glucoseSamplesDidChange, doseStore
-        // changes) here. Those remain in iOS LoopDataManager — Phase 2.E will
-        // forward them into the runner via the appropriate `add*` method.
+        // changes) here. Those remain on the iOS LoopDataManager shim, which
+        // forwards into the runner via `handleCarbEntriesDidChange()`,
+        // `handleGlucoseSamplesDidChange()`, and `handleDoseStoreDidChange()`.
         //
         // Same for the `automaticDosingStatus.$automaticDosingEnabled` Combine
         // sink (cancels temp basal when closed-loop mode flips off): keeping
         // the subscription on the iOS shim avoids cross-platform Combine
         // ordering surprises.
+    }
+
+    // MARK: - Notification observer hand-offs (B.3.a Phase 2.E)
+    //
+    // The iOS shim wires NotificationCenter observers and forwards them to
+    // these methods so the runner owns the cache-invalidation + notify
+    // semantics that used to live inline in those observers.
+
+    public func handleCarbEntriesDidChange() {
+        dataAccessQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.logger.default("Received notification of carb entries changing")
+            self.carbEffect = nil
+            self.carbsOnBoard = nil
+            self.recentCarbEntries = nil
+            self.remoteRecommendationNeedsUpdating = true
+            self.notify(forChange: .carbs)
+        }
+    }
+
+    public func handleGlucoseSamplesDidChange() {
+        dataAccessQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.logger.default("Received notification of glucose samples changing")
+            self.glucoseMomentumEffect = nil
+            self.remoteRecommendationNeedsUpdating = true
+            self.notify(forChange: .glucose)
+        }
+    }
+
+    public func handleDoseStoreDidChange() {
+        dataAccessQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.logger.default("Received notification of dosing changing")
+            self.clearCachedInsulinEffects()
+            self.remoteRecommendationNeedsUpdating = true
+            self.notify(forChange: .insulin)
+        }
+    }
+
+    // MARK: - Data-access queue helpers (B.3.a Phase 2.E)
+    //
+    // The iOS shim's LoopStateView needs to read cached state on the runner's
+    // serial queue so concurrent loop iterations don't corrupt the snapshot.
+    // These helpers expose the queue without exposing the queue object
+    // itself, keeping the runner's internal queueing strategy private.
+
+    public func runOnDataAccessQueue(_ work: @escaping () -> Void) {
+        dataAccessQueue.async { work() }
+    }
+
+    public func dispatchPrecondition_assertOnDataAccessQueue() {
+        dispatchPrecondition(condition: .onQueue(dataAccessQueue))
+    }
+
+    /// Runs `update(for: .getLoopState)` on the data-access queue
+    /// synchronously. Used by `LoopDataManager.getLoopState`.
+    public func runUpdateForGetLoopState() -> LoopError? {
+        dispatchPrecondition_assertOnDataAccessQueue()
+        let (_, updateError) = self.update(for: .getLoopState)
+        return updateError
     }
 
     // MARK: - Settings mutation
@@ -438,13 +490,18 @@ public final class LoopAlgorithmRunner {
             invalidateCachedEffects = true
         }
 
+        // `basalRateScheduleChanged` flags whether downstream analytics
+        // should fire — matches the original iOS LoopDataManager semantics:
+        // only when BOTH schedules are non-nil AND their items differ.
+        // (Adding or removing the schedule entirely doesn't trigger
+        // analytics; only an item-level change does.)
         let basalRateScheduleChanged: Bool
         if newValue.basalRateSchedule != oldValue.basalRateSchedule {
             doseStore.basalProfile = newValue.basalRateSchedule
             if let n = newValue.basalRateSchedule, let o = oldValue.basalRateSchedule, n.items != o.items {
                 basalRateScheduleChanged = true
             } else {
-                basalRateScheduleChanged = newValue.basalRateSchedule != oldValue.basalRateSchedule
+                basalRateScheduleChanged = false
             }
         } else {
             basalRateScheduleChanged = false
@@ -532,7 +589,7 @@ public final class LoopAlgorithmRunner {
         logger.error("Loop did error: \(String(describing: error))")
         lastLoopError = error
         var dosingDecisionWithError = dosingDecision
-        dosingDecisionWithError.loopAlgorithmCore_appendError(error)
+        appendError(error, to: &dosingDecisionWithError)
         dosingDecisionStore.storeDosingDecision(dosingDecisionWithError) {}
         delegate?.loopAlgorithmRunner(self, loopDidError: error, duration: duration)
     }
@@ -635,7 +692,7 @@ public final class LoopAlgorithmRunner {
         dosingDecision.lastReservoirValue = StoredDosingDecision.LastReservoirValue(doseStore.lastReservoirValue)
 
         if let error = error {
-            dosingDecision.loopAlgorithmCore_appendError(error)
+            appendError(error, to: &dosingDecision)
         }
         self.dosingDecisionStore.storeDosingDecision(dosingDecision) {}
 
@@ -926,7 +983,8 @@ public final class LoopAlgorithmRunner {
         _ = updateGroup.wait(timeout: .distantFuture)
 
         guard let lastGlucoseDate = latestGlucoseDate else {
-            dosingDecision.loopAlgorithmCore_appendError(LoopError.missingDataError(.glucose))
+            appendWarnings(warnings.value, to: &dosingDecision)
+            appendError(LoopError.missingDataError(.glucose), to: &dosingDecision)
             return (dosingDecision, .missingDataError(.glucose))
         }
 
@@ -1073,12 +1131,10 @@ public final class LoopAlgorithmRunner {
             logger.error("\(String(describing: error))")
         }
 
-        // The iOS-only LoopWarning → StoredDosingDecision.Issue conversion is
-        // intentionally skipped here. iOS Phase 2.E will rebuild a parallel
-        // observer chain that consumes `warnings.value` (or the runner can
-        // expose it via a future hook); the algorithm correctness is unchanged
-        // because the only callsite for `dosingDecision.appendWarnings` is the
-        // dosing-decision-store payload that downstream UI displays.
+        // Append warnings via the delegate's issue-conversion hook so the host
+        // (iOS) can substitute its rich `LoopWarning.issue` mapping. The
+        // default delegate impl falls back to a minimal stringification.
+        appendWarnings(warnings.value, to: &dosingDecision)
 
         dosingDecision.date = now()
         dosingDecision.historicalGlucose = historicalGlucose
@@ -1095,7 +1151,7 @@ public final class LoopAlgorithmRunner {
 
             // If we still have a bolus in progress, then warn (unlikely, but possible if device comms fail)
             if lastRequestedBolus != nil, dosingDecision.automaticDoseRecommendation == nil, dosingDecision.manualBolusRecommendation == nil {
-                // bolusInProgress warning intentionally not appended in LAC; iOS shim wires the surface in 2.E
+                appendWarning(.bolusInProgress, to: &dosingDecision)
             }
 
             return (dosingDecision, nil)
@@ -1106,6 +1162,38 @@ public final class LoopAlgorithmRunner {
 
     private func notify(forChange context: LoopAlgorithmUpdateContext) {
         delegate?.loopAlgorithmRunner(self, didChange: context)
+    }
+
+    // MARK: - Issue conversion (delegate-routed with fallback)
+
+    private func issue(for error: LoopError) -> StoredDosingDecision.Issue {
+        if let delegate = delegate {
+            return delegate.loopAlgorithmRunner(self, issueFor: error)
+        }
+        return StoredDosingDecision.Issue(id: String(describing: error))
+    }
+
+    private func issue(for warning: LoopAlgorithmWarning) -> StoredDosingDecision.Issue {
+        if let delegate = delegate {
+            return delegate.loopAlgorithmRunner(self, issueFor: warning)
+        }
+        return StoredDosingDecision.Issue(id: String(describing: warning))
+    }
+
+    fileprivate func appendError(_ error: LoopError, to dosingDecision: inout StoredDosingDecision) {
+        dosingDecision.errors.append(issue(for: error))
+    }
+
+    fileprivate func appendErrors(_ errors: [LoopError], to dosingDecision: inout StoredDosingDecision) {
+        for error in errors { appendError(error, to: &dosingDecision) }
+    }
+
+    fileprivate func appendWarning(_ warning: LoopAlgorithmWarning, to dosingDecision: inout StoredDosingDecision) {
+        dosingDecision.warnings.append(issue(for: warning))
+    }
+
+    fileprivate func appendWarnings(_ warnings: [LoopAlgorithmWarning], to dosingDecision: inout StoredDosingDecision) {
+        for warning in warnings { appendWarning(warning, to: &dosingDecision) }
     }
 
     /// Computes amount of insulin from boluses that have been issued and not confirmed, and
@@ -1137,7 +1225,7 @@ public final class LoopAlgorithmRunner {
         return pendingTempBasalInsulin + pendingBolusAmount
     }
 
-    fileprivate func predictGlucose(
+    public func predictGlucose(
         startingAt startingGlucoseOverride: GlucoseValue? = nil,
         using inputs: PredictionInputEffect,
         historicalInsulinEffect insulinEffectOverride: [GlucoseEffect]? = nil,
@@ -1279,7 +1367,7 @@ public final class LoopAlgorithmRunner {
         return prediction
     }
 
-    fileprivate func predictGlucoseFromManualGlucose(
+    public func predictGlucoseFromManualGlucose(
         _ glucose: NewGlucoseSample,
         potentialBolus: DoseEntry?,
         potentialCarbEntry: NewCarbEntry?,
@@ -1374,7 +1462,7 @@ public final class LoopAlgorithmRunner {
         )
     }
 
-    fileprivate func recommendBolusForManualGlucose(_ glucose: NewGlucoseSample, consideringPotentialCarbEntry potentialCarbEntry: NewCarbEntry?, replacingCarbEntry replacedCarbEntry: StoredCarbEntry?, considerPositiveVelocityAndRC: Bool) throws -> ManualBolusRecommendation? {
+    public func recommendBolusForManualGlucose(_ glucose: NewGlucoseSample, consideringPotentialCarbEntry potentialCarbEntry: NewCarbEntry?, replacingCarbEntry replacedCarbEntry: StoredCarbEntry?, considerPositiveVelocityAndRC: Bool) throws -> ManualBolusRecommendation? {
         guard lastRequestedBolus == nil else {
             // Don't recommend changes if a bolus was just requested.
             return nil
@@ -1386,7 +1474,7 @@ public final class LoopAlgorithmRunner {
         return try recommendManualBolus(forPrediction: prediction, consideringPotentialCarbEntry: potentialCarbEntry)
     }
 
-    fileprivate func recommendBolus(consideringPotentialCarbEntry potentialCarbEntry: NewCarbEntry?, replacingCarbEntry replacedCarbEntry: StoredCarbEntry?, considerPositiveVelocityAndRC: Bool) throws -> ManualBolusRecommendation? {
+    public func recommendBolus(consideringPotentialCarbEntry potentialCarbEntry: NewCarbEntry?, replacingCarbEntry replacedCarbEntry: StoredCarbEntry?, considerPositiveVelocityAndRC: Bool) throws -> ManualBolusRecommendation? {
         guard lastRequestedBolus == nil else {
             return nil
         }
@@ -1577,7 +1665,7 @@ public final class LoopAlgorithmRunner {
 
         guard let glucose = glucoseStore.latestGlucose else {
             logger.error("Latest glucose missing")
-            dosingDecision.loopAlgorithmCore_appendError(LoopError.missingDataError(.glucose))
+            appendError(LoopError.missingDataError(.glucose), to: &dosingDecision)
             return (dosingDecision, .missingDataError(.glucose))
         }
 
@@ -1646,7 +1734,7 @@ public final class LoopAlgorithmRunner {
             errors.append(.missingDataError(.activeInsulin))
         }
 
-        dosingDecision.loopAlgorithmCore_appendErrors(errors)
+        appendErrors(errors, to: &dosingDecision)
         if let error = errors.first {
             logger.error("\(String(describing: error))")
             return (dosingDecision, error)
@@ -1752,7 +1840,7 @@ public final class LoopAlgorithmRunner {
             loopError = error as? LoopError ?? .unknownError(error)
             if let loopError = loopError {
                 logger.error("Error attempting to predict glucose: \(String(describing: loopError))")
-                dosingDecision.loopAlgorithmCore_appendError(loopError)
+                appendError(loopError, to: &dosingDecision)
             }
         }
 

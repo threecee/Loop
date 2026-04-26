@@ -193,6 +193,29 @@ public protocol LoopAlgorithmRunnerDelegate: AnyObject {
                              insulinCounteractionEffects: [GlucoseEffectVelocity],
                              carbEffects: [GlucoseEffect],
                              pendingAutobolusUnits: Double?)
+
+    // MARK: Issue conversion hooks (host-rich `StoredDosingDecision.Issue` mapping)
+    //
+    // The runner persists errors and warnings into the dosing decision's
+    // `errors` / `warnings` arrays. iOS Loop's host extensions
+    // (`LoopError+Issue.swift`, `LoopWarning.issue`) provide a richer
+    // `StoredDosingDecision.Issue(id:details:)` conversion than the
+    // LAC-local stringification fallback. These hooks let the host plug
+    // that conversion in. Default implementations preserve the LAC-local
+    // minimal stringification so cross-platform callers (watch, tests)
+    // don't have to implement them.
+
+    /// Convert a `LoopError` to a host-rich `StoredDosingDecision.Issue`.
+    /// iOS overrides to use `error.issue`; default returns a minimal
+    /// stringified `Issue`.
+    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                             issueFor error: LoopError) -> StoredDosingDecision.Issue
+
+    /// Convert a `LoopAlgorithmWarning` to a host-rich `StoredDosingDecision.Issue`.
+    /// iOS overrides to use `LoopWarning.issue`; default returns a minimal
+    /// stringified `Issue`.
+    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                             issueFor warning: LoopAlgorithmWarning) -> StoredDosingDecision.Issue
 }
 
 // MARK: - Default no-op implementations
@@ -248,4 +271,14 @@ public extension LoopAlgorithmRunnerDelegate {
                              insulinCounteractionEffects: [GlucoseEffectVelocity],
                              carbEffects: [GlucoseEffect],
                              pendingAutobolusUnits: Double?) {}
+
+    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                             issueFor error: LoopError) -> StoredDosingDecision.Issue {
+        StoredDosingDecision.Issue(id: String(describing: error))
+    }
+
+    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                             issueFor warning: LoopAlgorithmWarning) -> StoredDosingDecision.Issue {
+        StoredDosingDecision.Issue(id: String(describing: warning))
+    }
 }
