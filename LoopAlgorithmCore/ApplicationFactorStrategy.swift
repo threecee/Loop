@@ -1,6 +1,6 @@
 //
 //  ApplicationFactorStrategy.swift
-//  Loop
+//  LoopAlgorithmCore
 //
 //  Created by Jonas Björkert on 2023-06-03.
 //  Copyright © 2023 LoopKit Authors. All rights reserved.
@@ -11,7 +11,7 @@ import HealthKit
 import LoopKit
 import LoopCore
 
-protocol ApplicationFactorStrategy {
+public protocol ApplicationFactorStrategy {
     func calculateDosingFactor(
         for glucose: HKQuantity,
         correctionRangeSchedule: GlucoseRangeSchedule,
