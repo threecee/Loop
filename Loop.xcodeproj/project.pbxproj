@@ -276,6 +276,8 @@
 		503149FBE22CF89F3553A3A7 /* WatchRemoteCommandBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AA4AFC96E2BE1D43C5BD62 /* WatchRemoteCommandBootstrap.swift */; };
 		61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */; };
 		F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */; };
+		A1B2C3D4E5F60001A1B2C3D4 /* Phase7_WarmingUpTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */; };
+		A1B2C3D4E5F60003A1B2C3D4 /* LoopWarmingUpBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60004A1B2C3D4 /* LoopWarmingUpBadge.swift */; };
 		623575103230CD309CD8E120 /* LoopAlgorithmCore-watchOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9F68F63F200483A5D11B40F2 /* LoopAlgorithmCore-watchOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		62E7554AE77F4726836D0DE5 /* GlucoseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */; };
 		65A87A4BEFD4945EF357AC02 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FFCF21EAE05D00AF44BF /* LoopCore.framework */; };
@@ -948,6 +950,8 @@
 		3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseCacheTests.swift; path = "WatchApp ExtensionTests/GlucoseCacheTests.swift"; sourceTree = SOURCE_ROOT; };
 		327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase5_BootstrapsTest.swift; path = Phase5_BootstrapsTest.swift; sourceTree = "<group>"; };
 		F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase6_SettingsSyncReceptionTests.swift; path = Phase6_SettingsSyncReceptionTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase7_WarmingUpTest.swift; path = Phase7_WarmingUpTest.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60004A1B2C3D4 /* LoopWarmingUpBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoopWarmingUpBadge.swift; path = LoopWarmingUpBadge.swift; sourceTree = "<group>"; };
 		334165BFE423BFA4E9650446 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneWatchTransport.swift; path = "WatchApp Extension/PhoneWatch/PhoneWatchTransport.swift"; sourceTree = SOURCE_ROOT; };
 		3D03C6DA2AACE6AC00FDE5D2 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Intents.strings; sourceTree = "<group>"; };
@@ -2590,6 +2594,7 @@
 				895788AA242E69A1002CB114 /* CircularAccessoryButtonStyle.swift */,
 				89A605E824328862009C1096 /* Checkmark.swift */,
 				89A605EE2432925D009C1096 /* CompletionCheckmark.swift */,
+				A1B2C3D4E5F60004A1B2C3D4 /* LoopWarmingUpBadge.swift */,
 				894F6DD8243C060600CCE676 /* ScalablePositionedText.swift */,
 				89A605EA243288E4009C1096 /* TopDownTriangle.swift */,
 				E98A55F624EEE1E10008715D /* OnOffSelectionView.swift */,
@@ -2717,6 +2722,7 @@
 				B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */,
 				327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */,
 				F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */,
+				A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */,
 			);
 			path = "WatchApp ExtensionTests";
 			sourceTree = "<group>";
@@ -3907,6 +3913,7 @@
 				BCE0D1D6CD31C643DD469207 /* Phase4_RemoteDataServicesManagerImportTest.swift in Sources */,
 				61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */,
 				F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */,
+				A1B2C3D4E5F60001A1B2C3D4 /* Phase7_WarmingUpTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4224,6 +4231,7 @@
 				94720A4691BB98B503831216 /* WatchAlgorithmBootstrap.swift in Sources */,
 				503149FBE22CF89F3553A3A7 /* WatchRemoteCommandBootstrap.swift in Sources */,
 				2CCA6A8E7E60C1A9E04A5D8F /* BackgroundPollScheduler.swift in Sources */,
+				A1B2C3D4E5F60003A1B2C3D4 /* LoopWarmingUpBadge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

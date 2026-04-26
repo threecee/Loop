@@ -22,11 +22,12 @@
 //  - Settings come from a `WatchSettingsSnapshot` placeholder. Phase 6 will
 //    replace this with `PhoneWatchSettingsSync` (real WCSession pull).
 //
-//  B.3.a Phase 5.
+//  B.3.a Phase 5. Phase 7: isWarmingUp tracking.
 //
 
 #if !os(iOS)
 
+import Combine
 import Foundation
 import HealthKit
 import LoopAlgorithmCore
@@ -143,13 +144,22 @@ final class WatchSettingsSnapshot {
 
 // MARK: - Driver
 
-final class WatchAlgorithmDriver: NSObject {
+final class WatchAlgorithmDriver: NSObject, ObservableObject {
 
     // MARK: Stored collaborators
 
     private let runner: LoopAlgorithmRunner
     private let settingsSnapshot: WatchSettingsSnapshot
     private let log = OSLog(subsystem: "com.loopkit.Loop.WatchApp", category: "WatchAlgorithmDriver")
+
+    // MARK: Warm-up tracking (B.3.a Phase 7)
+
+    /// True from construction until the runner completes its first full loop
+    /// iteration after handoff. During this window the algorithm's CoreData
+    /// stores are still backfilling from the G7 sensor and pod history, so
+    /// predictions are limited.
+    @Published private(set) var isWarmingUp: Bool = true
+    private var didCompleteFirstIteration = false
 
     // MARK: Construction
 
@@ -206,6 +216,17 @@ final class WatchAlgorithmDriver: NSObject {
     var underlyingRunner: LoopAlgorithmRunner { runner }
 }
 
+// MARK: - Notification names (B.3.a Phase 7)
+
+extension WatchAlgorithmDriver {
+    /// Posted on the main queue when `isWarmingUp` transitions from `true` to
+    /// `false` (i.e., the runner has completed its first full iteration after
+    /// handoff). `object` is the `WatchAlgorithmDriver` instance.
+    static let warmUpDidCompleteNotification = Notification.Name(
+        "com.loopkit.Loop.WatchAlgorithmDriver.warmUpDidComplete"
+    )
+}
+
 // MARK: - LoopAlgorithmRunnerDelegate (watch orchestration)
 
 extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
@@ -229,6 +250,20 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
 
     func loopAlgorithmRunnerDidFinishLoop(_ runner: LoopAlgorithmRunner) {
         log.default("WatchAlgorithmDriver: loop finished — refreshing complications")
+        // B.3.a Phase 7: clear warm-up flag on first completed iteration and
+        // notify WatchKit controllers (which cannot use Combine/ObservableObject
+        // directly) via NotificationCenter.
+        if !didCompleteFirstIteration {
+            didCompleteFirstIteration = true
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.isWarmingUp = false
+                NotificationCenter.default.post(
+                    name: WatchAlgorithmDriver.warmUpDidCompleteNotification,
+                    object: self
+                )
+            }
+        }
         refreshComplications()
     }
 

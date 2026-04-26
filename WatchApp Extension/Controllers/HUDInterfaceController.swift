@@ -12,6 +12,8 @@ import LoopKit
 
 class HUDInterfaceController: WKInterfaceController {
     private var activeContextObserver: NSObjectProtocol?
+    // B.3.a Phase 7: observer for warm-up completion
+    private var warmUpObserver: NSObjectProtocol?
 
     @IBOutlet weak var loopHUDImage: WKInterfaceImage!
     @IBOutlet weak var glucoseLabel: WKInterfaceLabel!
@@ -23,12 +25,24 @@ class HUDInterfaceController: WKInterfaceController {
         super.willActivate()
 
         update()
+        updateWarmUpTitle()
 
         if activeContextObserver == nil {
             activeContextObserver = NotificationCenter.default.addObserver(forName: WatchContextManager.didUpdateContextNotification, object: loopManager, queue: nil) { [weak self] _ in
                 DispatchQueue.main.async {
                     self?.update()
                 }
+            }
+        }
+
+        // B.3.a Phase 7: clear "Loop warming up" title when first iteration completes.
+        if warmUpObserver == nil {
+            warmUpObserver = NotificationCenter.default.addObserver(
+                forName: WatchAlgorithmDriver.warmUpDidCompleteNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                self?.updateWarmUpTitle()
             }
         }
 
@@ -44,6 +58,23 @@ class HUDInterfaceController: WKInterfaceController {
             NotificationCenter.default.removeObserver(observer)
         }
         activeContextObserver = nil
+        // Note: warmUpObserver is kept alive across deactivations so the
+        // title clears even if the controller is not the current page when
+        // the first iteration completes.
+    }
+
+    // MARK: - B.3.a Phase 7: warm-up title
+
+    /// Sets the controller's navigation-bar title to "Loop warming up" while
+    /// the algorithm driver is in its warm-up window, and clears it once
+    /// the first iteration completes (or if there is no active driver).
+    private func updateWarmUpTitle() {
+        let driver = ExtensionDelegate.shared().watchAlgorithmBootstrap?.driver
+        if driver?.isWarmingUp == true {
+            setTitle(NSLocalizedString("Loop warming up", comment: "Watch HUD title shown while algorithm stores are backfilling after handoff"))
+        } else {
+            setTitle(NSLocalizedString("Loop", comment: "Watch HUD default title"))
+        }
     }
 
     func update() {
