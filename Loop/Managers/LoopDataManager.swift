@@ -168,7 +168,9 @@ final class LoopDataManager {
         })
 
         // Required for device settings in stored dosing decisions
+        #if os(iOS)
         UIDevice.current.isBatteryMonitoringEnabled = true
+        #endif
 
         // Observe changes
         notificationObservers = [
@@ -477,6 +479,7 @@ final class LoopDataManager {
 
     // MARK: - Background task management
 
+    #if os(iOS)
     private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
 
     private func startBackgroundTask() {
@@ -492,6 +495,10 @@ final class LoopDataManager {
             backgroundTask = .invalid
         }
     }
+    #else
+    private func startBackgroundTask() { /* no-op on watchOS */ }
+    private func endBackgroundTask() { /* no-op on watchOS */ }
+    #endif
 
     private func loopDidComplete(date: Date, dosingDecision: StoredDosingDecision, duration: TimeInterval) {
         logger.default("Loop completed successfully.")
@@ -653,7 +660,9 @@ extension LoopDataManager {
 
         var dosingDecision = StoredDosingDecision(reason: reason.rawValue)
         dosingDecision.settings = StoredDosingDecision.Settings(latestStoredSettingsProvider.latestSettings)
+        #if os(iOS)
         dosingDecision.controllerStatus = UIDevice.current.controllerStatus
+        #endif
         dosingDecision.automaticDoseRecommendation = recommendation
 
         let error = enactRecommendedAutomaticDose()
@@ -815,11 +824,16 @@ extension LoopDataManager {
     }
 
     func storeManualBolusDosingDecision(_ bolusDosingDecision: BolusDosingDecision, withDate date: Date) {
+        #if os(iOS)
+        let controllerStatus: StoredDosingDecision.ControllerStatus? = UIDevice.current.controllerStatus
+        #else
+        let controllerStatus: StoredDosingDecision.ControllerStatus? = nil
+        #endif
         let dosingDecision = StoredDosingDecision(date: date,
                                                   reason: bolusDosingDecision.reason.rawValue,
                                                   settings: StoredDosingDecision.Settings(latestStoredSettingsProvider.latestSettings),
                                                   scheduleOverride: bolusDosingDecision.scheduleOverride,
-                                                  controllerStatus: UIDevice.current.controllerStatus,
+                                                  controllerStatus: controllerStatus,
                                                   pumpManagerStatus: delegate?.pumpManagerStatus,
                                                   cgmManagerStatus: delegate?.cgmManagerStatus,
                                                   lastReservoirValue: StoredDosingDecision.LastReservoirValue(doseStore.lastReservoirValue),
@@ -967,7 +981,9 @@ extension LoopDataManager {
         let latestSettings = latestStoredSettingsProvider.latestSettings
         dosingDecision.settings = StoredDosingDecision.Settings(latestSettings)
         dosingDecision.scheduleOverride = latestSettings.scheduleOverride
+        #if os(iOS)
         dosingDecision.controllerStatus = UIDevice.current.controllerStatus
+        #endif
         dosingDecision.pumpManagerStatus = delegate?.pumpManagerStatus
         if let pumpStatusHighlight = delegate?.pumpStatusHighlight {
             dosingDecision.pumpStatusHighlight = StoredDosingDecision.StoredDeviceHighlight(
@@ -2295,12 +2311,16 @@ extension LoopDataManager {
                                 entries.append(report)
                                 entries.append("")
 
+                                #if os(iOS)
                                 UIDevice.current.generateDiagnosticReport { (report) in
                                     entries.append(report)
                                     entries.append("")
 
                                     completion(entries.joined(separator: "\n"))
                                 }
+                                #else
+                                completion(entries.joined(separator: "\n"))
+                                #endif
                             }
                         }
                     }
