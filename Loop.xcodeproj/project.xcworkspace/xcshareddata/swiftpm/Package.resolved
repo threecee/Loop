@@ -1,6 +1,15 @@
 {
-  "originHash" : "c4cada90348e9cd61ccdc1fdd95d021f037913f127c30ed5678702f19c1b75db",
+  "originHash" : "7b64792c13c557dc0aa5a370aafd78924062e3f9639885b20ab57d531813c938",
   "pins" : [
+    {
+      "identity" : "base32",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mattrubin/Base32.git",
+      "state" : {
+        "branch" : "1.1.2+spm",
+        "revision" : "d185e44c8b355d34d5c6c6ad502c60cba4599f69"
+      }
+    },
     {
       "identity" : "mkringprogressview",
       "kind" : "remoteSourceControl",
