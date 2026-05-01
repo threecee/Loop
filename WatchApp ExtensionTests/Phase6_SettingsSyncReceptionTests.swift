@@ -98,6 +98,58 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
         XCTAssertNil(snapshot.loopSettings.suspendThreshold)
     }
 
+    // MARK: - B.4 Issue #3: automaticDosing flags read from sync
+
+    /// When sync provides automaticDosingEnabled = true, the constructed
+    /// snapshot reports automaticDosingEnabled = true (not hardcoded false).
+    func testInitFromSyncReadsAutomaticDosingEnabledWhenTrue() {
+        let sync = PhoneWatchSettingsSync(
+            protocolVersion: 2,
+            sentAt: Date(),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10,
+            maximumBasalRatePerHourUnits: 4,
+            suspendThresholdMgdL: 72,
+            nightscoutConfig: nil,
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true
+        )
+        let snapshot = WatchSettingsSnapshot(fromSync: sync)
+        XCTAssertTrue(snapshot.automaticDosingEnabled,
+                      "Watch should read automaticDosingEnabled from sync, not hardcode false")
+        XCTAssertTrue(snapshot.isAutomaticDosingAllowed,
+                      "Watch should read isAutomaticDosingAllowed from sync, not hardcode false")
+    }
+
+    /// When sync's flags are nil (v1 sender), snapshot defaults to false (fail-closed).
+    func testInitFromSyncDefaultsToFalseWhenSyncFlagsAreNil() {
+        let sync = PhoneWatchSettingsSync(
+            protocolVersion: 1,
+            sentAt: Date(),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10,
+            maximumBasalRatePerHourUnits: 4,
+            suspendThresholdMgdL: 72,
+            nightscoutConfig: nil
+            // automaticDosingEnabled + isAutomaticDosingAllowed default to nil
+        )
+        let snapshot = WatchSettingsSnapshot(fromSync: sync)
+        XCTAssertFalse(snapshot.automaticDosingEnabled,
+                       "Nil sync flag → false (fail-closed) on watch")
+        XCTAssertFalse(snapshot.isAutomaticDosingAllowed,
+                       "Nil sync flag → false (fail-closed) on watch")
+    }
+
     // MARK: - Test 2d: bootstrap settingsProvider reads from cache
 
     func testBootstrapSettingsProviderReadsFromCache() {

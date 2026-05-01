@@ -311,7 +311,8 @@ class LoopAppManager: NSObject {
                 policyEngine: policyEngine,
                 shadowScheduler: scheduler,
                 userDefaults: appGroupDefaults,
-                pumpManager: deviceDataManager.pumpManager as? OmniBLEPumpManager   // B.2.e
+                pumpManager: deviceDataManager.pumpManager as? OmniBLEPumpManager,   // B.2.e
+                settingsSyncProvider: { [weak self] in self?.currentSettingsSyncOrNil() }   // B.4 Issue #3
             )
             HandoffOrchestrator.shared = orchestrator
             orchestrator.start()
@@ -319,6 +320,61 @@ class LoopAppManager: NSObject {
         }
 
         state = state.next
+    }
+
+    /// B.4 Issue #3: Builds a `PhoneWatchSettingsSync` from current
+    /// `LoopDataManager` settings. Returns nil if settings aren't yet
+    /// available (e.g. very early launch). Used by `HandoffOrchestrator`'s
+    /// `settingsSyncProvider` closure so `emitSettingsSync()` actually
+    /// produces a payload in production (without this, the orchestrator
+    /// returns at the `guard let provider` check and the entire Phase 6
+    /// sync emission is dead code).
+    @MainActor
+    private func currentSettingsSyncOrNil() -> PhoneWatchSettingsSync? {
+        guard let lm = self.deviceDataManager?.loopManager else { return nil }
+        let settings = lm.settings
+        guard let basal = settings.basalRateSchedule,
+              let isf = settings.insulinSensitivitySchedule,
+              let cr = settings.carbRatioSchedule,
+              let targets = settings.glucoseTargetRangeSchedule
+        else { return nil }
+
+        // ISF wire format: mg/dL per unit. Convert from the schedule's native
+        // unit via HKQuantity to handle mmol/L users correctly.
+        let isfItems: [RepeatingScheduleValue<Double>] = isf.items.map {
+            let mgdL = HKQuantity(unit: isf.unit, doubleValue: $0.value)
+                .doubleValue(for: .milligramsPerDeciliter)
+            return RepeatingScheduleValue(startTime: $0.startTime, value: mgdL)
+        }
+
+        // Glucose target wire format: mg/dL DoubleRange. Use the schedule's
+        // own conversion API which preserves both bounds correctly.
+        let targetsInMgdl = targets.schedule(for: .milligramsPerDeciliter) ?? targets
+        let targetItems: [RepeatingScheduleValue<DoubleRange>] = targetsInMgdl.items
+
+        // Suspend threshold wire format: mg/dL Double. Convert via HKQuantity.
+        let suspendThresholdMgdL: Double? = settings.suspendThreshold.map {
+            $0.quantity.doubleValue(for: .milligramsPerDeciliter)
+        }
+
+        // NS config: nil for now until we wire RemoteDataServicesManager — the
+        // watch already handles nil correctly (skips Nightscout polling).
+        let nsConfig: PhoneWatchSettingsSync.NightscoutConfig? = nil
+
+        return PhoneWatchSettingsSync(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            basalScheduleItems: basal.items,
+            insulinSensitivityScheduleItems: isfItems,
+            carbRatioScheduleItems: cr.items,
+            glucoseTargetRangeScheduleItems: targetItems,
+            maximumBolusUnits: settings.maximumBolus ?? 0,
+            maximumBasalRatePerHourUnits: settings.maximumBasalRatePerHour ?? 0,
+            suspendThresholdMgdL: suspendThresholdMgdL,
+            nightscoutConfig: nsConfig,
+            automaticDosingEnabled: self.automaticDosingStatus.automaticDosingEnabled,
+            isAutomaticDosingAllowed: self.automaticDosingStatus.isAutomaticDosingAllowed
+        )
     }
 
     private func launchOnboarding() {

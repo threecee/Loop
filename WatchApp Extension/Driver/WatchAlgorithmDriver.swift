@@ -128,12 +128,11 @@ final class WatchSettingsSnapshot {
             self.nightscoutConfig = nil
         }
 
-        // Phase 6 doesn't sync automaticDosingEnabled/isAutomaticDosingAllowed
-        // yet (the PhoneWatchSettingsSync struct doesn't include them). Default
-        // to false, which is conservative (watch will not auto-dose unless
-        // a future sync adds these fields).
-        self.automaticDosingEnabled = false
-        self.isAutomaticDosingAllowed = false
+        // B.4 Issue #3: read from sync; default to false (fail-closed) when
+        // the v1 sender didn't include them, when the new fields are explicitly
+        // nil, or when the phone reports automatic dosing is off / disallowed.
+        self.automaticDosingEnabled = sync.automaticDosingEnabled ?? false
+        self.isAutomaticDosingAllowed = sync.isAutomaticDosingAllowed ?? false
     }
 
     struct NightscoutConfig {

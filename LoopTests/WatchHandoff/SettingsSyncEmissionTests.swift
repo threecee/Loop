@@ -59,7 +59,10 @@ final class SettingsSyncEmissionTests: XCTestCase {
         coordinator?.stop()
     }
 
-    private func makeOrchestrator(provideSync: Bool = true) -> HandoffOrchestrator {
+    private func makeOrchestrator(
+        provideSync: Bool = true,
+        providedSyncOverride: PhoneWatchSettingsSync? = nil
+    ) -> HandoffOrchestrator {
         let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
         let orch = HandoffOrchestrator(
             coordinator: coordinator,
@@ -76,7 +79,9 @@ final class SettingsSyncEmissionTests: XCTestCase {
             ),
             userDefaults: UserDefaults(suiteName: "test.settingssync.\(UUID())")!,
             pumpManager: nil,
-            settingsSyncProvider: provideSync ? { [weak self] in self?.sampleSync } : nil
+            settingsSyncProvider: provideSync
+                ? { [weak self] in providedSyncOverride ?? self?.sampleSync }
+                : nil
         )
         return orch
     }
@@ -141,5 +146,41 @@ final class SettingsSyncEmissionTests: XCTestCase {
         }
         XCTAssertEqual(syncs.count, 1,
                        "notifySettingsChanged should queue exactly one settings sync")
+    }
+
+    // MARK: - B.4 Issue #3: automaticDosing field passthrough
+
+    /// emitSettingsSync builds a sync that includes the automaticDosing flags
+    /// from the provider closure, so the watch receives them.
+    func testEmitSettingsSyncIncludesAutomaticDosingFlags() {
+        let syncWithFlags = PhoneWatchSettingsSync(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(timeIntervalSince1970: 1_700_000_000),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10.0,
+            maximumBasalRatePerHourUnits: 4.0,
+            suspendThresholdMgdL: 72.0,
+            nightscoutConfig: nil,
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true
+        )
+        orchestrator = makeOrchestrator(provideSync: true, providedSyncOverride: syncWithFlags)
+
+        let countBefore = transport.queuedMessages.count
+        orchestrator.emitSettingsSync()
+
+        let newMessages = transport.queuedMessages.dropFirst(countBefore)
+        XCTAssertEqual(newMessages.count, 1)
+        guard case let .settingsSync(received) = newMessages.first else {
+            return XCTFail("expected settingsSync message")
+        }
+        XCTAssertEqual(received.automaticDosingEnabled, true)
+        XCTAssertEqual(received.isAutomaticDosingAllowed, true)
+        XCTAssertEqual(received.protocolVersion, 2)
     }
 }
