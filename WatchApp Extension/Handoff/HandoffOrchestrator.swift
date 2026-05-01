@@ -24,7 +24,7 @@ final class HandoffOrchestrator: ObservableObject {
     @Published var settings: HandoffSettings
 
     /// User defaults used for settings persistence. Mutable for tests; production
-    /// uses the App Group suite (group.com.threecee.loopGroup).
+    /// uses the App Group suite (group.com.threecee.loop.LoopGroup).
     var userDefaults: UserDefaults
 
     private var coordinator: PhoneWatchSessionCoordinator
