@@ -150,6 +150,37 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
                        "Nil sync flag → false (fail-closed) on watch")
     }
 
+    /// Phone explicitly disabled automatic dosing → snapshot reads false.
+    /// Distinguishes the "phone said no" path from the v1-fallback path
+    /// (which `testInitFromSyncDefaultsToFalseWhenSyncFlagsAreNil` covers).
+    /// Critical because flipping the operator from `?? false` to `?? true`
+    /// would still pass the v1-fallback test (nil ?? true == true would
+    /// look like the v1 path returning true) — only an explicit-false
+    /// reception test locks in the safety-critical operator semantics.
+    func testInitFromSyncReadsAutomaticDosingDisabledWhenFalse() {
+        let sync = PhoneWatchSettingsSync(
+            protocolVersion: 2,
+            sentAt: Date(),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10,
+            maximumBasalRatePerHourUnits: 4,
+            suspendThresholdMgdL: 72,
+            nightscoutConfig: nil,
+            automaticDosingEnabled: false,
+            isAutomaticDosingAllowed: false
+        )
+        let snapshot = WatchSettingsSnapshot(fromSync: sync)
+        XCTAssertFalse(snapshot.automaticDosingEnabled,
+                       "Phone explicitly disabled → watch reads false (not the v1-fallback path)")
+        XCTAssertFalse(snapshot.isAutomaticDosingAllowed,
+                       "Phone explicitly disabled → watch reads false (not the v1-fallback path)")
+    }
+
     // MARK: - Test 2d: bootstrap settingsProvider reads from cache
 
     func testBootstrapSettingsProviderReadsFromCache() {

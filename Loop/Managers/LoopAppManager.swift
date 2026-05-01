@@ -336,7 +336,9 @@ class LoopAppManager: NSObject {
         guard let basal = settings.basalRateSchedule,
               let isf = settings.insulinSensitivitySchedule,
               let cr = settings.carbRatioSchedule,
-              let targets = settings.glucoseTargetRangeSchedule
+              let targets = settings.glucoseTargetRangeSchedule,
+              let maxBolus = settings.maximumBolus,
+              let maxBasal = settings.maximumBasalRatePerHour
         else { return nil }
 
         // ISF wire format: mg/dL per unit. Convert from the schedule's native
@@ -357,8 +359,10 @@ class LoopAppManager: NSObject {
             $0.quantity.doubleValue(for: .milligramsPerDeciliter)
         }
 
-        // NS config: nil for now until we wire RemoteDataServicesManager — the
-        // watch already handles nil correctly (skips Nightscout polling).
+        // TODO(B.5 or later): wire from RemoteDataServicesManager.
+        // Until then, watch loses Nightscout integration when running as
+        // algorithm driver — but the watch's WatchSettingsSnapshot init handles
+        // nil gracefully (skips Nightscout polling, no crash).
         let nsConfig: PhoneWatchSettingsSync.NightscoutConfig? = nil
 
         return PhoneWatchSettingsSync(
@@ -368,8 +372,8 @@ class LoopAppManager: NSObject {
             insulinSensitivityScheduleItems: isfItems,
             carbRatioScheduleItems: cr.items,
             glucoseTargetRangeScheduleItems: targetItems,
-            maximumBolusUnits: settings.maximumBolus ?? 0,
-            maximumBasalRatePerHourUnits: settings.maximumBasalRatePerHour ?? 0,
+            maximumBolusUnits: maxBolus,
+            maximumBasalRatePerHourUnits: maxBasal,
             suspendThresholdMgdL: suspendThresholdMgdL,
             nightscoutConfig: nsConfig,
             automaticDosingEnabled: self.automaticDosingStatus.automaticDosingEnabled,
