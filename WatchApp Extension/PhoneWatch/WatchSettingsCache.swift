@@ -37,11 +37,15 @@ final class WatchSettingsCache {
         current = sync
     }
 
+    #if DEBUG
     /// B.5: test-only helper to clear the singleton between test runs.
     /// Production never calls this — once a sync arrives, it stays cached.
+    /// `#if DEBUG`-guarded (B.5.1) to make accidental production calls a
+    /// compile-time error rather than a runtime footgun.
     func resetForTesting() {
         current = nil
     }
+    #endif
 }
 
 #endif  // !os(iOS)

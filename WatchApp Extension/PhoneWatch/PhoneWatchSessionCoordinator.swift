@@ -111,7 +111,7 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             if let orch = HandoffOrchestrator.shared,
                orch.handoffState.currentOwner == .watch,
                hb.claimedOwner == .phone {
-                log.error("split-brain detected: I (watch) believe I'm owner, but phone heartbeat claims phone is owner — phone wins, demoting self")
+                log.error("split-brain detected: I (watch) believe I'm owner, but phone heartbeat claims phone is owner; phone wins, demoting self")
                 orch.ownership.commandsAllowed = false   // immediate gate
                 orch.userRequestHandoff(to: .phone)      // emit transition request
             }
