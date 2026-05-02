@@ -185,6 +185,12 @@ final class WatchAlgorithmDriver: NSObject, ObservableObject {
     /// isWarmingUp at init time. Production callers leave this nil.
     private let isWarmingUpOverride: Bool?
 
+    /// B.6: Held strong so suppression decisions can include the same
+    /// battery / charging context as non-suppressed decisions (per
+    /// Phase 1 discovery point #4 — analytic parity). The runner also
+    /// uses this same instance via the provider-protocol bridge.
+    private let controllerStatusAdapter: WatchControllerStatusAdapter
+
     // MARK: Warm-up tracking (B.3.a Phase 7)
 
     /// True from construction until the runner completes its first full loop
@@ -218,6 +224,7 @@ final class WatchAlgorithmDriver: NSObject, ObservableObject {
         // initialized yet. Construct lightweight adapter shims that hold weak
         // references back to the driver, then resolve them at first call.
         let controllerStatusAdapter = WatchControllerStatusAdapter()
+        self.controllerStatusAdapter = controllerStatusAdapter
         let featureFlagAdapter = WatchFeatureFlagAdapter(snapshot: settingsSnapshot)
         let latestStoredSettingsAdapter = WatchLatestStoredSettingsAdapter(snapshot: settingsSnapshot)
         let dosingStatusAdapter = WatchAutomaticDosingStatusAdapter(snapshot: settingsSnapshot)
@@ -330,11 +337,18 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
     // dosingDecisionStore so they appear in event history, otherwise
     // dispatch the dose to the pump manager.
     //
-    // CRITICAL: completion(nil) is load-bearing on the suppression path.
-    // LoopAlgorithmRunner only clears its cached recommendedAutomaticDose
-    // when the delegate completion is called with nil; calling with an
-    // error (or skipping completion) would cause the algorithm to retry
-    // the same recommendation on the next tick. (Phase 1 discovery.)
+    // CRITICAL: completion(nil) is load-bearing on the NON-RETRYABLE
+    // suppression paths (gates 1-4). LoopAlgorithmRunner only clears its
+    // cached recommendedAutomaticDose when the delegate completion is
+    // called with nil; calling with an error (or skipping completion)
+    // would cause the algorithm to retry the same recommendation on the
+    // next tick. (Phase 1 discovery.)
+    //
+    // Gate 5 (delivery-uncertain) is the exception — it INTENTIONALLY
+    // returns LoopError.connectionError because delivery-uncertain is
+    // transient and we WANT the algorithm to retry next tick when the
+    // pump state may have settled. Don't change gate 5's completion
+    // without re-reading iOS DeviceDataManager.swift:1416.
     func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
                              didRecommend automaticDose: (recommendation: AutomaticDoseRecommendation, date: Date),
                              completion: @escaping (LoopError?) -> Void) {
@@ -361,6 +375,20 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
         guard let pumpManager = pumpManager else {
             recordSuppressed(automaticDose, reason: .noPumpManager)
             completion(nil)
+            return
+        }
+
+        // Gate 5: pump reports delivery state is uncertain (e.g., last
+        // command's ack was lost, BLE reconnect mid-bolus). Mirror iOS
+        // DeviceDataManager.swift:1416 — return a RETRYABLE error so the
+        // algorithm will try again next tick when state may have settled,
+        // rather than firing on top of an unconfirmed dose. NOTE: this is
+        // the one suppression path that does NOT call completion(nil) —
+        // see header comment about completion(nil)'s load-bearing role on
+        // non-retryable paths. delivery-uncertain is transient → retry.
+        guard !pumpManager.status.deliveryIsUncertain else {
+            log.error("WatchAlgorithmDriver: suppressing dose — pump delivery state uncertain")
+            completion(LoopError.connectionError)
             return
         }
 
@@ -404,6 +432,10 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
             reason: reason.rawValue
         )
         decision.automaticDoseRecommendation = automaticDose.recommendation
+        // B.6: enrich with controller status so suppression decisions
+        // are queryable with the same battery context as non-suppressed
+        // decisions (Phase 1 discovery point #4).
+        decision.controllerStatus = controllerStatusAdapter.controllerStatus
         return decision
     }
 
@@ -411,6 +443,13 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
     /// Loop target only; not shared). Temp basal first, then bolus, both via
     /// DispatchGroup. Result is a single LoopError? — the first failure
     /// short-circuits.
+    ///
+    /// TODO(B.7 or later): iOS brackets dose enactment with
+    /// crashRecoveryManager.dosingStarted/Finished (DeviceDataManager.swift:1423).
+    /// The watch driver has no equivalent — if the watch process dies mid-
+    /// bolus, there's no recovery state. The watch's OmniBLEPumpManager
+    /// itself records dose history, so this is partial mitigation, but a
+    /// proper crash-recovery layer is owed.
     private func enactRecommendedDose(
         _ recommendation: AutomaticDoseRecommendation,
         with pumpManager: PumpManager,

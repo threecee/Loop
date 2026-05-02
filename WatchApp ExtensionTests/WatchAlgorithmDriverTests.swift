@@ -31,11 +31,11 @@ final class WatchAlgorithmDriverTests: XCTestCase {
 
         // MARK: PumpManager required surface
 
-        static var onboardingMaximumBasalScheduleEntryCount: Int = 24
-        static var onboardingSupportedBasalRates: [Double] = [1, 2, 3]
-        static var onboardingSupportedBolusVolumes: [Double] = [1, 2, 3]
-        static var onboardingSupportedMaximumBolusVolumes: [Double] = [1, 2, 3]
-        static var pluginIdentifier: String = "RecordingPumpManager"
+        static let onboardingMaximumBasalScheduleEntryCount: Int = 24
+        static let onboardingSupportedBasalRates: [Double] = [1, 2, 3]
+        static let onboardingSupportedBolusVolumes: [Double] = [1, 2, 3]
+        static let onboardingSupportedMaximumBolusVolumes: [Double] = [1, 2, 3]
+        static let pluginIdentifier: String = "RecordingPumpManager"
 
         var supportedBasalRates: [Double] = [1, 2, 3]
         var supportedBolusVolumes: [Double] = [1, 2, 3]
@@ -314,5 +314,36 @@ final class WatchAlgorithmDriverTests: XCTestCase {
         XCTAssertEqual(store.storedDecisions.first?.reason,
                        WatchDoseSuppressionReason.warmingUp.rawValue,
                        "Warming-up gate is first; its reason wins")
+    }
+
+    /// Pump reports deliveryIsUncertain → returns retryable error
+    /// (NOT completion(nil)) so the algorithm will retry next tick.
+    func testDidRecommend_deliveryIsUncertain_returnsErrorAndDoesNotEnact() {
+        let pump = RecordingPumpManager()
+        // Set up status with deliveryIsUncertain = true
+        // (RecordingPumpManager.status is a stored mutable property)
+        var status = pump.status
+        status.deliveryIsUncertain = true
+        pump.status = status
+
+        let (driver, store) = makeDriver(pumpManager: pump,
+                                          automaticDosingEnabled: true,
+                                          isAutomaticDosingAllowed: true,
+                                          isWarmingUpOverride: false)
+        let exp = expectation(description: "didRecommend completion")
+        var receivedError: LoopError?
+        let (rec, date) = sampleRecommendation()
+        driver.loopAlgorithmRunner(driver.underlyingRunner,
+                                    didRecommend: (rec, date)) { err in
+            receivedError = err
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 1.0)
+
+        XCTAssertNotNil(receivedError, "Gate 5 should return a retryable error")
+        XCTAssertEqual(pump.enactBolusCalls.count, 0)
+        XCTAssertEqual(pump.enactTempBasalCalls.count, 0)
+        XCTAssertTrue(store.storedDecisions.isEmpty,
+                      "Gate 5 does NOT record a suppressed decision (it returns an error to retry)")
     }
 }
