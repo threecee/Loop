@@ -43,7 +43,7 @@ final class HandoffOrchestrator: ObservableObject {
 
     /// B.4 Issue #2: debounce window matches HandoffPolicyEngine.absenceThreshold (60s).
     /// Tests can override via the optional `phoneStableDebounceOverride` init parameter.
-    private static let phoneStableDebounceSeconds: TimeInterval = 60
+    private static let defaultPhoneStableDebounceSeconds: TimeInterval = 60
     private let phoneStableDebounceSeconds: TimeInterval
 
     // B.2.e: BLE ownership coordinator
@@ -79,7 +79,7 @@ final class HandoffOrchestrator: ObservableObject {
             initialState: stateMachine.state
         )
         self.phoneStableDebounceSeconds = phoneStableDebounceOverride
-            ?? Self.phoneStableDebounceSeconds
+            ?? Self.defaultPhoneStableDebounceSeconds
     }
 
     func start() {
@@ -186,6 +186,9 @@ final class HandoffOrchestrator: ObservableObject {
             guard !Task.isCancelled else { return }
             await MainActor.run {
                 guard let self else { return }
+                // Re-check reachability after the actor hop: defends against the
+                // window where reachability flipped off during the sleep but the
+                // off-callback hasn't been processed yet.
                 if self.coordinator.isReachable {
                     self.policyEngine.markPhoneStableSince(Date())
                 }

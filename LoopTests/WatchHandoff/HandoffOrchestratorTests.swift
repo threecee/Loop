@@ -144,13 +144,13 @@ final class HandoffOrchestratorTests: XCTestCase {
 
     func test_start_seedsCurrentOwnerToPhone() {
         orchestrator.start()
-        XCTAssertEqual(policyEngine.debugCurrentOwner, .phone)
+        XCTAssertEqual(policyEngine.currentOwnerForTesting, .phone)
     }
 
     func test_userRequestHandoff_callsMarkUserInteractedAt() {
         let before = Date()
         orchestrator.userRequestHandoff(to: .watch)
-        let recorded = policyEngine.debugLastUserInteractionAt
+        let recorded = policyEngine.lastUserInteractionAtForTesting
         XCTAssertNotNil(recorded)
         XCTAssertGreaterThanOrEqual(recorded!, before)
     }
@@ -167,7 +167,7 @@ final class HandoffOrchestratorTests: XCTestCase {
         )
         orchestrator.handleIncoming(message: .modeSwitch(ms))
         XCTAssertEqual(orchestrator.handoffState, .watchDriver)
-        XCTAssertEqual(policyEngine.debugCurrentOwner, .watch)
+        XCTAssertEqual(policyEngine.currentOwnerForTesting, .watch)
     }
 
     func test_reachabilityFlipOn_marksStableAfterDebounce() async throws {
@@ -175,7 +175,7 @@ final class HandoffOrchestratorTests: XCTestCase {
         // in start() therefore emits an initial false (handler clears stable-since).
         orchestrator.start()
         await Task.yield()
-        XCTAssertNil(policyEngine.debugPhoneStableReachableSince)
+        XCTAssertNil(policyEngine.phoneStableReachableSinceForTesting)
 
         // Drive a flip-ON by feeding an inbound heartbeat through the transport;
         // the coordinator updates isCounterpartReachable = true.
@@ -189,7 +189,7 @@ final class HandoffOrchestratorTests: XCTestCase {
         coordinatorTransport.onIncomingMessage?(.heartbeat(inboundHB))
         // Allow main-actor hop + the 50ms debounce + slack.
         try await Task.sleep(nanoseconds: 300_000_000)
-        let recorded = policyEngine.debugPhoneStableReachableSince
+        let recorded = policyEngine.phoneStableReachableSinceForTesting
         XCTAssertNotNil(recorded, "expected markPhoneStableSince to fire after debounce")
         if let recorded {
             XCTAssertGreaterThanOrEqual(recorded, before)

@@ -140,8 +140,8 @@ final class HandoffPolicyEngine {
     }
 
     // MARK: - B.4 Issue #2: test inspectors (internal so @testable can read).
-    var debugCurrentOwner: HandoffOwner { currentOwner }
-    var debugPhoneStableReachableSince: Date? { phoneStableReachableSince }
-    var debugLastUserInteractionAt: Date? { lastUserInteractionAt }
-    var debugCachedPodStateAt: Date? { cachedPodStateAt }
+    var currentOwnerForTesting: HandoffOwner { currentOwner }
+    var phoneStableReachableSinceForTesting: Date? { phoneStableReachableSince }
+    var lastUserInteractionAtForTesting: Date? { lastUserInteractionAt }
+    var cachedPodStateAtForTesting: Date? { cachedPodStateAt }
 }
