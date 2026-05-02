@@ -196,6 +196,12 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
     /// uses this same instance via the provider-protocol bridge.
     private let controllerStatusAdapter: WatchControllerStatusAdapter
 
+    /// B.5: UserDefaults handle used by the dose recovery tripwire. In
+    /// production this is the App Group defaults (so ExtensionDelegate's
+    /// launch-time stale check sees the entry). Tests pass an isolated
+    /// suite-named defaults to verify the recordStart/clear lifecycle.
+    private let recoveryDefaults: UserDefaults?
+
     // MARK: Warm-up tracking (B.3.a Phase 7)
 
     /// True from construction until the runner completes its first full loop
@@ -219,11 +225,13 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
                 now: @escaping () -> Date = { Date() },
                 trustedTimeOffset: @escaping () -> TimeInterval = { 0 },
                 pumpManager: PumpManager? = nil,                    // B.6: dose-emission target (nil → suppress all)
-                isWarmingUpOverride: Bool? = nil) {                 // B.6: test-only override
+                isWarmingUpOverride: Bool? = nil,                   // B.6: test-only override
+                recoveryDefaults: UserDefaults? = nil) {            // B.5: dose recovery tripwire defaults (nil → resolve App Group at use)
         self.settingsSnapshot = settingsSnapshot
         self.pumpManager = pumpManager
         self.dosingDecisionStore = dosingDecisionStore
         self.isWarmingUpOverride = isWarmingUpOverride
+        self.recoveryDefaults = recoveryDefaults
 
         // B.6 Phase 4c: copy schedules from settings to doseStore so the
         // algorithm runner can read them. LoopAlgorithmRunner reads
@@ -471,17 +479,29 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
     /// DispatchGroup. Result is a single LoopError? — the first failure
     /// short-circuits.
     ///
-    /// TODO(B.7 or later): iOS brackets dose enactment with
-    /// crashRecoveryManager.dosingStarted/Finished (DeviceDataManager.swift:1423).
-    /// The watch driver has no equivalent — if the watch process dies mid-
-    /// bolus, there's no recovery state. The watch's OmniBLEPumpManager
-    /// itself records dose history, so this is partial mitigation, but a
-    /// proper crash-recovery layer is owed.
+    /// B.5: dose enactment is bracketed by WatchDoseRecoveryStore which
+    /// records "dose in flight" to App Group UserDefaults before the BLE
+    /// command and clears after completion. On watch app launch,
+    /// ExtensionDelegate checks for stale entries and logs them. NOT a
+    /// full iOS-style CrashRecoveryManager analog (no retry/cancel/reconcile
+    /// flow); just a tripwire so we know a dose may have been interrupted
+    /// and the pod's own history is the source of truth.
     private func enactRecommendedDose(
         _ recommendation: AutomaticDoseRecommendation,
         with pumpManager: PumpManager,
         completion: @escaping (LoopError?) -> Void
     ) {
+        // B.5: record dose-in-flight tripwire BEFORE BLE command. Cleared
+        // in completion (both success + error branches, including the
+        // early-return temp basal error path).
+        let defaults = recoveryDefaults
+            ?? UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)
+            ?? .standard
+        WatchDoseRecoveryStore.recordStart(
+            description: String(describing: recommendation),
+            to: defaults
+        )
+
         let queue = DispatchQueue(label: "com.loopkit.WatchAlgorithmDriver.dosingQueue", qos: .utility)
         queue.async {
             let group = DispatchGroup()
@@ -501,6 +521,7 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
             group.wait()
 
             guard tempBasalError == nil else {
+                WatchDoseRecoveryStore.clear(from: defaults)  // B.5
                 completion(tempBasalError.map { .pumpManagerError($0) })
                 return
             }
@@ -513,6 +534,7 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
                 }
             }
             group.wait()
+            WatchDoseRecoveryStore.clear(from: defaults)  // B.5
             completion(bolusError.map { .pumpManagerError($0) })
         }
     }

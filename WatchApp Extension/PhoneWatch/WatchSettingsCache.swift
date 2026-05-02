@@ -36,6 +36,12 @@ final class WatchSettingsCache {
     func update(_ sync: PhoneWatchSettingsSync) {
         current = sync
     }
+
+    /// B.5: test-only helper to clear the singleton between test runs.
+    /// Production never calls this — once a sync arrives, it stays cached.
+    func resetForTesting() {
+        current = nil
+    }
 }
 
 #endif  // !os(iOS)

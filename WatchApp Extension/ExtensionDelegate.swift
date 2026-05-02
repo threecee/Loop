@@ -265,6 +265,11 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         if #available(watchOSApplicationExtension 5.0, *) {
             INRelevantShortcutStore.default.registerShortcuts()
         }
+        // B.5: check for interrupted dose recovery tripwire on app launch.
+        // If a stale entry (>60s old) is found, it gets logged at .error
+        // and cleared. Pod history is the source of truth.
+        let recoveryDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) ?? .standard
+        WatchDoseRecoveryStore.checkAndClearStale(in: recoveryDefaults)
         // B.3.a Phase 5: schedule the first background poll wake. Must happen
         // after WKExtension has the delegate wired up, otherwise the call
         // crashes with "WKExtensionDelegate (null)".

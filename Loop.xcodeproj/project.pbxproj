@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		B6F100000020 /* WatchAlgorithmDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000013 /* WatchAlgorithmDriver.swift */; };
 		B6F100000021 /* WatchAlgorithmStores.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000014 /* WatchAlgorithmStores.swift */; };
+		B5D000000001 /* WatchDoseRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D000000002 /* WatchDoseRecoveryStore.swift */; };
 		B6F100000022 /* OSLog+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000015 /* OSLog+Convenience.swift */; };
 		B6F100000030 /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; };
 		B6F100000031 /* WatchAlgorithmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -289,6 +290,7 @@
 		F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */; };
 		A1B2C3D4E5F60001A1B2C3D4 /* Phase7_WarmingUpTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */; };
 		B6E5F6010001B6E5F6010001 /* WatchAlgorithmDriverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E5F6010002B6E5F6010002 /* WatchAlgorithmDriverTests.swift */; };
+		B5D000000003 /* WatchPumpManagerSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D000000004 /* WatchPumpManagerSettingsTests.swift */; };
 		A1B2C3D4E5F60003A1B2C3D4 /* LoopWarmingUpBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60004A1B2C3D4 /* LoopWarmingUpBadge.swift */; };
 		623575103230CD309CD8E120 /* LoopAlgorithmCore-watchOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9F68F63F200483A5D11B40F2 /* LoopAlgorithmCore-watchOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		62E7554AE77F4726836D0DE5 /* GlucoseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */; };
@@ -935,6 +937,7 @@
 		B6F100000012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B6F100000013 /* WatchAlgorithmDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmDriver.swift; sourceTree = "<group>"; };
 		B6F100000014 /* WatchAlgorithmStores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmStores.swift; sourceTree = "<group>"; };
+		B5D000000002 /* WatchDoseRecoveryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDoseRecoveryStore.swift; sourceTree = "<group>"; };
 		B6F100000015 /* OSLog+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+Convenience.swift"; sourceTree = "<group>"; };
 		0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HealthKitWriterTests.swift; path = "WatchApp ExtensionTests/HealthKitWriterTests.swift"; sourceTree = SOURCE_ROOT; };
 		091FD4801D540EC2D6AAE6F6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -997,6 +1000,7 @@
 		F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase6_SettingsSyncReceptionTests.swift; path = Phase6_SettingsSyncReceptionTests.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase7_WarmingUpTest.swift; path = Phase7_WarmingUpTest.swift; sourceTree = "<group>"; };
 		B6E5F6010002B6E5F6010002 /* WatchAlgorithmDriverTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmDriverTests.swift; path = WatchAlgorithmDriverTests.swift; sourceTree = "<group>"; };
+		B5D000000004 /* WatchPumpManagerSettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchPumpManagerSettingsTests.swift; path = WatchPumpManagerSettingsTests.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60004A1B2C3D4 /* LoopWarmingUpBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoopWarmingUpBadge.swift; path = LoopWarmingUpBadge.swift; sourceTree = "<group>"; };
 		334165BFE423BFA4E9650446 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS11.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		389BCB231AFA4393987F35F0 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneWatchTransport.swift; path = "WatchApp Extension/PhoneWatch/PhoneWatchTransport.swift"; sourceTree = SOURCE_ROOT; };
@@ -2541,6 +2545,7 @@
 			children = (
 				B6F100000013 /* WatchAlgorithmDriver.swift */,
 				B6F100000014 /* WatchAlgorithmStores.swift */,
+				B5D000000002 /* WatchDoseRecoveryStore.swift */,
 				B6F100000015 /* OSLog+Convenience.swift */,
 				B6F100000012 /* Info.plist */,
 			);
@@ -2787,6 +2792,7 @@
 				F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */,
 				A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */,
 				B6E5F6010002B6E5F6010002 /* WatchAlgorithmDriverTests.swift */,
+				B5D000000004 /* WatchPumpManagerSettingsTests.swift */,
 			);
 			path = "WatchApp ExtensionTests";
 			sourceTree = "<group>";
@@ -3942,6 +3948,7 @@
 			files = (
 				B6F100000020 /* WatchAlgorithmDriver.swift in Sources */,
 				B6F100000021 /* WatchAlgorithmStores.swift in Sources */,
+				B5D000000001 /* WatchDoseRecoveryStore.swift in Sources */,
 				B6F100000022 /* OSLog+Convenience.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4026,6 +4033,7 @@
 				F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */,
 				A1B2C3D4E5F60001A1B2C3D4 /* Phase7_WarmingUpTest.swift in Sources */,
 				B6E5F6010001B6E5F6010001 /* WatchAlgorithmDriverTests.swift in Sources */,
+				B5D000000003 /* WatchPumpManagerSettingsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

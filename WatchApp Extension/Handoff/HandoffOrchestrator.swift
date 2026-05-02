@@ -259,7 +259,7 @@ final class HandoffOrchestrator: ObservableObject {
 
                 // B.2.e: lazy-instantiate OmniBLEPumpManager on first .watchDriver
                 if case .watchDriver = state, ownership.pumpManager == nil {
-                    let pm = OmniBLEPumpManager(state: .watchSideDefault)
+                    let pm = makeWatchSidePumpManager()  // B.5 Issue #7
                     ownership.setPumpManager(pm)
                 }
                 ownership.update(state: state)   // B.2.e
@@ -273,6 +273,42 @@ final class HandoffOrchestrator: ObservableObject {
                 handoffState = state
             }
         }
+    }
+
+    /// B.5 Issue #7: Constructs the watch-side OmniBLEPumpManager from the
+    /// most-recent received settings sync (via WatchSettingsCache). Falls
+    /// back to .watchSideDefault if no sync has arrived yet (rare — watch
+    /// becoming driver before first sync would itself be unusual).
+    ///
+    /// We override only the basal schedule + max temp basal rate from the
+    /// sync — the rest of the state (podState, controllerId, podId,
+    /// insulinType) gets hydrated post-construction by
+    /// OmniBLEOwnership.acquireBLE() from the cached OmniBLEHandoffPayload,
+    /// matching the contract documented on `.watchSideDefault`.
+    ///
+    /// `internal` (not `private`) so `WatchPumpManagerSettingsTests` can
+    /// exercise the helper directly via `@testable import`.
+    internal func makeWatchSidePumpManager() -> OmniBLEPumpManager {
+        guard let sync = WatchSettingsCache.shared.current else {
+            log.default("watch became driver before first settings sync — using .watchSideDefault for pump manager construction")
+            return OmniBLEPumpManager(state: .watchSideDefault)
+        }
+        let basalSchedule: BasalSchedule
+        if sync.basalScheduleItems.isEmpty {
+            basalSchedule = BasalSchedule(entries: [])
+        } else {
+            basalSchedule = BasalSchedule(entries: sync.basalScheduleItems.map {
+                BasalScheduleEntry(rate: $0.value, startTime: $0.startTime)
+            })
+        }
+        let state = OmniBLEPumpManagerState(
+            podState: nil,                         // hydrated post-construction
+            timeZone: TimeZone.current,
+            basalSchedule: basalSchedule,
+            insulinType: nil,                      // hydrated with podState
+            maximumTempBasalRate: sync.maximumBasalRatePerHourUnits
+        )
+        return OmniBLEPumpManager(state: state)
     }
 
     /// B.2.e: Fills the pairing-handoff payload with the current PodState

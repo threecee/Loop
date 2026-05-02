@@ -163,7 +163,8 @@ final class WatchAlgorithmDriverTests: XCTestCase {
         pumpManager: PumpManager?,
         automaticDosingEnabled: Bool = true,
         isAutomaticDosingAllowed: Bool = true,
-        isWarmingUpOverride: Bool? = false
+        isWarmingUpOverride: Bool? = false,
+        recoveryDefaults: UserDefaults? = nil   // B.5
     ) -> (driver: WatchAlgorithmDriver, store: RecordingDecisionStore) {
         let store = RecordingDecisionStore()
         let snapshot = WatchSettingsSnapshot(
@@ -178,7 +179,8 @@ final class WatchAlgorithmDriverTests: XCTestCase {
             dosingDecisionStore: store,
             settingsSnapshot: snapshot,
             pumpManager: pumpManager,
-            isWarmingUpOverride: isWarmingUpOverride
+            isWarmingUpOverride: isWarmingUpOverride,
+            recoveryDefaults: recoveryDefaults
         )
         return (driver, store)
     }
@@ -346,5 +348,146 @@ final class WatchAlgorithmDriverTests: XCTestCase {
         XCTAssertEqual(pump.enactTempBasalCalls.count, 0)
         XCTAssertTrue(store.storedDecisions.isEmpty,
                       "Gate 5 does NOT record a suppressed decision (it returns an error to retry)")
+    }
+
+    // MARK: - B.5: dose recovery store interaction
+
+    /// A pump that returns a configurable error from enactTempBasal so we can
+    /// exercise the early-return error branch of enactRecommendedDose.
+    private final class FailingTempBasalPumpManager: PumpManager {
+        var tempBasalError: PumpManagerError?
+        var enactTempBasalCalls: [(unitsPerHour: Double, duration: TimeInterval)] = []
+        var enactBolusCalls: [(units: Double, type: BolusActivationType)] = []
+
+        static let onboardingMaximumBasalScheduleEntryCount: Int = 24
+        static let onboardingSupportedBasalRates: [Double] = [1, 2, 3]
+        static let onboardingSupportedBolusVolumes: [Double] = [1, 2, 3]
+        static let onboardingSupportedMaximumBolusVolumes: [Double] = [1, 2, 3]
+        static let pluginIdentifier: String = "FailingTempBasalPumpManager"
+
+        var supportedBasalRates: [Double] = [1, 2, 3]
+        var supportedBolusVolumes: [Double] = [1, 2, 3]
+        var supportedMaximumBolusVolumes: [Double] = [1, 2, 3]
+        var maximumBasalScheduleEntryCount: Int = 24
+        var minimumBasalScheduleEntryDuration: TimeInterval = .minutes(30)
+        var pumpManagerDelegate: PumpManagerDelegate?
+        var pumpRecordsBasalProfileStartEvents: Bool = false
+        var pumpReservoirCapacity: Double = 50
+        var lastSync: Date?
+        var status: PumpManagerStatus = PumpManagerStatus(
+            timeZone: TimeZone.current,
+            device: HKDevice(name: "Failing", manufacturer: nil, model: nil,
+                             hardwareVersion: nil, firmwareVersion: nil, softwareVersion: nil,
+                             localIdentifier: nil, udiDeviceIdentifier: nil),
+            pumpBatteryChargeRemaining: nil,
+            basalDeliveryState: nil,
+            bolusState: .noBolus,
+            insulinType: .novolog
+        )
+        var localizedTitle: String = "Failing"
+        var delegateQueue: DispatchQueue!
+        var rawState: RawStateValue = [:]
+        var isOnboarded: Bool = true
+        var debugDescription: String = "Failing"
+
+        init(error: PumpManagerError?) { self.tempBasalError = error }
+        required init?(rawState: RawStateValue) {}
+
+        func addStatusObserver(_ observer: PumpManagerStatusObserver, queue: DispatchQueue) {}
+        func removeStatusObserver(_ observer: PumpManagerStatusObserver) {}
+        func ensureCurrentPumpData(completion: ((Date?) -> Void)?) { completion?(Date()) }
+        func setMustProvideBLEHeartbeat(_ mustProvideBLEHeartbeat: Bool) {}
+        func createBolusProgressReporter(reportingOn dispatchQueue: DispatchQueue) -> DoseProgressReporter? { nil }
+        func estimatedDuration(toBolus units: Double) -> TimeInterval { .minutes(units / 1.5) }
+
+        func enactBolus(units: Double, activationType: BolusActivationType,
+                        completion: @escaping (PumpManagerError?) -> Void) {
+            enactBolusCalls.append((units, activationType))
+            completion(nil)
+        }
+        func cancelBolus(completion: @escaping (PumpManagerResult<DoseEntry?>) -> Void) {
+            completion(.success(nil))
+        }
+        func enactTempBasal(unitsPerHour: Double, for duration: TimeInterval,
+                            completion: @escaping (PumpManagerError?) -> Void) {
+            enactTempBasalCalls.append((unitsPerHour, duration))
+            completion(tempBasalError)
+        }
+        func suspendDelivery(completion: @escaping (Error?) -> Void) { completion(nil) }
+        func resumeDelivery(completion: @escaping (Error?) -> Void) { completion(nil) }
+        func syncBasalRateSchedule(items scheduleItems: [RepeatingScheduleValue<Double>],
+                                   completion: @escaping (Swift.Result<BasalRateSchedule, Error>) -> Void) {}
+        func syncDeliveryLimits(limits deliveryLimits: DeliveryLimits,
+                                completion: @escaping (Swift.Result<DeliveryLimits, Error>) -> Void) {}
+        func acknowledgeAlert(alertIdentifier: Alert.AlertIdentifier,
+                              completion: @escaping (Error?) -> Void) {}
+        func getSoundBaseURL() -> URL? { nil }
+        func getSounds() -> [Alert.Sound] { [] }
+    }
+
+    /// Successful dose enactment clears the recovery store.
+    func testDidRecommend_successfulDose_clearsRecoveryStore() {
+        let suiteName = "B5_RecoveryStoreClearOnSuccess_\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer {
+            WatchDoseRecoveryStore.clear(from: defaults)
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+        // Pre-populate with a stale-ish entry to confirm clear() runs.
+        WatchDoseRecoveryStore.recordStart(description: "preexisting", to: defaults)
+        XCTAssertNotNil(WatchDoseRecoveryStore.load(from: defaults), "precondition: entry exists")
+
+        let pump = RecordingPumpManager()
+        let (driver, _) = makeDriver(
+            pumpManager: pump,
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true,
+            isWarmingUpOverride: false,
+            recoveryDefaults: defaults
+        )
+        let exp = expectation(description: "didRecommend completion")
+        let (rec, date) = sampleRecommendation()
+        driver.loopAlgorithmRunner(driver.underlyingRunner,
+                                    didRecommend: (rec, date)) { _ in exp.fulfill() }
+        wait(for: [exp], timeout: 5.0)
+
+        XCTAssertEqual(pump.enactTempBasalCalls.count, 1, "temp basal should have enacted")
+        XCTAssertNil(WatchDoseRecoveryStore.load(from: defaults),
+                     "Successful dose enactment should clear the recovery store")
+    }
+
+    /// Temp-basal error early-return path also clears the recovery store.
+    func testDidRecommend_tempBasalError_clearsRecoveryStore() {
+        let suiteName = "B5_RecoveryStoreClearOnTempBasalError_\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defer {
+            WatchDoseRecoveryStore.clear(from: defaults)
+            defaults.removePersistentDomain(forName: suiteName)
+        }
+
+        let pump = FailingTempBasalPumpManager(error: .uncertainDelivery)
+        let (driver, _) = makeDriver(
+            pumpManager: pump,
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true,
+            isWarmingUpOverride: false,
+            recoveryDefaults: defaults
+        )
+        let exp = expectation(description: "didRecommend completion")
+        var receivedError: LoopError?
+        let (rec, date) = sampleRecommendation()
+        driver.loopAlgorithmRunner(driver.underlyingRunner,
+                                    didRecommend: (rec, date)) { err in
+            receivedError = err
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 5.0)
+
+        XCTAssertNotNil(receivedError, "temp basal failure should propagate as LoopError")
+        XCTAssertEqual(pump.enactTempBasalCalls.count, 1)
+        XCTAssertEqual(pump.enactBolusCalls.count, 0,
+                       "temp basal failure should short-circuit before bolus")
+        XCTAssertNil(WatchDoseRecoveryStore.load(from: defaults),
+                     "Early-return temp basal error path should still clear the recovery store")
     }
 }
