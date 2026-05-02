@@ -17,6 +17,18 @@ final class HandoffOrchestratorTests: XCTestCase {
     private var policyEngine: HandoffPolicyEngine!  // B.4 Issue #2: held for inspection
     private var clock: Date!
 
+    // B.5 Issue #4 carryover: each direct HandoffStateMachine construction in
+    // these tests gets a fresh, isolated UserDefaults suite so persisted state
+    // (HandoffStatePersistence.save in state.didSet) from a prior test doesn't
+    // leak into the next test's machine init via App Group UserDefaults.
+    private var isolatedSuiteNames: [String] = []
+
+    private func isolatedDefaults() -> UserDefaults {
+        let suiteName = "B5_WatchHandoffOrchestratorTests_\(UUID().uuidString)"
+        isolatedSuiteNames.append(suiteName)
+        return UserDefaults(suiteName: suiteName)!
+    }
+
     override func setUp() async throws {
         clock = Date(timeIntervalSince1970: 1_700_000_000)
         coordinatorTransport = MockPhoneWatchTransport()
@@ -37,7 +49,8 @@ final class HandoffOrchestratorTests: XCTestCase {
         )
         orchestrator = HandoffOrchestrator(
             coordinator: coordinator,
-            stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .watch),
+            stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .watch,
+                                              appGroupDefaults: isolatedDefaults()),
             policyEngine: policyEngine,
             shadowScheduler: ShadowStateScheduler(
                 clock: { [unowned self] in self.clock },
@@ -51,6 +64,12 @@ final class HandoffOrchestratorTests: XCTestCase {
     override func tearDown() async throws {
         orchestrator?.stop()
         coordinator?.stop()
+        // B.5 Issue #4 carryover: clean up isolated UserDefaults suites we
+        // created so we don't leave stray entries in ~/Library/Preferences.
+        for suiteName in isolatedSuiteNames {
+            UserDefaults().removePersistentDomain(forName: suiteName)
+        }
+        isolatedSuiteNames.removeAll()
     }
 
     func testInitialStateIsPhoneDriver() {
@@ -113,7 +132,8 @@ final class HandoffOrchestratorTests: XCTestCase {
         orchestrator.injectStateMachine(HandoffStateMachine(
             initialState: .recovering(reason: .timeoutWaitingForConfirmation,
                                        lastKnownOwner: .phone),
-            role: .watch))
+            role: .watch,
+            appGroupDefaults: isolatedDefaults()))
         orchestrator.dismissRecovering()
         XCTAssertEqual(orchestrator.handoffState, .phoneDriver)
     }
