@@ -38,7 +38,7 @@ import os.log
 #if canImport(WatchKit)
 import WatchKit
 #endif
-#if canImport(ClockKit)
+#if os(watchOS)
 import ClockKit
 #endif
 
@@ -498,7 +498,9 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
     // MARK: Watch-specific helpers
 
     private func refreshComplications() {
-        #if canImport(ClockKit)
+        // CLKComplicationServer is part of ClockKit but is marked unavailable
+        // on iOS — gate on os(watchOS) rather than canImport(ClockKit).
+        #if os(watchOS)
         let server = CLKComplicationServer.sharedInstance()
         for complication in server.activeComplications ?? [] {
             server.reloadTimeline(for: complication)
