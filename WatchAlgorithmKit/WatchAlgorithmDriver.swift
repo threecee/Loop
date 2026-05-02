@@ -225,6 +225,28 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
         self.dosingDecisionStore = dosingDecisionStore
         self.isWarmingUpOverride = isWarmingUpOverride
 
+        // B.6 Phase 4c: copy schedules from settings to doseStore so the
+        // algorithm runner can read them. LoopAlgorithmRunner reads
+        // `basalProfileApplyingOverrideHistory` and `insulinSensitivitySchedule`
+        // from the DoseStore, NOT from the LoopSettings struct — so without
+        // this copy, the runner errors with
+        // configurationError(.basalRateSchedule) and never produces a
+        // recommendation (silent failure). Discovered during Phase 4b
+        // integration test development.
+        //
+        // Idempotent — if some other code path also sets these (e.g., a
+        // future CoreData restore, or LoopAlgorithmRunner.settingsDidChange),
+        // the copy just re-assigns the same values. iOS production sets these
+        // via LoopAlgorithmRunner.swift:488-500 (settings observer); the
+        // watch's defensive init copy ensures correctness regardless of
+        // whether that observer fires before the first loop tick.
+        if let basalProfile = settingsSnapshot.loopSettings.basalRateSchedule {
+            doseStore.basalProfile = basalProfile
+        }
+        if let isfSchedule = settingsSnapshot.loopSettings.insulinSensitivitySchedule {
+            doseStore.insulinSensitivitySchedule = isfSchedule
+        }
+
         // Provider conformances live on `self`, but `self` isn't fully
         // initialized yet. Construct lightweight adapter shims that hold weak
         // references back to the driver, then resolve them at first call.
