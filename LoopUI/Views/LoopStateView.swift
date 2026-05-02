@@ -61,6 +61,9 @@ final class LoopStateView: UIView {
         super.layoutSubviews()
 
         shapeLayer.path = drawPath()
+        innerLayer.path = drawInnerPath()
+        // Inner layer frame doesn't need updating because we draw an absolute path
+        // from bounds.mid each layout.
     }
 
     private func drawPath(lineWidth: CGFloat? = nil) -> CGPath {
@@ -83,6 +86,73 @@ final class LoopStateView: UIView {
     }
 
     private static let AnimationKey = "com.loudnate.Naterade.breatheAnimation"
+    private static let PulseAnimationKey = "handoffPulse"
+
+    /// B.7: when true, render the inner driver indicator (small white-filled
+    /// circle at center) showing this device is currently driving the pod.
+    /// When false, the inner indicator is hidden.
+    var isThisDeviceDriving: Bool = false {
+        didSet {
+            if isThisDeviceDriving != oldValue { updateInnerIndicator() }
+        }
+    }
+
+    /// B.7: when true, the inner driver indicator pulses (opacity breathe)
+    /// to signal a handoff transition is in progress. When false, the pulse
+    /// animation is removed. Independent of `isThisDeviceDriving` — the
+    /// animation is added either way (when not driving, the layer is hidden
+    /// so the user doesn't see it).
+    var isHandoffPending: Bool = false {
+        didSet {
+            if isHandoffPending != oldValue { updateInnerIndicator() }
+        }
+    }
+
+    /// Inner indicator layer. Hidden by default until `isThisDeviceDriving`
+    /// flips to true.
+    private lazy var innerLayer: CAShapeLayer = {
+        let layer = CAShapeLayer()
+        layer.fillColor = UIColor.white.cgColor
+        layer.strokeColor = UIColor.clear.cgColor
+        layer.isHidden = true
+        self.layer.addSublayer(layer)
+        return layer
+    }()
+
+    /// Test-only accessor for the inner layer.
+    internal var innerLayerForTesting: CAShapeLayer { innerLayer }
+
+    private func updateInnerIndicator() {
+        innerLayer.path = drawInnerPath()
+        innerLayer.isHidden = !isThisDeviceDriving
+
+        if isHandoffPending {
+            let pulse = CABasicAnimation(keyPath: "opacity")
+            pulse.fromValue = 1.0
+            pulse.toValue = 0.4
+            pulse.duration = 0.8
+            pulse.repeatCount = .greatestFiniteMagnitude
+            pulse.autoreverses = true
+            pulse.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            innerLayer.add(pulse, forKey: Self.PulseAnimationKey)
+        } else {
+            innerLayer.removeAnimation(forKey: Self.PulseAnimationKey)
+        }
+    }
+
+    private func drawInnerPath() -> CGPath {
+        let center = CGPoint(x: bounds.midX, y: bounds.midY)
+        let outerRadius = min(bounds.width / 2, bounds.height / 2) - shapeLayer.lineWidth / 2
+        let innerRadius = outerRadius / 4
+        let path = UIBezierPath(
+            arcCenter: center,
+            radius: innerRadius,
+            startAngle: 0,
+            endAngle: 2 * CGFloat.pi,
+            clockwise: true
+        )
+        return path.cgPath
+    }
 
     var animated: Bool = false {
         didSet {
