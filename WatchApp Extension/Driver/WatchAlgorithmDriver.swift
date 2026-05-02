@@ -25,8 +25,6 @@
 //  B.3.a Phase 5. Phase 7: isWarmingUp tracking.
 //
 
-#if !os(iOS)
-
 import Combine
 import Foundation
 import HealthKit
@@ -568,5 +566,3 @@ private final class WatchAutomaticDosingStatusAdapter: AutomaticDosingStatusBrid
     var automaticDosingEnabled: Bool { snapshot.automaticDosingEnabled }
     var isAutomaticDosingAllowed: Bool { snapshot.isAutomaticDosingAllowed }
 }
-
-#endif  // !os(iOS)
