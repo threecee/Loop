@@ -377,7 +377,13 @@ class LoopAppManager: NSObject {
             suspendThresholdMgdL: suspendThresholdMgdL,
             nightscoutConfig: nsConfig,
             automaticDosingEnabled: self.automaticDosingStatus.automaticDosingEnabled,
-            isAutomaticDosingAllowed: self.automaticDosingStatus.isAutomaticDosingAllowed
+            isAutomaticDosingAllowed: self.automaticDosingStatus.isAutomaticDosingAllowed,
+            // B.5.2 Issue #3: include the phone's current TimeZone identifier so
+            // the watch can align its schedule lookups to the phone's local time
+            // (e.g. "Europe/Copenhagen") even when the two devices report
+            // different TimeZone.current. Read at emission time so each fresh
+            // sync reflects the phone's current zone.
+            timeZone: TimeZone.current.identifier
         )
     }
 

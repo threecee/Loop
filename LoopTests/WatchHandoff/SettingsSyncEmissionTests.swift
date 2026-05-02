@@ -166,6 +166,74 @@ final class SettingsSyncEmissionTests: XCTestCase {
                        "notifySettingsChanged should queue exactly one settings sync")
     }
 
+    // MARK: - B.5.2 Issue #3: timeZone field passthrough
+
+    /// `LoopAppManager.makeWatchSettingsSync()` is the production builder of
+    /// the sync payload — it now populates `timeZone` from `TimeZone.current`.
+    /// The orchestrator-level emit tests use a sample sync directly, so to
+    /// assert the field is wired in, we construct a sync mirroring production
+    /// and verify the wire round-trip still carries the identifier.
+    func testOutboundSyncIncludesTimeZoneFromCurrent() {
+        // Build a sync payload exactly as LoopAppManager would: timeZone =
+        // TimeZone.current.identifier at construction time.
+        let phoneZoneIdentifier = TimeZone.current.identifier
+        let syncWithZone = PhoneWatchSettingsSync(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(timeIntervalSince1970: 1_700_000_000),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10.0,
+            maximumBasalRatePerHourUnits: 4.0,
+            suspendThresholdMgdL: 72.0,
+            nightscoutConfig: nil,
+            automaticDosingEnabled: true,
+            isAutomaticDosingAllowed: true,
+            timeZone: phoneZoneIdentifier
+        )
+        orchestrator = makeOrchestrator(provideSync: true, providedSyncOverride: syncWithZone)
+
+        let countBefore = transport.queuedMessages.count
+        orchestrator.emitSettingsSync()
+
+        let newMessages = transport.queuedMessages.dropFirst(countBefore)
+        guard case let .settingsSync(received) = newMessages.first else {
+            return XCTFail("expected settingsSync message")
+        }
+        XCTAssertEqual(received.timeZone, phoneZoneIdentifier,
+                       "Outbound sync must carry the phone's TimeZone.current identifier")
+    }
+
+    /// B.5.2 Issue #3b: posting `.NSSystemTimeZoneDidChange` synthetically
+    /// triggers a fresh sync emission. The closure-based observer installed
+    /// in `init(...)` calls `notifySettingsChanged()` → `emitSettingsSync()`.
+    func testSystemTimeZoneDidChangeNotificationTriggersFreshEmission() {
+        orchestrator = makeOrchestrator(provideSync: true)
+        // Drain any messages queued during construction.
+        transport.queuedMessages.removeAll()
+
+        NotificationCenter.default.post(
+            name: .NSSystemTimeZoneDidChange,
+            object: nil
+        )
+
+        // The closure observer is registered on `.main`; we're already on
+        // @MainActor so the post is dispatched synchronously into the queue.
+        // Spin one runloop tick to let it drain.
+        let exp = expectation(description: "drain main runloop")
+        DispatchQueue.main.async { exp.fulfill() }
+        wait(for: [exp], timeout: 1.0)
+
+        let syncs = transport.queuedMessages.filter {
+            if case .settingsSync = $0 { return true }; return false
+        }
+        XCTAssertEqual(syncs.count, 1,
+                       "NSSystemTimeZoneDidChange should trigger exactly one fresh sync emission")
+    }
+
     // MARK: - B.4 Issue #3: automaticDosing field passthrough
 
     /// emitSettingsSync builds a sync that includes the automaticDosing flags

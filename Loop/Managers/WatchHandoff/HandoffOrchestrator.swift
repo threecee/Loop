@@ -42,6 +42,13 @@ final class HandoffOrchestrator: ObservableObject {
     /// off in the interim, the timer is cancelled and stable-since is cleared.
     private var phoneStableDebounce: Task<Void, Never>?
 
+    /// B.5.2 Issue #3b: token returned by the closure-based observer for
+    /// `.NSSystemTimeZoneDidChange`. Held so `deinit` can remove it explicitly
+    /// (closure observers are not removed by `removeObserver(self)` because the
+    /// observer object is the returned token, not `self`). App-lifetime scoped
+    /// — `deinit` only fires at app termination in production.
+    private var systemTZObserver: NSObjectProtocol?
+
     /// B.4 Issue #2: debounce window matches HandoffPolicyEngine.absenceThreshold (60s).
     /// Tests can override via the optional `phoneStableDebounceOverride` init parameter.
     private static let defaultPhoneStableDebounceSeconds: TimeInterval = 60
@@ -92,6 +99,31 @@ final class HandoffOrchestrator: ObservableObject {
         self.settingsSyncProvider = settingsSyncProvider
         self.phoneStableDebounceSeconds = phoneStableDebounceOverride
             ?? Self.defaultPhoneStableDebounceSeconds
+
+        // B.5.2 Issue #3b: observe phone-side time-zone changes (iOS posts this
+        // when the user crosses a zone boundary, when Settings → General → Date
+        // & Time changes, or when the carrier reports a TZ change). Trigger a
+        // fresh sync emission so the watch picks up the new TimeZone.current
+        // identifier promptly instead of lagging until the next settings change.
+        // Closure-based observer pattern avoids the `@objc` complication;
+        // `[weak self]` defends against retain cycles even though the orchestrator
+        // is app-lifetime-scoped (owned by LoopAppManager).
+        self.systemTZObserver = NotificationCenter.default.addObserver(
+            forName: .NSSystemTimeZoneDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.notifySettingsChanged()
+        }
+    }
+
+    deinit {
+        // B.5.2 Issue #3b: explicit removal of the closure observer (token-based;
+        // `removeObserver(self)` would not match it because the observer object
+        // is the returned token, not `self`).
+        if let observer = systemTZObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 
     func start() {

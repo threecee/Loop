@@ -84,20 +84,30 @@ public final class WatchSettingsSnapshot {
     /// over WCSession. Converts the transport struct into the richer local
     /// type that `WatchAlgorithmDriver` adapters expect.
     public init(fromSync sync: PhoneWatchSettingsSync) {
+        // B.5.2 Issue #3: resolve schedule zone from the sync payload (the
+        // phone's TimeZone.current at emission time). Fall back to the watch's
+        // own TimeZone.current when the sync didn't include a zone (v3 senders
+        // before the field was added) or when the identifier was unrecognized.
+        // Schedules use this zone to interpret `RepeatingScheduleValue` startTime
+        // offsets (seconds-from-midnight in WHICH zone) — without alignment, the
+        // watch's basal/ISF/CR/target lookups would drift relative to the phone
+        // when the two devices report different zones.
+        let scheduleZone = sync.timeZone.flatMap(TimeZone.init(identifier:)) ?? TimeZone.current
+
         let basalSchedule = sync.basalScheduleItems.isEmpty ? nil
-            : BasalRateSchedule(dailyItems: sync.basalScheduleItems, timeZone: TimeZone.current)
+            : BasalRateSchedule(dailyItems: sync.basalScheduleItems, timeZone: scheduleZone)
         let isfSchedule = sync.insulinSensitivityScheduleItems.isEmpty ? nil
             : InsulinSensitivitySchedule(unit: .milligramsPerDeciliter,
                                          dailyItems: sync.insulinSensitivityScheduleItems,
-                                         timeZone: TimeZone.current)
+                                         timeZone: scheduleZone)
         let carbSchedule = sync.carbRatioScheduleItems.isEmpty ? nil
             : CarbRatioSchedule(unit: .gram(),
                                 dailyItems: sync.carbRatioScheduleItems,
-                                timeZone: TimeZone.current)
+                                timeZone: scheduleZone)
         let targetSchedule = sync.glucoseTargetRangeScheduleItems.isEmpty ? nil
             : GlucoseRangeSchedule(unit: .milligramsPerDeciliter,
                                    dailyItems: sync.glucoseTargetRangeScheduleItems,
-                                   timeZone: TimeZone.current)
+                                   timeZone: scheduleZone)
         let suspendThreshold: GlucoseThreshold? = sync.suspendThresholdMgdL.map {
             GlucoseThreshold(unit: .milligramsPerDeciliter, value: $0)
         }

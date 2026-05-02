@@ -687,6 +687,7 @@
 		WB2D000000000100021 /* HandoffPolicyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100001 /* HandoffPolicyEngine.swift */; };
 		WB2D000000000100022 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100002 /* ShadowStateScheduler.swift */; };
 		WB2D000000000100023 /* HandoffOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100003 /* HandoffOrchestrator.swift */; };
+		WB2D000000000100028 /* HandoffBlockedError.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100008 /* HandoffBlockedError.swift */; };
 		WB2D000000000100024 /* HandoffPolicyEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100004 /* HandoffPolicyEngineTests.swift */; };
 		WB2D000000000100025 /* ShadowStateSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100005 /* ShadowStateSchedulerTests.swift */; };
 		WB2D000000000100026 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100006 /* HandoffOrchestratorTests.swift */; };
@@ -1649,6 +1650,7 @@
 		WB2D000000000100001 /* HandoffPolicyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffPolicyEngine.swift; sourceTree = "<group>"; };
 		WB2D000000000100002 /* ShadowStateScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowStateScheduler.swift; sourceTree = "<group>"; };
 		WB2D000000000100003 /* HandoffOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffOrchestrator.swift; sourceTree = "<group>"; };
+		WB2D000000000100008 /* HandoffBlockedError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffBlockedError.swift; sourceTree = "<group>"; };
 		WB2D000000000100004 /* HandoffPolicyEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffPolicyEngineTests.swift; sourceTree = "<group>"; };
 		WB2D000000000100005 /* ShadowStateSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowStateSchedulerTests.swift; sourceTree = "<group>"; };
 		WB2D000000000100006 /* HandoffOrchestratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffOrchestratorTests.swift; sourceTree = "<group>"; };
@@ -3119,6 +3121,7 @@
 				WB2D000000000100001 /* HandoffPolicyEngine.swift */,
 				WB2D000000000100002 /* ShadowStateScheduler.swift */,
 				WB2D000000000100003 /* HandoffOrchestrator.swift */,
+				WB2D000000000100008 /* HandoffBlockedError.swift */,
 			);
 			path = WatchHandoff;
 			sourceTree = "<group>";
@@ -4048,6 +4051,7 @@
 				WB2D000000000100021 /* HandoffPolicyEngine.swift in Sources */,
 				WB2D000000000100022 /* ShadowStateScheduler.swift in Sources */,
 				WB2D000000000100023 /* HandoffOrchestrator.swift in Sources */,
+				WB2D000000000100028 /* HandoffBlockedError.swift in Sources */,
 				WB2D00000000010002B /* WatchHandoffSection.swift in Sources */,
 				WB2D00000000010002C /* WatchHandoffEventLogView.swift in Sources */,
 				C17824A51E1AD4D100D9D25C /* ManualBolusRecommendation.swift in Sources */,

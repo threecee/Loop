@@ -182,6 +182,35 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
                        "Phone explicitly disabled → watch reads false (not the v1-fallback path)")
     }
 
+    // MARK: - B.5.2 Issue #3: timeZone round-trips through the cache
+
+    /// A sync carrying a `timeZone` identifier survives caching + JSON
+    /// round-trip unchanged, so the watch-side bootstrap reads the same
+    /// identifier the phone emitted.
+    func testTimeZoneRoundTripsThroughCache() {
+        let cache = WatchSettingsCache()
+        let sync = PhoneWatchSettingsSync(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10.0,
+            maximumBasalRatePerHourUnits: 4.0,
+            suspendThresholdMgdL: 72.0,
+            nightscoutConfig: nil,
+            timeZone: "Europe/Copenhagen"
+        )
+
+        cache.update(sync)
+
+        XCTAssertEqual(cache.current?.timeZone, "Europe/Copenhagen",
+                       "timeZone identifier must survive cache round-trip")
+    }
+
     // MARK: - Test 2d: bootstrap settingsProvider reads from cache
 
     func testBootstrapSettingsProviderReadsFromCache() {

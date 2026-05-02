@@ -14,6 +14,7 @@ import HealthKit
 import LoopAlgorithmCore
 import LoopKit
 import LoopCore
+import OmniBLE  // for PhoneWatchSettingsSync (B.5.2 #3 schedule-zone tests)
 @testable import WatchAlgorithmKit
 @testable import WatchApp_Extension  // for TimeInterval.minutes/.hours convenience
 
@@ -454,6 +455,67 @@ final class WatchAlgorithmDriverTests: XCTestCase {
         XCTAssertEqual(pump.enactTempBasalCalls.count, 1, "temp basal should have enacted")
         XCTAssertNil(WatchDoseRecoveryStore.load(from: defaults),
                      "Successful dose enactment should clear the recovery store")
+    }
+
+    // MARK: - B.5.2 Issue #3: schedule zone resolution from sync.timeZone
+
+    /// `WatchSettingsSnapshot(fromSync:)` resolves a `scheduleZone` from
+    /// `sync.timeZone` and threads it into the 4 schedule constructors. When
+    /// the sync carries `"Europe/Copenhagen"`, the basal schedule's `timeZone`
+    /// must equal that identifier — not the watch's local `TimeZone.current`.
+    func testScheduleZoneDerivedFromSyncTimeZone() {
+        let copenhagen = TimeZone(identifier: "Europe/Copenhagen")!
+        let sync = PhoneWatchSettingsSync(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10.0,
+            maximumBasalRatePerHourUnits: 4.0,
+            suspendThresholdMgdL: 72.0,
+            nightscoutConfig: nil,
+            timeZone: "Europe/Copenhagen"
+        )
+
+        let snapshot = WatchSettingsSnapshot(fromSync: sync)
+
+        XCTAssertEqual(snapshot.loopSettings.basalRateSchedule?.timeZone, copenhagen,
+                       "basal schedule must use the sync's timeZone, not the watch's local zone")
+        XCTAssertEqual(snapshot.loopSettings.insulinSensitivitySchedule?.timeZone, copenhagen,
+                       "ISF schedule must use the sync's timeZone")
+        XCTAssertEqual(snapshot.loopSettings.carbRatioSchedule?.timeZone, copenhagen,
+                       "carb ratio schedule must use the sync's timeZone")
+        XCTAssertEqual(snapshot.loopSettings.glucoseTargetRangeSchedule?.timeZone, copenhagen,
+                       "glucose target range schedule must use the sync's timeZone")
+    }
+
+    /// When the sync's `timeZone` is nil (v3 senders before the field was added)
+    /// the resolved zone must fall back to the watch's local `TimeZone.current`,
+    /// preserving pre-B.5.2 behavior for backward compatibility.
+    func testScheduleZoneFallsBackToCurrentWhenSyncTimeZoneNil() {
+        let sync = PhoneWatchSettingsSync(
+            protocolVersion: 3,
+            sentAt: Date(),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10.0,
+            maximumBasalRatePerHourUnits: 4.0,
+            suspendThresholdMgdL: 72.0,
+            nightscoutConfig: nil
+            // timeZone defaults to nil
+        )
+
+        let snapshot = WatchSettingsSnapshot(fromSync: sync)
+        XCTAssertEqual(snapshot.loopSettings.basalRateSchedule?.timeZone, TimeZone.current,
+                       "Nil sync.timeZone → schedule zone falls back to watch's TimeZone.current")
     }
 
     /// Temp-basal error early-return path also clears the recovery store.

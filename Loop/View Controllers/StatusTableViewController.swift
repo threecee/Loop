@@ -1307,12 +1307,44 @@ final class StatusTableViewController: LoopChartsTableViewController {
     private func presentErrorCancelingBolus(_ error: (Error)) {
         log.error("Error Canceling Bolus: %@", error.localizedDescription)
         let title = NSLocalizedString("Error Canceling Bolus", comment: "The alert title for an error while canceling a bolus")
-        let body = NSLocalizedString("Unable to stop the bolus in progress. Move your iPhone closer to the pump and try again. Check your insulin delivery history for details, and monitor your glucose closely.", comment: "The alert body for an error while canceling a bolus")
+        // B.5.2 Issue #5b: when the OmniBLE command gate is currently blocking
+        // commands AND the underlying error is the gate's `.uncertainDelivery`
+        // signal, swap in a friendly "handoff in progress, try again" body
+        // instead of the misleading generic body that suggests moving the iPhone
+        // closer to the pump.
+        let body: String
+        if isHandoffBlocked(error: error),
+           let friendly = HandoffBlockedError.handoffInProgress.errorDescription {
+            body = friendly
+        } else {
+            body = NSLocalizedString("Unable to stop the bolus in progress. Move your iPhone closer to the pump and try again. Check your insulin delivery history for details, and monitor your glucose closely.", comment: "The alert body for an error while canceling a bolus")
+        }
         let action = UIAlertAction(
             title: NSLocalizedString("com.loudnate.LoopKit.errorAlertActionTitle", value: "OK", comment: "The title of the action used to dismiss an error alert"), style: .default)
         let alert = UIAlertController(title: title, message: body, preferredStyle: .alert)
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
+    }
+
+    /// B.5.2 Issue #5b: detects whether `error` originated from the OmniBLE
+    /// command gate during a handoff. The gate fires
+    /// `PumpManagerError.uncertainDelivery` (mirror of the B.5 Phase 2A
+    /// precedent — OmniBLE submodule cannot import Loop, so it cannot use
+    /// `LoopError` directly) and the orchestrator's
+    /// `ownership.commandsAllowed == false` flag tells us we're mid-handoff.
+    /// When both conditions hold, callers substitute a friendly message
+    /// (`HandoffBlockedError.handoffInProgress`) for the misleading
+    /// "uncertain delivery" string.
+    private func isHandoffBlocked(error: Error) -> Bool {
+        guard let orchestrator = HandoffOrchestrator.shared,
+              orchestrator.ownership.commandsAllowed == false else {
+            return false
+        }
+        if let pumpError = error as? PumpManagerError,
+           case .uncertainDelivery = pumpError {
+            return true
+        }
+        return false
     }
 
     // MARK: - Actions
