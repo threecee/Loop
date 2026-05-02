@@ -169,7 +169,10 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         // message arrives from the phone.
         let algorithmBootstrap = WatchAlgorithmBootstrap(
             storesProvider: { [weak self] in self?.makeAlgorithmStoresIfPossible() },
-            syncProvider: { WatchSettingsCache.shared.current }
+            syncProvider: { WatchSettingsCache.shared.current },
+            // B.6: thread the lazily-constructed OmniBLEPumpManager through to the driver.
+            // [weak] capture avoids a retain cycle through ExtensionDelegate -> bootstrap.
+            pumpManagerProvider: { [weak orchestrator] in orchestrator?.pumpManager }
         )
         let remoteBootstrap = WatchRemoteCommandBootstrap(
             storesProvider: { [weak self] in self?.makeAlgorithmStoresIfPossible() },

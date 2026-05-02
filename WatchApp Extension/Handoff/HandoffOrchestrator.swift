@@ -14,6 +14,7 @@
 //
 
 import Foundation
+import LoopKit  // B.6: for `PumpManager` (forwarded accessor)
 import OmniBLE
 import Combine
 
@@ -52,6 +53,14 @@ final class HandoffOrchestrator: ObservableObject {
     /// B.2.e: replaces the previous `lastReceivedPayload` field — accessor
     /// now forwards to ownership's cache (single source of truth).
     var cachedPayload: OmniBLEHandoffPayload? { ownership.cachedPayload }
+
+    /// B.6: forwarded accessor for the lazily-constructed OmniBLEPumpManager,
+    /// typed as `PumpManager` (LoopKit) since that's what the algorithm enacts on.
+    /// Returns nil until the first `.watchDriver` transition triggers
+    /// `OmniBLEOwnership.setPumpManager(_:)`. The runtime cast
+    /// `OmniBLEPodOwner? -> PumpManager?` is safe because the concrete type is
+    /// always `OmniBLEPumpManager`, which conforms to both protocols.
+    var pumpManager: PumpManager? { ownership.pumpManager as? PumpManager }
 
     /// Forwarded from the state machine. Capped at 10 (state machine enforces).
     var transitionLog: [HandoffTransitionRecord] {

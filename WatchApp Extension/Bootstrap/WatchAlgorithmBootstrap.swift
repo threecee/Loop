@@ -39,27 +39,37 @@ final class WatchAlgorithmBootstrap {
 
     private let storesProvider: () -> WatchAlgorithmStores?
     private let settingsProvider: () -> WatchSettingsSnapshot?
+    private let pumpManagerProvider: () -> PumpManager?  // B.6
 
     /// - Parameters:
     ///   - storesProvider: Returns the watch-side stores bundle, or nil if
     ///     the stores aren't ready (e.g., still initializing).
     ///   - settingsProvider: Returns the most recent settings snapshot, or
     ///     nil if no sync has been received yet.
+    ///   - pumpManagerProvider: B.6 — Returns the watch-side OmniBLEPumpManager
+    ///     (typed as PumpManager since that's what the algorithm enacts on),
+    ///     or nil if not yet constructed. Defaulted to a nil-returning closure
+    ///     so existing callers don't break.
     init(storesProvider: @escaping () -> WatchAlgorithmStores?,
-         settingsProvider: @escaping () -> WatchSettingsSnapshot?) {
+         settingsProvider: @escaping () -> WatchSettingsSnapshot?,
+         pumpManagerProvider: @escaping () -> PumpManager? = { nil }) {
         self.storesProvider = storesProvider
         self.settingsProvider = settingsProvider
+        self.pumpManagerProvider = pumpManagerProvider
     }
 
     /// B.3.a Phase 6 convenience init: takes a `PhoneWatchSettingsSync`
     /// provider and converts to `WatchSettingsSnapshot` internally.
+    /// B.6: also accepts a pumpManagerProvider with the same default.
     init(storesProvider: @escaping () -> WatchAlgorithmStores?,
-         syncProvider: @escaping () -> PhoneWatchSettingsSync?) {
+         syncProvider: @escaping () -> PhoneWatchSettingsSync?,
+         pumpManagerProvider: @escaping () -> PumpManager? = { nil }) {
         self.storesProvider = storesProvider
         self.settingsProvider = {
             guard let sync = syncProvider() else { return nil }
             return WatchSettingsSnapshot(fromSync: sync)
         }
+        self.pumpManagerProvider = pumpManagerProvider
     }
 
     /// Updates the bootstrap in response to a handoff-state change.
@@ -91,7 +101,8 @@ final class WatchAlgorithmBootstrap {
             doseStore: stores.doseStore,
             glucoseStore: stores.glucoseStore,
             dosingDecisionStore: stores.dosingDecisionStore,
-            settingsSnapshot: settings
+            settingsSnapshot: settings,
+            pumpManager: pumpManagerProvider()  // B.6: nil if not yet constructed
         )
     }
 
