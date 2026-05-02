@@ -9,6 +9,7 @@
 import WatchKit
 import LoopCore
 import LoopKit
+import WatchAlgorithmKit  // for WatchAlgorithmDriver.warmUpDidCompleteNotification (B.6 Phase 4a-bis)
 
 class HUDInterfaceController: WKInterfaceController {
     private var activeContextObserver: NSObjectProtocol?

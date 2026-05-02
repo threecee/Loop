@@ -20,16 +20,7 @@ import Foundation
 import LoopAlgorithmCore
 import LoopKit
 import OmniBLE  // for HandoffState
-
-/// Bundle of stores the algorithm needs. The watch already owns CarbStore +
-/// GlucoseStore via `WatchContextManager`. DoseStore + DosingDecisionStore
-/// are constructed on-demand by the caller.
-struct WatchAlgorithmStores {
-    let carbStore: CarbStoreProtocol
-    let doseStore: DoseStoreProtocol
-    let glucoseStore: GlucoseStoreProtocol
-    let dosingDecisionStore: DosingDecisionStoreProtocol
-}
+import WatchAlgorithmKit  // for WatchAlgorithmDriver, WatchAlgorithmStores, WatchSettingsSnapshot
 
 final class WatchAlgorithmBootstrap {
 

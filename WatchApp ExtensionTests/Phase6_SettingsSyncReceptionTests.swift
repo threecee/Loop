@@ -11,6 +11,7 @@
 import XCTest
 import LoopKit
 import OmniBLE  // for PhoneWatchSettingsSync, HandoffState
+import WatchAlgorithmKit  // for WatchSettingsSnapshot (B.6 Phase 4a-bis)
 @testable import WatchApp_Extension
 
 final class Phase6_SettingsSyncReceptionTests: XCTestCase {

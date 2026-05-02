@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B6F100000020 /* WatchAlgorithmDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000013 /* WatchAlgorithmDriver.swift */; };
+		B6F100000021 /* WatchAlgorithmStores.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000014 /* WatchAlgorithmStores.swift */; };
+		B6F100000022 /* OSLog+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000015 /* OSLog+Convenience.swift */; };
+		B6F100000030 /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; };
+		B6F100000031 /* WatchAlgorithmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B6F100000032 /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; };
+		B6F100000040 /* LoopAlgorithmCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20FB8776F6A88FEE34DAF43 /* LoopAlgorithmCore.framework */; };
+		B6F100000041 /* LoopKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4344628320A7A3BE00C4BE6F /* LoopKit.framework */; };
+		B6F100000042 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9002A21EB209400AF44BF /* LoopCore.framework */; };
+		B6F100000043 /* OmniBLE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; };
+		B6F100000044 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F5C2C81B929C09003EB13D /* HealthKit.framework */; };
 		0420A78F8B7AD7D82ED05CDC /* LoopAlgorithmCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A20FB8776F6A88FEE34DAF43 /* LoopAlgorithmCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		049A1126B9804AFFBB289978 /* HandoffOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */; };
 		085ADF8A7E798FA650DF7297 /* BolusDosingDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FB75F0252BE320004C7D3F /* BolusDosingDecision.swift */; };
@@ -431,7 +442,6 @@
 		AAC65206E62D4840A5D600D5 /* ExtendedRuntimeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EA43E989364C63872E9437 /* ExtendedRuntimeCoordinator.swift */; };
 		AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */; };
 		AF24CEA23D3F475C93EC8AB4 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */; };
-		B3ADC067ED5A880674615B9A /* WatchAlgorithmDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC588A87E160380BD2AA3CAB /* WatchAlgorithmDriver.swift */; };
 		B4001CEE28CBBC82002FB414 /* AlertManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4001CED28CBBC82002FB414 /* AlertManagementView.swift */; };
 		B405E35924D2A75B00DD058D /* DerivedAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A966152923EA5A37005D8B29 /* DerivedAssets.xcassets */; };
 		B405E35A24D2B1A400DD058D /* HUDAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F2C15961E09E94E00E160D4 /* HUDAssets.xcassets */; };
@@ -684,6 +694,34 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		B6F100000051 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43776F841B8022E90074EA36 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B6F100000001;
+			remoteInfo = WatchAlgorithmKit;
+		};
+		B6F100000053 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43776F841B8022E90074EA36 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B6F100000001;
+			remoteInfo = WatchAlgorithmKit;
+		};
+		B6F100000060 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43776F841B8022E90074EA36 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F76BCE39F1F5CDAEB93A0B01;
+			remoteInfo = LoopAlgorithmCore;
+		};
+		B6F100000061 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43776F841B8022E90074EA36 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E4C53C19BA2871A44259506C;
+			remoteInfo = "LoopAlgorithmCore-watchOS";
+		};
 		1481F9BD28DA26F4004C5AEB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 43776F841B8022E90074EA36 /* Project object */;
@@ -860,6 +898,7 @@
 				7836FCE780F547C190A5EA1F /* OmniBLE.framework in Embed Frameworks */,
 				DFCE6F6BC8CF414C91D452C9 /* G7SensorKit.framework in Embed Frameworks */,
 				623575103230CD309CD8E120 /* LoopAlgorithmCore-watchOS.framework in Embed Frameworks */,
+				B6F100000031 /* WatchAlgorithmKit.framework in Embed Frameworks */,
 				1C58DC035C16895AD4EB79F0 /* NightscoutServiceKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -892,6 +931,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B6F100000011 /* WatchAlgorithmKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = WatchAlgorithmKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6F100000012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B6F100000013 /* WatchAlgorithmDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmDriver.swift; sourceTree = "<group>"; };
+		B6F100000014 /* WatchAlgorithmStores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmStores.swift; sourceTree = "<group>"; };
+		B6F100000015 /* OSLog+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+Convenience.swift"; sourceTree = "<group>"; };
 		0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HealthKitWriterTests.swift; path = "WatchApp ExtensionTests/HealthKitWriterTests.swift"; sourceTree = SOURCE_ROOT; };
 		091FD4801D540EC2D6AAE6F6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		0C482251645A52AFF8E9DF32 /* HKUnit+LocalizedString.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "HKUnit+LocalizedString.swift"; path = "HKUnit+LocalizedString.swift"; sourceTree = "<group>"; };
@@ -1590,7 +1634,6 @@
 		F5E0BDD827E1D71E0033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Main.strings; sourceTree = "<group>"; };
 		F5E0BDDA27E1D71F0033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F5E0BDE327E1D7230033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
-		FC588A87E160380BD2AA3CAB /* WatchAlgorithmDriver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmDriver.swift; path = WatchAlgorithmDriver.swift; sourceTree = "<group>"; };
 		FD84A081E0E14A27AE019F82 /* PhoneWatchSessionCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneWatchSessionCoordinatorTests.swift; path = "WatchApp ExtensionTests/PhoneWatchSessionCoordinatorTests.swift"; sourceTree = SOURCE_ROOT; };
 		WB2CA10000000000F0 /* OmniBLE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = OmniBLE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		WB2CA10000000000F1 /* PhoneWatchTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransport.swift; sourceTree = "<group>"; };
@@ -1611,6 +1654,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B6F100000003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6F100000040 /* LoopAlgorithmCore.framework in Frameworks */,
+				B6F100000041 /* LoopKit.framework in Frameworks */,
+				B6F100000042 /* LoopCore.framework in Frameworks */,
+				B6F100000043 /* OmniBLE.framework in Frameworks */,
+				B6F100000044 /* HealthKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		131BF2D8FC7B21F54637B91B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1675,6 +1730,7 @@
 				6B6036285E654E899F014EC7 /* G7SensorKit.framework in Frameworks */,
 				231723D38F9452BD1D74DC58 /* LoopAlgorithmCore-watchOS.framework in Frameworks */,
 				A6F3FFE541FFBA7F565A0477 /* NightscoutServiceKit.framework in Frameworks */,
+				B6F100000030 /* WatchAlgorithmKit.framework in Frameworks */,
 				F71A7C135799A2B9347C6191 /* Base32 in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1743,6 +1799,7 @@
 				E1EE31C5CC644875853D8B6B /* WatchApp Extension.appex in Frameworks */,
 				0BBB169B1ECDEC28418A982E /* LoopAlgorithmCore-watchOS.framework in Frameworks */,
 				BD6F6DAB5780A11DD05B8ADB /* NightscoutServiceKit.framework in Frameworks */,
+				B6F100000032 /* WatchAlgorithmKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1816,15 +1873,6 @@
 				B4D4534028E5CA7900F1A8D9 /* AlertMuterTests.swift */,
 			);
 			path = Alerts;
-			sourceTree = "<group>";
-		};
-		20BD735AF87D620A97A290C6 /* Driver */ = {
-			isa = PBXGroup;
-			children = (
-				FC588A87E160380BD2AA3CAB /* WatchAlgorithmDriver.swift */,
-			);
-			name = Driver;
-			path = Driver;
 			sourceTree = "<group>";
 		};
 		3ED319892EB659E600820BCF /* Live Activity */ = {
@@ -1940,6 +1988,7 @@
 				437D9BA11D7B5203007245E8 /* Loop.xcconfig */,
 				A951C5FF23E8AB51003E26DC /* Version.xcconfig */,
 				5F530310052376CA3C3C34DC /* LoopAlgorithmCore */,
+				B6F100000010 /* WatchAlgorithmKit */,
 				0CB297036FF4DD6B83889E05 /* NightscoutServiceKit.framework */,
 			);
 			sourceTree = "<group>";
@@ -1960,6 +2009,7 @@
 				A22A82FDA3554D77BC068817 /* WatchApp ExtensionTests.xctest */,
 				A20FB8776F6A88FEE34DAF43 /* LoopAlgorithmCore.framework */,
 				9F68F63F200483A5D11B40F2 /* LoopAlgorithmCore-watchOS.framework */,
+				B6F100000011 /* WatchAlgorithmKit.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2025,7 +2075,6 @@
 				C0D90DA6F09F41F8ACA8D1BF /* Lifecycle */,
 				8AF24B0CE7C845F694F5C2BB /* PhoneWatch */,
 				F08D133C35ED4AB09F27A7E1 /* Handoff */,
-				20BD735AF87D620A97A290C6 /* Driver */,
 				8DE36B527BF5692D99C62778 /* Bootstrap */,
 				D70F92345646BF6A14334DF2 /* BackgroundTasks */,
 			);
@@ -2485,6 +2534,18 @@
 				E9B08015253BBD7300BAD8F8 /* UserDefaults+LoopIntents.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		B6F100000010 /* WatchAlgorithmKit */ = {
+			isa = PBXGroup;
+			children = (
+				B6F100000013 /* WatchAlgorithmDriver.swift */,
+				B6F100000014 /* WatchAlgorithmStores.swift */,
+				B6F100000015 /* OSLog+Convenience.swift */,
+				B6F100000012 /* Info.plist */,
+			);
+			name = WatchAlgorithmKit;
+			path = WatchAlgorithmKit;
 			sourceTree = "<group>";
 		};
 		5F530310052376CA3C3C34DC /* LoopAlgorithmCore */ = {
@@ -3072,6 +3133,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		B6F100000005 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		11A797F79E554DD136D90683 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -3113,6 +3181,26 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		B6F100000001 /* WatchAlgorithmKit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B6F100000006 /* Build configuration list for PBXNativeTarget "WatchAlgorithmKit" */;
+			buildPhases = (
+				B6F100000005 /* Headers */,
+				B6F100000002 /* Sources */,
+				B6F100000003 /* Frameworks */,
+				B6F100000004 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B6F100000062 /* PBXTargetDependency */,
+				B6F100000063 /* PBXTargetDependency */,
+			);
+			name = WatchAlgorithmKit;
+			productName = WatchAlgorithmKit;
+			productReference = B6F100000011 /* WatchAlgorithmKit.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		14B1735B28AED9EC006CCD7C /* Loop Widget Extension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 14B1736C28AED9EE006CCD7C /* Build configuration list for PBXNativeTarget "Loop Widget Extension" */;
@@ -3201,6 +3289,7 @@
 			dependencies = (
 				C117ED71232EDB3200DA57CD /* PBXTargetDependency */,
 				1ADC950AFD96405591506C85 /* PBXTargetDependency */,
+				B6F100000050 /* PBXTargetDependency */,
 			);
 			name = "WatchApp Extension";
 			packageProductDependencies = (
@@ -3322,6 +3411,7 @@
 			);
 			dependencies = (
 				964E086AA40347A8967AB244 /* PBXTargetDependency */,
+				B6F100000052 /* PBXTargetDependency */,
 			);
 			name = "WatchApp ExtensionTests";
 			productName = "WatchApp ExtensionTests";
@@ -3545,11 +3635,19 @@
 				6BFA1604CBAF49B382A541D6 /* WatchApp ExtensionTests */,
 				F76BCE39F1F5CDAEB93A0B01 /* LoopAlgorithmCore */,
 				E4C53C19BA2871A44259506C /* LoopAlgorithmCore-watchOS */,
+				B6F100000001 /* WatchAlgorithmKit */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B6F100000004 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		14B1735A28AED9EC006CCD7C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3838,6 +3936,16 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B6F100000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B6F100000020 /* WatchAlgorithmDriver.swift in Sources */,
+				B6F100000021 /* WatchAlgorithmStores.swift in Sources */,
+				B6F100000022 /* OSLog+Convenience.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0FD993B9E977F1C1A66FB046 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -4231,7 +4339,6 @@
 				435400351C9F878D00D5819C /* SetBolusUserInfo.swift in Sources */,
 				895788B2242E69A2002CB114 /* CircularAccessoryButtonStyle.swift in Sources */,
 				A69496E50A6A725D3276234C /* RemoteDataServicesManager.swift in Sources */,
-				B3ADC067ED5A880674615B9A /* WatchAlgorithmDriver.swift in Sources */,
 				94720A4691BB98B503831216 /* WatchAlgorithmBootstrap.swift in Sources */,
 				503149FBE22CF89F3553A3A7 /* WatchRemoteCommandBootstrap.swift in Sources */,
 				2CCA6A8E7E60C1A9E04A5D8F /* BackgroundPollScheduler.swift in Sources */,
@@ -4438,6 +4545,28 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		B6F100000050 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B6F100000001 /* WatchAlgorithmKit */;
+			targetProxy = B6F100000051 /* PBXContainerItemProxy */;
+		};
+		B6F100000052 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B6F100000001 /* WatchAlgorithmKit */;
+			targetProxy = B6F100000053 /* PBXContainerItemProxy */;
+		};
+		B6F100000062 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LoopAlgorithmCore;
+			target = F76BCE39F1F5CDAEB93A0B01 /* LoopAlgorithmCore */;
+			targetProxy = B6F100000060 /* PBXContainerItemProxy */;
+		};
+		B6F100000063 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "LoopAlgorithmCore-watchOS";
+			target = E4C53C19BA2871A44259506C /* LoopAlgorithmCore-watchOS */;
+			targetProxy = B6F100000061 /* PBXContainerItemProxy */;
+		};
 		1481F9BE28DA26F4004C5AEB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4F75288A1DFE1DC600C322D6 /* LoopUI */;
@@ -4706,6 +4835,81 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		B6F100000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = WatchAlgorithmKit/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.loopkit.WatchAlgorithmKit;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator watchos watchsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,4";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		B6F100000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = WatchAlgorithmKit/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.loopkit.WatchAlgorithmKit;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator watchos watchsimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,4";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 		14B1736A28AED9EE006CCD7C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -5670,6 +5874,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B6F100000006 /* Build configuration list for PBXNativeTarget "WatchAlgorithmKit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B6F100000007 /* Debug */,
+				B6F100000008 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		14B1736C28AED9EE006CCD7C /* Build configuration list for PBXNativeTarget "Loop Widget Extension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

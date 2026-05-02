@@ -14,7 +14,8 @@ import HealthKit
 import LoopAlgorithmCore
 import LoopKit
 import LoopCore
-@testable import WatchApp_Extension
+@testable import WatchAlgorithmKit
+@testable import WatchApp_Extension  // for TimeInterval.minutes/.hours convenience
 
 final class WatchAlgorithmDriverTests: XCTestCase {
 

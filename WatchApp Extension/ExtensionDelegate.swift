@@ -18,6 +18,7 @@ import Combine
 import LoopKit
 import LoopCore
 import OmniBLE
+import WatchAlgorithmKit  // for WatchAlgorithmStores (B.6 Phase 4a-bis)
 
 
 final class ExtensionDelegate: NSObject, WKExtensionDelegate {

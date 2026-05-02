@@ -17,6 +17,7 @@ import Foundation
 import LoopKit
 import NightscoutServiceKit
 import OmniBLE  // for HandoffState
+import WatchAlgorithmKit  // for WatchAlgorithmStores, WatchSettingsSnapshot (B.6 Phase 4a-bis)
 
 final class WatchRemoteCommandBootstrap {
 

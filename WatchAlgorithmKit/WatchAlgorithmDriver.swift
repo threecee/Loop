@@ -1,6 +1,6 @@
 //
 //  WatchAlgorithmDriver.swift
-//  WatchApp Extension
+//  WatchAlgorithmKit
 //
 //  Watch-side mirror of iOS LoopDataManager. Constructs a `LoopAlgorithmRunner`
 //  with watch-side stores; conforms to `LoopAlgorithmRunnerDelegate` plus the
@@ -23,6 +23,8 @@
 //    replace this with `PhoneWatchSettingsSync` (real WCSession pull).
 //
 //  B.3.a Phase 5. Phase 7: isWarmingUp tracking.
+//  B.6 Phase 4a-bis: extracted into WatchAlgorithmKit framework so OmniBLETests
+//  (iOS) can link this code for Phase 4b's integration test.
 //
 
 import Combine
@@ -46,31 +48,31 @@ import ClockKit
 /// from the phone. Used by `WatchAlgorithmDriver` adapters and by the
 /// Phase 5 bootstraps. Phase 6 populates via `PhoneWatchSettingsSync` (see
 /// `init(fromSync:)` below); Phase 5 tests still construct it directly.
-final class WatchSettingsSnapshot {
+public final class WatchSettingsSnapshot {
 
     /// The most recent `LoopSettings` synced from the phone.
-    let loopSettings: LoopSettings
+    public let loopSettings: LoopSettings
 
     /// The most recent `StoredSettings` snapshot synced from the phone.
-    let storedSettings: StoredSettings
+    public let storedSettings: StoredSettings
 
     /// Nightscout configuration (URL + API secret) if the phone has
     /// configured one. `nil` means "do not start RemoteDataServicesManager
     /// against Nightscout."
-    let nightscoutConfig: NightscoutConfig?
+    public let nightscoutConfig: NightscoutConfig?
 
     /// Whether the phone has automatic dosing turned on.
-    let automaticDosingEnabled: Bool
+    public let automaticDosingEnabled: Bool
 
     /// Whether automatic dosing is currently allowed (not blocked by, e.g.,
     /// a pump comms failure).
-    let isAutomaticDosingAllowed: Bool
+    public let isAutomaticDosingAllowed: Bool
 
-    init(loopSettings: LoopSettings = LoopSettings(),
-         storedSettings: StoredSettings = StoredSettings(),
-         nightscoutConfig: NightscoutConfig? = nil,
-         automaticDosingEnabled: Bool = false,
-         isAutomaticDosingAllowed: Bool = false) {
+    public init(loopSettings: LoopSettings = LoopSettings(),
+                storedSettings: StoredSettings = StoredSettings(),
+                nightscoutConfig: NightscoutConfig? = nil,
+                automaticDosingEnabled: Bool = false,
+                isAutomaticDosingAllowed: Bool = false) {
         self.loopSettings = loopSettings
         self.storedSettings = storedSettings
         self.nightscoutConfig = nightscoutConfig
@@ -81,7 +83,7 @@ final class WatchSettingsSnapshot {
     /// B.3.a Phase 6: construct from a real `PhoneWatchSettingsSync` received
     /// over WCSession. Converts the transport struct into the richer local
     /// type that `WatchAlgorithmDriver` adapters expect.
-    init(fromSync sync: PhoneWatchSettingsSync) {
+    public init(fromSync sync: PhoneWatchSettingsSync) {
         let basalSchedule = sync.basalScheduleItems.isEmpty ? nil
             : BasalRateSchedule(dailyItems: sync.basalScheduleItems, timeZone: TimeZone.current)
         let isfSchedule = sync.insulinSensitivityScheduleItems.isEmpty ? nil
@@ -133,9 +135,14 @@ final class WatchSettingsSnapshot {
         self.isAutomaticDosingAllowed = sync.isAutomaticDosingAllowed ?? false
     }
 
-    struct NightscoutConfig {
-        let siteURL: URL
-        let apiSecret: String
+    public struct NightscoutConfig {
+        public let siteURL: URL
+        public let apiSecret: String
+
+        public init(siteURL: URL, apiSecret: String) {
+            self.siteURL = siteURL
+            self.apiSecret = apiSecret
+        }
     }
 }
 
@@ -146,7 +153,7 @@ final class WatchSettingsSnapshot {
 /// shows why the watch decided not to dose. Reason strings are namespaced
 /// with `watchSuppressed.` to disambiguate from iOS's bare-string reasons
 /// like `"loop"` / `"getLoopState"` (per Phase 1 discovery).
-enum WatchDoseSuppressionReason: String {
+public enum WatchDoseSuppressionReason: String {
     /// The watch is still in its warming-up window (first ~30 min after handoff).
     case warmingUp = "watchSuppressed.warmingUp"
     /// The phone reported automatic dosing is turned off.
@@ -160,7 +167,7 @@ enum WatchDoseSuppressionReason: String {
 
 // MARK: - Driver
 
-final class WatchAlgorithmDriver: NSObject, ObservableObject {
+public final class WatchAlgorithmDriver: NSObject, ObservableObject {
 
     // MARK: Stored collaborators
 
@@ -195,7 +202,7 @@ final class WatchAlgorithmDriver: NSObject, ObservableObject {
     /// iteration after handoff. During this window the algorithm's CoreData
     /// stores are still backfilling from the G7 sensor and pod history, so
     /// predictions are limited.
-    @Published private(set) var isWarmingUp: Bool = true
+    @Published public private(set) var isWarmingUp: Bool = true
     private var didCompleteFirstIteration = false
 
     // MARK: Construction
@@ -203,16 +210,16 @@ final class WatchAlgorithmDriver: NSObject, ObservableObject {
     /// Builds a `LoopAlgorithmRunner` against the supplied watch-side stores.
     /// The driver retains the runner and serves as its delegate plus all
     /// three provider protocols.
-    init(carbStore: CarbStoreProtocol,
-         doseStore: DoseStoreProtocol,
-         glucoseStore: GlucoseStoreProtocol,
-         dosingDecisionStore: DosingDecisionStoreProtocol,
-         settingsSnapshot: WatchSettingsSnapshot,
-         pumpInsulinType: InsulinType? = nil,
-         now: @escaping () -> Date = { Date() },
-         trustedTimeOffset: @escaping () -> TimeInterval = { 0 },
-         pumpManager: PumpManager? = nil,                    // B.6: dose-emission target (nil → suppress all)
-         isWarmingUpOverride: Bool? = nil) {                 // B.6: test-only override
+    public init(carbStore: CarbStoreProtocol,
+                doseStore: DoseStoreProtocol,
+                glucoseStore: GlucoseStoreProtocol,
+                dosingDecisionStore: DosingDecisionStoreProtocol,
+                settingsSnapshot: WatchSettingsSnapshot,
+                pumpInsulinType: InsulinType? = nil,
+                now: @escaping () -> Date = { Date() },
+                trustedTimeOffset: @escaping () -> TimeInterval = { 0 },
+                pumpManager: PumpManager? = nil,                    // B.6: dose-emission target (nil → suppress all)
+                isWarmingUpOverride: Bool? = nil) {                 // B.6: test-only override
         self.settingsSnapshot = settingsSnapshot
         self.pumpManager = pumpManager
         self.dosingDecisionStore = dosingDecisionStore
@@ -266,7 +273,7 @@ final class WatchAlgorithmDriver: NSObject, ObservableObject {
     /// Test-only access to the underlying runner. Phase-5 tests assert on
     /// "construction succeeded" rather than driving the algorithm; this
     /// accessor is intentionally minimal.
-    var underlyingRunner: LoopAlgorithmRunner { runner }
+    public var underlyingRunner: LoopAlgorithmRunner { runner }
 }
 
 // MARK: - Notification names (B.3.a Phase 7)
@@ -275,7 +282,7 @@ extension WatchAlgorithmDriver {
     /// Posted on the main queue when `isWarmingUp` transitions from `true` to
     /// `false` (i.e., the runner has completed its first full iteration after
     /// handoff). `object` is the `WatchAlgorithmDriver` instance.
-    static let warmUpDidCompleteNotification = Notification.Name(
+    public static let warmUpDidCompleteNotification = Notification.Name(
         "com.loopkit.Loop.WatchAlgorithmDriver.warmUpDidComplete"
     )
 }
@@ -284,24 +291,24 @@ extension WatchAlgorithmDriver {
 
 extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
 
-    func loopAlgorithmRunnerDidStartLoop(_ runner: LoopAlgorithmRunner) {
+    public func loopAlgorithmRunnerDidStartLoop(_ runner: LoopAlgorithmRunner) {
         log.default("WatchAlgorithmDriver: loop iteration starting")
     }
 
-    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
-                             loopDidComplete date: Date,
-                             duration: TimeInterval) {
+    public func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                                    loopDidComplete date: Date,
+                                    duration: TimeInterval) {
         log.default("WatchAlgorithmDriver: loop completed in %{public}.2fs", duration)
     }
 
-    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
-                             loopDidError error: LoopError,
-                             duration: TimeInterval) {
+    public func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                                    loopDidError error: LoopError,
+                                    duration: TimeInterval) {
         log.error("WatchAlgorithmDriver: loop errored after %{public}.2fs: %{public}@",
                   duration, String(describing: error))
     }
 
-    func loopAlgorithmRunnerDidFinishLoop(_ runner: LoopAlgorithmRunner) {
+    public func loopAlgorithmRunnerDidFinishLoop(_ runner: LoopAlgorithmRunner) {
         log.default("WatchAlgorithmDriver: loop finished — refreshing complications")
         // B.3.a Phase 7: clear warm-up flag on first completed iteration and
         // notify WatchKit controllers (which cannot use Combine/ObservableObject
@@ -320,8 +327,8 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
         refreshComplications()
     }
 
-    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
-                             didChange context: LoopAlgorithmUpdateContext) {
+    public func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                                    didChange context: LoopAlgorithmUpdateContext) {
         // Watch UI listens via its own publishers; no NotificationCenter
         // bridging is needed here. Logged for diagnostics.
         log.debug("WatchAlgorithmDriver: state changed (context=%{public}@)",
@@ -347,9 +354,9 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
     // transient and we WANT the algorithm to retry next tick when the
     // pump state may have settled. Don't change gate 5's completion
     // without re-reading iOS DeviceDataManager.swift:1416.
-    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
-                             didRecommend automaticDose: (recommendation: AutomaticDoseRecommendation, date: Date),
-                             completion: @escaping (LoopError?) -> Void) {
+    public func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                                    didRecommend automaticDose: (recommendation: AutomaticDoseRecommendation, date: Date),
+                                    completion: @escaping (LoopError?) -> Void) {
         // Gate 1: warming-up window. Order matters — only the first failing
         // gate's reason is recorded.
         if isWarmingUp {
