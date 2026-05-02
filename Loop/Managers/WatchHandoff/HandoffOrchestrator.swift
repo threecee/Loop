@@ -11,6 +11,7 @@
 import Foundation
 import OmniBLE
 import Combine
+import os.log
 
 @MainActor
 final class HandoffOrchestrator: ObservableObject {
@@ -23,6 +24,9 @@ final class HandoffOrchestrator: ObservableObject {
     @Published var settings: HandoffSettings
 
     var userDefaults: UserDefaults
+
+    /// B.5 Issue #1: log channel for command-gate effect transitions.
+    private let log = OSLog(category: "HandoffOrchestrator")
 
     private var coordinator: PhoneWatchSessionCoordinator
     private var stateMachine: HandoffStateMachine
@@ -43,8 +47,11 @@ final class HandoffOrchestrator: ObservableObject {
     private static let defaultPhoneStableDebounceSeconds: TimeInterval = 60
     private let phoneStableDebounceSeconds: TimeInterval
 
-    // B.2.e: BLE ownership coordinator
-    private let ownership: OmniBLEOwnership
+    // B.2.e: BLE ownership coordinator. Exposed (internal) so the
+    // PhoneWatchSessionCoordinator's split-brain detection (B.5 Issue #5)
+    // and the orchestrator unit tests (B.5 Issue #1) can read/write the
+    // commandsAllowed flag directly.
+    let ownership: OmniBLEOwnership
 
     /// B.3.a Phase 6: returns the current settings snapshot for sync to the
     /// watch. Injected at init via closure so the orchestrator stays decoupled
@@ -210,7 +217,10 @@ final class HandoffOrchestrator: ObservableObject {
         }
     }
 
-    private func execute(_ effects: [HandoffSideEffect]) {
+    /// B.5 Issue #1: surfaced (internal) so unit tests can directly invoke
+    /// the side-effect set under test (e.g. `.stopIssuingPodCommands`)
+    /// without having to drive a full state-machine event sequence.
+    func execute(_ effects: [HandoffSideEffect]) {
         for effect in effects {
             switch effect {
             case .sendModeSwitch(let ms):
@@ -224,9 +234,12 @@ final class HandoffOrchestrator: ObservableObject {
             case .scheduleTimeout(let id, let delay):
                 scheduleTimeout(id: id, after: delay)
             case .stopIssuingPodCommands:
-                NSLog("HandoffOrchestrator: stopIssuingPodCommands (B.2.e wires this up)")
+                // B.5 Issue #1: gate pod commands during handoff transitions.
+                ownership.commandsAllowed = false
+                log.default("commandsAllowed=false (handoff in progress)")
             case .resumeIssuingPodCommands:
-                NSLog("HandoffOrchestrator: resumeIssuingPodCommands (B.2.e wires this up)")
+                ownership.commandsAllowed = true
+                log.default("commandsAllowed=true (handoff complete)")
             case .recordTransitionInLog:
                 break
             case .notifyUI(let state):

@@ -10,6 +10,7 @@
 import Foundation
 import OmniBLE
 import Combine
+import os.log
 
 @MainActor
 final class PhoneWatchSessionCoordinator: ObservableObject {
@@ -21,6 +22,9 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
     private let appBuildNumber: String
     private let clock: () -> Date
     private var heartbeat: HeartbeatScheduler?
+
+    /// B.5 Issue #5: log channel for split-brain detection.
+    private let log = OSLog(category: "PhoneWatchSessionCoordinator")
 
     /// B.2.d: orchestrator subscribes to incoming non-heartbeat messages
     /// (modeSwitch / pairingHandoff). The coordinator continues to handle
@@ -82,7 +86,8 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             protocolVersion: PhoneWatchProtocol.currentVersion,
             sentAt: clock(),
             senderRole: .watch,
-            appBuildNumber: appBuildNumber
+            appBuildNumber: appBuildNumber,
+            claimedOwner: HandoffOrchestrator.shared?.handoffState.currentOwner  // B.5 Issue #5
         )
         transport.sendMessage(.heartbeat(hb), reply: nil, onError: { _ in })
         lastHeartbeatSentAt = clock()
@@ -97,6 +102,19 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: hb.protocolVersion) else { return }
             lastHeartbeatReceivedAt = clock()
             isCounterpartReachable = true
+
+            // B.5 Issue #5: split-brain detection. If we (the watch) think
+            // we're the owner AND the inbound heartbeat says the phone also
+            // thinks it's the owner, that's split-brain. Phone-wins
+            // arbitration: silently demote ourselves (commands off + emit a
+            // userRequestHandoff(.phone) so the state machine reverts).
+            if let orch = HandoffOrchestrator.shared,
+               orch.handoffState.currentOwner == .watch,
+               hb.claimedOwner == .phone {
+                log.error("split-brain detected: I (watch) believe I'm owner, but phone heartbeat claims phone is owner — phone wins, demoting self")
+                orch.ownership.commandsAllowed = false   // immediate gate
+                orch.userRequestHandoff(to: .phone)      // emit transition request
+            }
         case .modeSwitch(let ms):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ms.protocolVersion) else { return }
             NSLog("PhoneWatchSessionCoordinator: received mode switch \(ms.targetMode.rawValue) (transition \(ms.transitionId))")

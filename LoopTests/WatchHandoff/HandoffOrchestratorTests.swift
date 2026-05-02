@@ -170,6 +170,22 @@ final class HandoffOrchestratorTests: XCTestCase {
         XCTAssertEqual(policyEngine.currentOwnerForTesting, .watch)
     }
 
+    // MARK: - B.5 Issue #1: command-gate effect wiring
+
+    /// .stopIssuingPodCommands effect sets ownership.commandsAllowed = false.
+    func test_executeStopIssuingPodCommands_setsCommandsAllowedFalse() {
+        XCTAssertTrue(orchestrator.ownership.commandsAllowed)  // sanity: starts true
+        orchestrator.execute([.stopIssuingPodCommands])
+        XCTAssertFalse(orchestrator.ownership.commandsAllowed)
+    }
+
+    /// .resumeIssuingPodCommands effect sets ownership.commandsAllowed = true.
+    func test_executeResumeIssuingPodCommands_setsCommandsAllowedTrue() {
+        orchestrator.ownership.commandsAllowed = false  // start in suppressed state
+        orchestrator.execute([.resumeIssuingPodCommands])
+        XCTAssertTrue(orchestrator.ownership.commandsAllowed)
+    }
+
     func test_reachabilityFlipOn_marksStableAfterDebounce() async throws {
         // The coordinator starts with isCounterpartReachable=false. Subscribing
         // in start() therefore emits an initial false (handler clears stable-since).

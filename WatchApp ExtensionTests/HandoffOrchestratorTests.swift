@@ -192,6 +192,67 @@ final class HandoffOrchestratorTests: XCTestCase {
         }
     }
 
+    // MARK: - B.5 Issue #1: command-gate effect wiring (watch side)
+
+    /// .stopIssuingPodCommands effect sets ownership.commandsAllowed = false.
+    func test_executeStopIssuingPodCommands_setsCommandsAllowedFalse() {
+        XCTAssertTrue(orchestrator.ownership.commandsAllowed)  // sanity: starts true
+        orchestrator.execute([.stopIssuingPodCommands])
+        XCTAssertFalse(orchestrator.ownership.commandsAllowed)
+    }
+
+    /// .resumeIssuingPodCommands effect sets ownership.commandsAllowed = true.
+    func test_executeResumeIssuingPodCommands_setsCommandsAllowedTrue() {
+        orchestrator.ownership.commandsAllowed = false
+        orchestrator.execute([.resumeIssuingPodCommands])
+        XCTAssertTrue(orchestrator.ownership.commandsAllowed)
+    }
+
+    // MARK: - B.5 Issue #5: split-brain detection (watch side)
+
+    /// Watch silently demotes when phone heartbeat claims phone is owner
+    /// while watch thinks watch is owner. Phone-wins arbitration.
+    func test_heartbeat_splitBrain_watchDemotesItself() async {
+        // Drive the watch to .watchDriver via a self-completing modeSwitch
+        // (matches the established test pattern).
+        let ms = PhoneWatchModeSwitch(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: clock,
+            requestedBy: .phone,
+            targetMode: .watchDriver,
+            transitionId: UUID()
+        )
+        orchestrator.handleIncoming(message: .modeSwitch(ms))
+        XCTAssertEqual(orchestrator.handoffState, .watchDriver)
+        XCTAssertEqual(orchestrator.handoffState.currentOwner, .watch)
+
+        // Publish singleton so the coordinator's split-brain handler can find it.
+        let savedShared = HandoffOrchestrator.shared
+        HandoffOrchestrator.shared = orchestrator
+        defer { HandoffOrchestrator.shared = savedShared }
+
+        // Inject a phone heartbeat claiming the phone is owner — split-brain.
+        let inboundHB = PhoneWatchHeartbeat(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: clock,
+            senderRole: .phone,
+            appBuildNumber: "TEST",
+            claimedOwner: .phone   // B.5 #5: phone claims phone
+        )
+        coordinatorTransport.onIncomingMessage?(.heartbeat(inboundHB))
+        // Allow the @MainActor hop in the coordinator's incoming-dispatch.
+        await Task.yield()
+        await Task.yield()
+
+        // Watch demoted: commands gated off + state machine reverted toward
+        // phone (a userRequestHandoff(.phone) was emitted, so the state
+        // should no longer be .watchDriver).
+        XCTAssertFalse(orchestrator.ownership.commandsAllowed,
+                       "watch should silently disable commands on split-brain")
+        XCTAssertNotEqual(orchestrator.handoffState, .watchDriver,
+                          "watch should leave .watchDriver on split-brain demotion")
+    }
+
     func test_handleIncomingPairingHandoff_marksCachedPodStateAge() throws {
         let raw: [String: Any] = ["address": UInt32(0x12345678)]
         let serialized = try PropertyListSerialization.data(

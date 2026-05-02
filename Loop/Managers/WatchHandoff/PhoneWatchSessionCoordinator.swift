@@ -10,6 +10,7 @@
 import Foundation
 import OmniBLE
 import Combine
+import os.log
 
 @MainActor
 final class PhoneWatchSessionCoordinator: ObservableObject {
@@ -27,6 +28,9 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
     private let appBuildNumber: String
     private let clock: () -> Date
     private var heartbeat: HeartbeatScheduler?
+
+    /// B.5 Issue #5: log channel for split-brain detection (advisory only on iOS).
+    private let log = OSLog(category: "PhoneWatchSessionCoordinator")
 
     /// B.2.d: orchestrator subscribes to incoming non-heartbeat messages
     /// (modeSwitch / pairingHandoff). The coordinator continues to handle
@@ -86,7 +90,8 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             protocolVersion: PhoneWatchProtocol.currentVersion,
             sentAt: clock(),
             senderRole: .phone,
-            appBuildNumber: appBuildNumber
+            appBuildNumber: appBuildNumber,
+            claimedOwner: HandoffOrchestrator.shared?.handoffState.currentOwner  // B.5 Issue #5
         )
         transport.sendMessage(.heartbeat(hb), reply: nil, onError: { _ in })
         lastHeartbeatSentAt = clock()
@@ -99,7 +104,8 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
         let now = clock()
         let hb = PhoneWatchHeartbeat(
             protocolVersion: PhoneWatchProtocol.currentVersion,
-            sentAt: now, senderRole: .phone, appBuildNumber: appBuildNumber
+            sentAt: now, senderRole: .phone, appBuildNumber: appBuildNumber,
+            claimedOwner: HandoffOrchestrator.shared?.handoffState.currentOwner  // B.5 Issue #5
         )
         transport.sendMessage(.heartbeat(hb), reply: { result in
             switch result {
@@ -121,6 +127,16 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: hb.protocolVersion) else { return }
             lastHeartbeatReceivedAt = clock()
             isCounterpartReachable = true
+
+            // B.5 Issue #5: split-brain detection (advisory on phone). Phone-wins
+            // arbitration means the phone keeps owning if both sides think they
+            // own — log a warning but don't demote, since the watch will silently
+            // demote on its receipt of our heartbeat.
+            if let orch = HandoffOrchestrator.shared,
+               orch.handoffState.currentOwner == .phone,
+               hb.claimedOwner == .watch {
+                log.error("split-brain detected (advisory): watch heartbeat claims watch is owner; phone retains ownership per arbitration rule")
+            }
         case .modeSwitch(let ms):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ms.protocolVersion) else { return }
             NSLog("PhoneWatchSessionCoordinator: received mode switch \(ms.targetMode.rawValue) (transition \(ms.transitionId))")

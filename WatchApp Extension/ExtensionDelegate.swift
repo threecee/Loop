@@ -155,6 +155,9 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         )
         orchestrator.start()
         self.handoffOrchestrator = orchestrator
+        // B.5 Issue #5: publish singleton so PhoneWatchSessionCoordinator's
+        // split-brain detection can read currentOwner + flip ownership.commandsAllowed.
+        HandoffOrchestrator.shared = orchestrator
 
         // B.3.a Phase 5: watch self-driving bootstraps
         bootstrapWatchSelfDrivingStack(orchestrator: orchestrator)
