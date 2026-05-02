@@ -25,6 +25,18 @@ final class SettingsSyncEmissionTests: XCTestCase {
     private var orchestrator: HandoffOrchestrator!
     private var clock: Date!
 
+    // B.5 Issue #4 carryover: each direct HandoffStateMachine construction
+    // gets a fresh, isolated UserDefaults suite so HandoffStatePersistence
+    // (state.didSet -> save) from a prior test doesn't leak into the next
+    // test's machine init via App Group UserDefaults.
+    private var isolatedSuiteNames: [String] = []
+
+    private func isolatedDefaults() -> UserDefaults {
+        let suiteName = "B5_SettingsSyncEmissionTests_\(UUID().uuidString)"
+        isolatedSuiteNames.append(suiteName)
+        return UserDefaults(suiteName: suiteName)!
+    }
+
     private let sampleSync = PhoneWatchSettingsSync(
         protocolVersion: PhoneWatchProtocol.currentVersion,
         sentAt: Date(timeIntervalSince1970: 1_700_000_000),
@@ -57,6 +69,11 @@ final class SettingsSyncEmissionTests: XCTestCase {
     override func tearDown() async throws {
         orchestrator?.stop()
         coordinator?.stop()
+        // B.5 Issue #4 carryover: clean up isolated UserDefaults suites.
+        for suiteName in isolatedSuiteNames {
+            UserDefaults().removePersistentDomain(forName: suiteName)
+        }
+        isolatedSuiteNames.removeAll()
     }
 
     private func makeOrchestrator(
@@ -66,7 +83,8 @@ final class SettingsSyncEmissionTests: XCTestCase {
         let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
         let orch = HandoffOrchestrator(
             coordinator: coordinator,
-            stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone),
+            stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone,
+                                              appGroupDefaults: isolatedDefaults()),
             policyEngine: HandoffPolicyEngine(
                 coordinator: stub,
                 settings: HandoffSettings(),
@@ -181,6 +199,6 @@ final class SettingsSyncEmissionTests: XCTestCase {
         }
         XCTAssertEqual(received.automaticDosingEnabled, true)
         XCTAssertEqual(received.isAutomaticDosingAllowed, true)
-        XCTAssertEqual(received.protocolVersion, 2)
+        XCTAssertEqual(received.protocolVersion, PhoneWatchProtocol.currentVersion)
     }
 }
