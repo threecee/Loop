@@ -14,6 +14,7 @@ final class HandoffOrchestratorTests: XCTestCase {
     private var coordinatorTransport: MockPhoneWatchTransport!
     private var coordinator: PhoneWatchSessionCoordinator!
     private var orchestrator: HandoffOrchestrator!
+    private var policyEngine: HandoffPolicyEngine!  // B.4 Issue #2: held for inspection
     private var clock: Date!
 
     override func setUp() async throws {
@@ -27,21 +28,23 @@ final class HandoffOrchestratorTests: XCTestCase {
         coordinator.start()
 
         let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
+        policyEngine = HandoffPolicyEngine(
+            coordinator: stub,
+            settings: HandoffSettings(),
+            clock: { [unowned self] in self.clock },
+            emit: { _ in }
+        )
         orchestrator = HandoffOrchestrator(
             coordinator: coordinator,
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone),
-            policyEngine: HandoffPolicyEngine(
-                coordinator: stub,
-                settings: HandoffSettings(),
-                clock: { [unowned self] in self.clock },
-                emit: { _ in }
-            ),
+            policyEngine: policyEngine,
             shadowScheduler: ShadowStateScheduler(
                 clock: { [unowned self] in self.clock },
                 fire: { }
             ),
             userDefaults: UserDefaults(suiteName: "test.handoff.\(UUID())")!,
-            pumpManager: nil
+            pumpManager: nil,
+            phoneStableDebounceOverride: 0.05    // 50ms for tests
         )
     }
 
@@ -135,5 +138,61 @@ final class HandoffOrchestratorTests: XCTestCase {
         orchestrator.handleIncoming(message: .pairingHandoff(ph))
         XCTAssertNotNil(orchestrator.cachedPayload)
         XCTAssertEqual(orchestrator.cachedPayload?.podSerial, "TESTPOD")
+    }
+
+    // MARK: - B.4 Issue #2: policy-engine markX wiring
+
+    func test_start_seedsCurrentOwnerToPhone() {
+        orchestrator.start()
+        XCTAssertEqual(policyEngine.debugCurrentOwner, .phone)
+    }
+
+    func test_userRequestHandoff_callsMarkUserInteractedAt() {
+        let before = Date()
+        orchestrator.userRequestHandoff(to: .watch)
+        let recorded = policyEngine.debugLastUserInteractionAt
+        XCTAssertNotNil(recorded)
+        XCTAssertGreaterThanOrEqual(recorded!, before)
+    }
+
+    func test_notifyUI_marksCurrentOwnerOnTransitionToWatchDriver() {
+        // Drive the state machine to .watchDriver via a self-completing
+        // incoming modeSwitch (matches existing tests' pattern).
+        let ms = PhoneWatchModeSwitch(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: clock,
+            requestedBy: .phone,
+            targetMode: .watchDriver,
+            transitionId: UUID()
+        )
+        orchestrator.handleIncoming(message: .modeSwitch(ms))
+        XCTAssertEqual(orchestrator.handoffState, .watchDriver)
+        XCTAssertEqual(policyEngine.debugCurrentOwner, .watch)
+    }
+
+    func test_reachabilityFlipOn_marksStableAfterDebounce() async throws {
+        // The coordinator starts with isCounterpartReachable=false. Subscribing
+        // in start() therefore emits an initial false (handler clears stable-since).
+        orchestrator.start()
+        await Task.yield()
+        XCTAssertNil(policyEngine.debugPhoneStableReachableSince)
+
+        // Drive a flip-ON by feeding an inbound heartbeat through the transport;
+        // the coordinator updates isCounterpartReachable = true.
+        let inboundHB = PhoneWatchHeartbeat(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: clock,
+            senderRole: .watch,
+            appBuildNumber: "TEST"
+        )
+        let before = Date()
+        coordinatorTransport.onIncomingMessage?(.heartbeat(inboundHB))
+        // Allow main-actor hop + the 50ms debounce + slack.
+        try await Task.sleep(nanoseconds: 300_000_000)
+        let recorded = policyEngine.debugPhoneStableReachableSince
+        XCTAssertNotNil(recorded, "expected markPhoneStableSince to fire after debounce")
+        if let recorded {
+            XCTAssertGreaterThanOrEqual(recorded, before)
+        }
     }
 }

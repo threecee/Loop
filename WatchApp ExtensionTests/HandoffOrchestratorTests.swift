@@ -14,6 +14,7 @@ final class HandoffOrchestratorTests: XCTestCase {
     private var coordinatorTransport: MockPhoneWatchTransport!
     private var coordinator: PhoneWatchSessionCoordinator!
     private var orchestrator: HandoffOrchestrator!
+    private var policyEngine: HandoffPolicyEngine!  // B.4 Issue #2: held for inspection
     private var clock: Date!
 
     override func setUp() async throws {
@@ -28,20 +29,22 @@ final class HandoffOrchestratorTests: XCTestCase {
         coordinator.start()
 
         let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
+        policyEngine = HandoffPolicyEngine(
+            coordinator: stub,
+            settings: HandoffSettings(),
+            clock: { [unowned self] in self.clock },
+            emit: { _ in }
+        )
         orchestrator = HandoffOrchestrator(
             coordinator: coordinator,
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .watch),
-            policyEngine: HandoffPolicyEngine(
-                coordinator: stub,
-                settings: HandoffSettings(),
-                clock: { [unowned self] in self.clock },
-                emit: { _ in }
-            ),
+            policyEngine: policyEngine,
             shadowScheduler: ShadowStateScheduler(
                 clock: { [unowned self] in self.clock },
                 fire: { }
             ),
-            userDefaults: UserDefaults(suiteName: "test.handoff.\(UUID())")!
+            userDefaults: UserDefaults(suiteName: "test.handoff.\(UUID())")!,
+            phoneStableDebounceOverride: 0.05    // 50ms for tests
         )
     }
 
@@ -138,5 +141,82 @@ final class HandoffOrchestratorTests: XCTestCase {
         orchestrator.handleIncoming(message: .pairingHandoff(ph))
         XCTAssertNotNil(orchestrator.cachedPayload)
         XCTAssertEqual(orchestrator.cachedPayload?.podSerial, "TESTPOD")
+    }
+
+    // MARK: - B.4 Issue #2: policy-engine markX wiring
+
+    func test_start_seedsCurrentOwnerToPhone() {
+        orchestrator.start()
+        XCTAssertEqual(policyEngine.debugCurrentOwner, .phone)
+    }
+
+    func test_userRequestHandoff_callsMarkUserInteractedAt() {
+        let before = Date()
+        orchestrator.userRequestHandoff(to: .watch)
+        let recorded = policyEngine.debugLastUserInteractionAt
+        XCTAssertNotNil(recorded)
+        XCTAssertGreaterThanOrEqual(recorded!, before)
+    }
+
+    func test_notifyUI_marksCurrentOwnerOnTransitionToWatchDriver() {
+        let ms = PhoneWatchModeSwitch(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: clock,
+            requestedBy: .phone,
+            targetMode: .watchDriver,
+            transitionId: UUID()
+        )
+        orchestrator.handleIncoming(message: .modeSwitch(ms))
+        XCTAssertEqual(orchestrator.handoffState, .watchDriver)
+        XCTAssertEqual(policyEngine.debugCurrentOwner, .watch)
+    }
+
+    func test_reachabilityFlipOn_marksStableAfterDebounce() async throws {
+        orchestrator.start()
+        await Task.yield()
+        XCTAssertNil(policyEngine.debugPhoneStableReachableSince)
+
+        let inboundHB = PhoneWatchHeartbeat(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: clock,
+            senderRole: .phone,
+            appBuildNumber: "TEST"
+        )
+        let before = Date()
+        coordinatorTransport.onIncomingMessage?(.heartbeat(inboundHB))
+        try await Task.sleep(nanoseconds: 300_000_000)
+        let recorded = policyEngine.debugPhoneStableReachableSince
+        XCTAssertNotNil(recorded, "expected markPhoneStableSince to fire after debounce")
+        if let recorded {
+            XCTAssertGreaterThanOrEqual(recorded, before)
+        }
+    }
+
+    func test_handleIncomingPairingHandoff_marksCachedPodStateAge() throws {
+        let raw: [String: Any] = ["address": UInt32(0x12345678)]
+        let serialized = try PropertyListSerialization.data(
+            fromPropertyList: raw, format: .binary, options: 0)
+        let payload = OmniBLEHandoffPayload(
+            podSerial: "TESTPOD",
+            serializedPodState: serialized,
+            lastBolusSequence: 7,
+            lastBasalScheduleId: nil,
+            validUntil: Date.distantFuture,
+            createdAt: Date(timeIntervalSince1970: 1_700_000_000)
+        )
+        let payloadData = try JSONEncoder().encode(payload)
+        let ph = PhoneWatchPairingHandoff(
+            protocolVersion: 1, sentAt: clock,
+            podId: "TESTPOD", pairingPayload: payloadData,
+            validUntil: clock.addingTimeInterval(60),
+            transitionId: UUID())
+
+        let before = Date()
+        orchestrator.handleIncoming(message: .pairingHandoff(ph))
+        let recorded = policyEngine.debugCachedPodStateAt
+        XCTAssertNotNil(recorded)
+        if let recorded {
+            XCTAssertGreaterThanOrEqual(recorded, before)
+        }
     }
 }

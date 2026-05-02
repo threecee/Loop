@@ -32,6 +32,17 @@ final class HandoffOrchestrator: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     private var scheduledTimers: [UUID: Task<Void, Never>] = [:]
 
+    /// B.4 Issue #2: 60s debounce timer for marking phone-stable. When
+    /// reachability flips on, we wait 60s before declaring "stable since",
+    /// to avoid flapping during BLE reconnect storms. If reachability flips
+    /// off in the interim, the timer is cancelled and stable-since is cleared.
+    private var phoneStableDebounce: Task<Void, Never>?
+
+    /// B.4 Issue #2: debounce window matches HandoffPolicyEngine.absenceThreshold (60s).
+    /// Tests can override via the optional `phoneStableDebounceOverride` init parameter.
+    private static let phoneStableDebounceSeconds: TimeInterval = 60
+    private let phoneStableDebounceSeconds: TimeInterval
+
     // B.2.e: BLE ownership coordinator
     private let ownership: OmniBLEOwnership
 
@@ -56,7 +67,8 @@ final class HandoffOrchestrator: ObservableObject {
          userDefaults: UserDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)
             ?? UserDefaults.standard,
          pumpManager: OmniBLEPodOwner? = nil,
-         settingsSyncProvider: (() -> PhoneWatchSettingsSync?)? = nil) {
+         settingsSyncProvider: (() -> PhoneWatchSettingsSync?)? = nil,
+         phoneStableDebounceOverride: TimeInterval? = nil) {
         self.coordinator = coordinator
         self.stateMachine = stateMachine
         self.policyEngine = policyEngine
@@ -71,6 +83,8 @@ final class HandoffOrchestrator: ObservableObject {
             initialState: stateMachine.state
         )
         self.settingsSyncProvider = settingsSyncProvider
+        self.phoneStableDebounceSeconds = phoneStableDebounceOverride
+            ?? Self.phoneStableDebounceSeconds
     }
 
     func start() {
@@ -84,6 +98,21 @@ final class HandoffOrchestrator: ObservableObject {
         }
         policyEngine.start()
         shadowScheduler.start()
+
+        // B.4 Issue #2: seed initial owner state for the policy engine. The
+        // iOS state machine starts in .phoneDriver, so the phone is the
+        // initial owner.
+        policyEngine.markCurrentOwner(.phone)
+
+        // B.4 Issue #2: subscribe to reachability changes. Flip-on starts a
+        // 60s debounce; flip-off immediately clears stable-since.
+        coordinator.$isCounterpartReachable
+            .removeDuplicates()
+            .sink { [weak self] reachable in
+                guard let self else { return }
+                self.handleReachabilityChanged(reachable)
+            }
+            .store(in: &cancellables)
 
         // B.3.a Phase 6 — trigger point 1: emit settings on WCSession connect.
         // The coordinator's `start()` has already been called by the time the
@@ -99,9 +128,15 @@ final class HandoffOrchestrator: ObservableObject {
         shadowScheduler.stop()
         scheduledTimers.values.forEach { $0.cancel() }
         scheduledTimers.removeAll()
+        phoneStableDebounce?.cancel()
+        phoneStableDebounce = nil
+        cancellables.removeAll()
     }
 
     func userRequestHandoff(to target: HandoffOwner) {
+        // B.4 Issue #2: record the user activity so the policy engine's
+        // 30s user-activity-quiet window kicks in.
+        policyEngine.markUserInteractedAt(Date())
         let effects = stateMachine.handle(.userRequestedHandoff(target: target))
         execute(effects)
     }
@@ -149,6 +184,29 @@ final class HandoffOrchestrator: ObservableObject {
         handoffState = machine.state
     }
 
+    /// B.4 Issue #2: reachability change handler. On flip-on, schedule a 60s
+    /// debounce → mark phone stable. On flip-off, cancel the debounce and
+    /// clear stable-since immediately.
+    @MainActor
+    private func handleReachabilityChanged(_ reachable: Bool) {
+        phoneStableDebounce?.cancel()
+        if !reachable {
+            policyEngine.markPhoneStableSince(nil)
+            return
+        }
+        let debounce = phoneStableDebounceSeconds
+        phoneStableDebounce = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(debounce * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                guard let self else { return }
+                if self.coordinator.isReachable {
+                    self.policyEngine.markPhoneStableSince(Date())
+                }
+            }
+        }
+    }
+
     private func execute(_ effects: [HandoffSideEffect]) {
         for effect in effects {
             switch effect {
@@ -174,6 +232,11 @@ final class HandoffOrchestrator: ObservableObject {
                 // entering .handoffPending (the watch will become the driver).
                 if case .handoffPending(direction: .phoneToWatch, _, _) = state {
                     emitSettingsSync()
+                }
+                // B.4 Issue #2: mark current owner on every state transition
+                // so the policy engine knows whose perspective to evaluate from.
+                if let owner = state.currentOwner {
+                    policyEngine.markCurrentOwner(owner)
                 }
                 ownership.update(state: state)   // B.2.e
             }

@@ -138,4 +138,10 @@ final class HandoffPolicyEngine {
     func markCachedPodStateAge(_ when: Date) {
         cachedPodStateAt = when
     }
+
+    // MARK: - B.4 Issue #2: test inspectors (internal so @testable can read).
+    var debugCurrentOwner: HandoffOwner { currentOwner }
+    var debugPhoneStableReachableSince: Date? { phoneStableReachableSince }
+    var debugLastUserInteractionAt: Date? { lastUserInteractionAt }
+    var debugCachedPodStateAt: Date? { cachedPodStateAt }
 }
