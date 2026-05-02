@@ -141,6 +141,25 @@ final class WatchSettingsSnapshot {
     }
 }
 
+// MARK: - Suppression reasons (B.6)
+
+/// Why a watch-side automatic dose was suppressed instead of enacted.
+/// Persisted into `StoredDosingDecision.reason` so the iOS event log
+/// shows why the watch decided not to dose. Reason strings are namespaced
+/// with `watchSuppressed.` to disambiguate from iOS's bare-string reasons
+/// like `"loop"` / `"getLoopState"` (per Phase 1 discovery).
+enum WatchDoseSuppressionReason: String {
+    /// The watch is still in its warming-up window (first ~30 min after handoff).
+    case warmingUp = "watchSuppressed.warmingUp"
+    /// The phone reported automatic dosing is turned off.
+    case automaticDosingDisabled = "watchSuppressed.automaticDosingDisabled"
+    /// The phone reported automatic dosing is currently not allowed
+    /// (e.g., pump comms failure).
+    case automaticDosingNotAllowed = "watchSuppressed.automaticDosingNotAllowed"
+    /// No pump manager is available (driver was constructed without one).
+    case noPumpManager = "watchSuppressed.noPumpManager"
+}
+
 // MARK: - Driver
 
 final class WatchAlgorithmDriver: NSObject, ObservableObject {
@@ -150,6 +169,21 @@ final class WatchAlgorithmDriver: NSObject, ObservableObject {
     private let runner: LoopAlgorithmRunner
     private let settingsSnapshot: WatchSettingsSnapshot
     private let log = OSLog(subsystem: "com.loopkit.Loop.WatchApp", category: "WatchAlgorithmDriver")
+
+    /// B.6: Pump manager for dose enactment. Nil during construction or when
+    /// the watch hasn't yet been wired to an OmniBLEPumpManager — the
+    /// didRecommend override treats nil as "suppress all doses."
+    private let pumpManager: PumpManager?
+
+    /// B.6: Persistent reference for recording suppressed dose decisions.
+    /// The runner already gets the same store; we keep our own handle so the
+    /// didRecommend override can write suppression records without going
+    /// through the runner.
+    private let dosingDecisionStore: DosingDecisionStoreProtocol
+
+    /// B.6: Test-only override — when set, replaces the published value of
+    /// isWarmingUp at init time. Production callers leave this nil.
+    private let isWarmingUpOverride: Bool?
 
     // MARK: Warm-up tracking (B.3.a Phase 7)
 
@@ -172,8 +206,13 @@ final class WatchAlgorithmDriver: NSObject, ObservableObject {
          settingsSnapshot: WatchSettingsSnapshot,
          pumpInsulinType: InsulinType? = nil,
          now: @escaping () -> Date = { Date() },
-         trustedTimeOffset: @escaping () -> TimeInterval = { 0 }) {
+         trustedTimeOffset: @escaping () -> TimeInterval = { 0 },
+         pumpManager: PumpManager? = nil,                    // B.6: dose-emission target (nil → suppress all)
+         isWarmingUpOverride: Bool? = nil) {                 // B.6: test-only override
         self.settingsSnapshot = settingsSnapshot
+        self.pumpManager = pumpManager
+        self.dosingDecisionStore = dosingDecisionStore
+        self.isWarmingUpOverride = isWarmingUpOverride
 
         // Provider conformances live on `self`, but `self` isn't fully
         // initialized yet. Construct lightweight adapter shims that hold weak
@@ -205,6 +244,16 @@ final class WatchAlgorithmDriver: NSObject, ObservableObject {
 
         // weak delegate; runner owns its half of the cycle.
         self.runner.delegate = self
+
+        // B.6: apply test override if supplied. Setting didCompleteFirstIteration
+        // alongside ensures the next loop tick doesn't re-trigger the warmup-
+        // cleared notification path (per Phase 1 discovery).
+        if let override = isWarmingUpOverride {
+            self.isWarmingUp = override
+            if !override {
+                self.didCompleteFirstIteration = true
+            }
+        }
     }
 
     // MARK: Test / introspection helpers
@@ -274,11 +323,133 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
                   String(describing: context))
     }
 
-    // The runner's default `settingsDidChange`, `didRecommend`, rounding,
-    // and missed-meal hooks all default to no-op / pass-through, which is
-    // the right behavior on watch for Phase 5. Phase 6+ will refine.
+    // B.6: dose-emission with gating. Phase 5 left this as the default
+    // no-op (algorithm decided, recommendation discarded). Now: check
+    // 4 gates (warming-up, automaticDosingEnabled, isAutomaticDosingAllowed,
+    // pumpManager non-nil), record suppressed decisions to the
+    // dosingDecisionStore so they appear in event history, otherwise
+    // dispatch the dose to the pump manager.
+    //
+    // CRITICAL: completion(nil) is load-bearing on the suppression path.
+    // LoopAlgorithmRunner only clears its cached recommendedAutomaticDose
+    // when the delegate completion is called with nil; calling with an
+    // error (or skipping completion) would cause the algorithm to retry
+    // the same recommendation on the next tick. (Phase 1 discovery.)
+    func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
+                             didRecommend automaticDose: (recommendation: AutomaticDoseRecommendation, date: Date),
+                             completion: @escaping (LoopError?) -> Void) {
+        // Gate 1: warming-up window. Order matters — only the first failing
+        // gate's reason is recorded.
+        if isWarmingUp {
+            recordSuppressed(automaticDose, reason: .warmingUp)
+            completion(nil)
+            return
+        }
+        // Gate 2: phone reports automatic dosing is off.
+        if !settingsSnapshot.automaticDosingEnabled {
+            recordSuppressed(automaticDose, reason: .automaticDosingDisabled)
+            completion(nil)
+            return
+        }
+        // Gate 3: phone reports automatic dosing is currently disallowed.
+        if !settingsSnapshot.isAutomaticDosingAllowed {
+            recordSuppressed(automaticDose, reason: .automaticDosingNotAllowed)
+            completion(nil)
+            return
+        }
+        // Gate 4: no pump manager available (defensive).
+        guard let pumpManager = pumpManager else {
+            recordSuppressed(automaticDose, reason: .noPumpManager)
+            completion(nil)
+            return
+        }
+
+        log.default("WatchAlgorithmDriver: enacting recommended dose: %{public}@",
+                    String(describing: automaticDose.recommendation))
+        enactRecommendedDose(automaticDose.recommendation, with: pumpManager, completion: completion)
+    }
+
+    // The runner's default `settingsDidChange`, rounding, and missed-meal hooks
+    // all default to no-op / pass-through, which is the right behavior on watch
+    // for Phase 5/6 scope. Future phases may refine.
 
     // Issue conversion: defaults stringify, which is fine for watch.
+
+    // MARK: - B.6 dose enactment + suppression recording
+
+    /// Records a suppressed automatic dose into the dosingDecisionStore so it
+    /// appears in the watch's (and via sync, the phone's) event history.
+    /// The recommendation is preserved so the user can see what would have
+    /// been dosed if the gates had passed.
+    private func recordSuppressed(_ automaticDose: (recommendation: AutomaticDoseRecommendation, date: Date),
+                                   reason: WatchDoseSuppressionReason) {
+        log.default("WatchAlgorithmDriver: suppressed dose (%{public}@): %{public}@",
+                    reason.rawValue,
+                    String(describing: automaticDose.recommendation))
+        let decision = makeSuppressedDecision(automaticDose: automaticDose, reason: reason)
+        dosingDecisionStore.storeDosingDecision(decision) { /* fire-and-forget */ }
+    }
+
+    /// Constructs a `StoredDosingDecision` describing the suppressed dose.
+    /// Uses the iOS pattern (mirrors LoopAlgorithmRunner.swift:945): init with
+    /// the required `reason: String` field, then assign other fields var-style.
+    /// All StoredDosingDecision fields are `public var` so post-init assignment
+    /// is the canonical pattern (per Phase 1 discovery).
+    private func makeSuppressedDecision(
+        automaticDose: (recommendation: AutomaticDoseRecommendation, date: Date),
+        reason: WatchDoseSuppressionReason
+    ) -> StoredDosingDecision {
+        var decision = StoredDosingDecision(
+            date: automaticDose.date,
+            reason: reason.rawValue
+        )
+        decision.automaticDoseRecommendation = automaticDose.recommendation
+        return decision
+    }
+
+    /// Mirrors iOS `DoseEnactor.enact(...)` inline (DoseEnactor lives in iOS
+    /// Loop target only; not shared). Temp basal first, then bolus, both via
+    /// DispatchGroup. Result is a single LoopError? — the first failure
+    /// short-circuits.
+    private func enactRecommendedDose(
+        _ recommendation: AutomaticDoseRecommendation,
+        with pumpManager: PumpManager,
+        completion: @escaping (LoopError?) -> Void
+    ) {
+        let queue = DispatchQueue(label: "com.loopkit.WatchAlgorithmDriver.dosingQueue", qos: .utility)
+        queue.async {
+            let group = DispatchGroup()
+            var tempBasalError: PumpManagerError?
+            var bolusError: PumpManagerError?
+
+            if let basalAdjustment = recommendation.basalAdjustment {
+                group.enter()
+                pumpManager.enactTempBasal(
+                    unitsPerHour: basalAdjustment.unitsPerHour,
+                    for: basalAdjustment.duration
+                ) { error in
+                    tempBasalError = error
+                    group.leave()
+                }
+            }
+            group.wait()
+
+            guard tempBasalError == nil else {
+                completion(tempBasalError.map { .pumpManagerError($0) })
+                return
+            }
+
+            if let bolusUnits = recommendation.bolusUnits, bolusUnits > 0 {
+                group.enter()
+                pumpManager.enactBolus(units: bolusUnits, activationType: .automatic) { error in
+                    bolusError = error
+                    group.leave()
+                }
+            }
+            group.wait()
+            completion(bolusError.map { .pumpManagerError($0) })
+        }
+    }
 
     // MARK: Watch-specific helpers
 
