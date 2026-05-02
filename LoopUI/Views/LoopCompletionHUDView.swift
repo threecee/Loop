@@ -57,6 +57,24 @@ public final class LoopCompletionHUDView: BaseHUDView {
 
     public var closedLoopDisallowedLocalizedDescription: String?
 
+    /// B.7 Phase 3: forwarder for the inner driver indicator on the underlying
+    /// `LoopStateView`. `loopStateView` itself is `private` (IBOutlet), so
+    /// callers outside the LoopUI framework reach the new property through
+    /// here. `true` paints the inner solid dot indicating this device is the
+    /// active loop driver; `false` clears it.
+    public var isThisDeviceDriving: Bool {
+        get { loopStateView.isThisDeviceDriving }
+        set { loopStateView.isThisDeviceDriving = newValue }
+    }
+
+    /// B.7 Phase 3: forwarder for the pending-handoff treatment on the
+    /// underlying `LoopStateView`. `true` indicates a handoff is in flight
+    /// (the inner indicator renders a hollow ring); `false` clears it.
+    public var isHandoffPending: Bool {
+        get { loopStateView.isHandoffPending }
+        set { loopStateView.isHandoffPending = newValue }
+    }
+
     public func assertTimer(_ active: Bool = true) {
         if active && window != nil, let date = lastLoopCompleted {
             initTimer(date)

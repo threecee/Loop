@@ -46,6 +46,12 @@ final class StatusTableViewController: LoopChartsTableViewController {
 
     lazy private var cancellables = Set<AnyCancellable>()
 
+    /// B.7 Phase 3: dedicated cancellable for the HandoffOrchestrator subscription
+    /// that drives the inner loop-ring indicator. Held separately from
+    /// `cancellables` so the subscription's lifetime is obvious and easy to
+    /// audit. Single subscription, so a property — not a Set — is sufficient.
+    private var handoffStateCancellable: AnyCancellable?
+
     override func viewDidLoad() {
 
         super.viewDidLoad()
@@ -146,7 +152,9 @@ final class StatusTableViewController: LoopChartsTableViewController {
         addScenarioStepGestureRecognizers()
 
         tableView.backgroundColor = .secondarySystemBackground
-    
+
+        subscribeToHandoffState()
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -1345,6 +1353,34 @@ final class StatusTableViewController: LoopChartsTableViewController {
             return true
         }
         return false
+    }
+
+    /// B.7 Phase 3: subscribe to `HandoffOrchestrator.shared.$handoffState` and
+    /// drive the inner loop-ring indicator on the LoopCompletionHUDView.
+    /// `LoopAppManager` populates `HandoffOrchestrator.shared` during launch
+    /// (LoopAppManager.swift:317), so it is expected to be non-nil by the time
+    /// this status view controller's `viewDidLoad` runs. If for any reason it
+    /// is still nil we log and bail — the indicator stays in its default
+    /// "off" state, but the rest of the status UI continues to function.
+    ///
+    /// `loopCompletionHUD` itself is non-optional once `hudView` is unwrapped
+    /// (mirrors the pattern used by the existing `.LoopDataUpdated` /
+    /// `.LoopRunning` handlers above), so the chain is
+    /// `hudView?.loopCompletionHUD.<property> = ...`.
+    private func subscribeToHandoffState() {
+        guard let orchestrator = HandoffOrchestrator.shared else {
+            log.error("HandoffOrchestrator.shared nil at subscribeToHandoffState; loop ring driver indicator will not update")
+            return
+        }
+        handoffStateCancellable = orchestrator.$handoffState
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                self.hudView?.loopCompletionHUD.isThisDeviceDriving = (state.currentOwner == .phone)
+                let pending: Bool
+                if case .handoffPending = state { pending = true } else { pending = false }
+                self.hudView?.loopCompletionHUD.isHandoffPending = pending
+            }
     }
 
     // MARK: - Actions
