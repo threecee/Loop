@@ -225,18 +225,32 @@ final class HandoffOrchestrator: ObservableObject {
             case .recordTransitionInLog:
                 break  // state machine maintains its own log
             case .notifyUI(let state):
-                handoffState = state
+                // B.6 race hardening: do all dependent-state mutations BEFORE
+                // assigning handoffState. The @Published handoffState fires
+                // a Combine sink (in ExtensionDelegate) that calls into
+                // WatchAlgorithmBootstrap, which reads ownership.pumpManager.
+                // If we set handoffState first, the sink could (depending
+                // on scheduler) observe the lazy-init NOT having happened
+                // yet, causing the algorithm driver to be constructed with
+                // pumpManager: nil and suppressing the first dose.
+                //
+                // Order: lazy-init pump manager → ownership.update → policy
+                // engine mark → publish handoffState (triggers downstream).
+
                 // B.2.e: lazy-instantiate OmniBLEPumpManager on first .watchDriver
                 if case .watchDriver = state, ownership.pumpManager == nil {
                     let pm = OmniBLEPumpManager(state: .watchSideDefault)
                     ownership.setPumpManager(pm)
                 }
+                ownership.update(state: state)   // B.2.e
                 // B.4 Issue #2: mark current owner on every state transition
                 // so the policy engine knows whose perspective to evaluate from.
                 if let owner = state.currentOwner {
                     policyEngine.markCurrentOwner(owner)
                 }
-                ownership.update(state: state)   // B.2.e
+                // Publish handoffState LAST — triggers downstream sinks
+                // that depend on the now-current ownership + policy state.
+                handoffState = state
             }
         }
     }
