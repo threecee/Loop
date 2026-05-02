@@ -210,9 +210,11 @@ final class HandoffOrchestrator: ObservableObject {
     }
 
     /// B.3.a Phase 6: emit settings sync via trigger point 2 (settings change).
-    /// Caller (e.g., LoopAppManager observer) is responsible for invoking this
-    /// whenever the app's LoopSettings change. Fire-and-forget; debounce is the
-    /// caller's responsibility if needed.
+    /// As of B.5.2 Phase 4, the sole production caller is the iOS
+    /// `.NSSystemTimeZoneDidChange` observer in `init(...)` — there is no
+    /// LoopSettings-change observer wired up yet. A future LoopSettings
+    /// observer (e.g. on `LoopDataManager.didUpdate*`) should also route
+    /// through here. Fire-and-forget; debounce is the caller's responsibility.
     func notifySettingsChanged() {
         emitSettingsSync()
     }

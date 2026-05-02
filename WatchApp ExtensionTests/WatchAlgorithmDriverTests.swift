@@ -518,6 +518,31 @@ final class WatchAlgorithmDriverTests: XCTestCase {
                        "Nil sync.timeZone → schedule zone falls back to watch's TimeZone.current")
     }
 
+    /// B.5.2 #3: malformed TimeZone identifiers (TimeZone(identifier:) → nil)
+    /// fall back to TimeZone.current via the `??` in `flatMap(TimeZone.init(identifier:)) ?? TimeZone.current`.
+    /// Protects against silent regression if anyone refactors to force-unwrap.
+    func testScheduleZoneFallsBackToCurrentWhenSyncTimeZoneMalformed() {
+        let sync = PhoneWatchSettingsSync(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: 10.0,
+            maximumBasalRatePerHourUnits: 4.0,
+            suspendThresholdMgdL: 72.0,
+            nightscoutConfig: nil,
+            timeZone: "Bogus/NotAZone"
+        )
+
+        let snapshot = WatchSettingsSnapshot(fromSync: sync)
+        XCTAssertEqual(snapshot.loopSettings.basalRateSchedule?.timeZone, TimeZone.current,
+                       "Malformed sync.timeZone → schedule zone falls back to watch's TimeZone.current")
+    }
+
     /// Temp-basal error early-return path also clears the recovery store.
     func testDidRecommend_tempBasalError_clearsRecoveryStore() {
         let suiteName = "B5_RecoveryStoreClearOnTempBasalError_\(UUID().uuidString)"
