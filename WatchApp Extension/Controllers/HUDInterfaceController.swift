@@ -9,14 +9,24 @@
 import WatchKit
 import LoopCore
 import LoopKit
+import Combine  // B.7: subscribe to HandoffOrchestrator.$handoffState
 import WatchAlgorithmKit  // for WatchAlgorithmDriver.warmUpDidCompleteNotification (B.6 Phase 4a-bis)
 
 class HUDInterfaceController: WKInterfaceController {
     private var activeContextObserver: NSObjectProtocol?
     // B.3.a Phase 7: observer for warm-up completion
     private var warmUpObserver: NSObjectProtocol?
+    // B.7: cancellable for HandoffOrchestrator handoffState subscription
+    private var handoffStateCancellable: AnyCancellable?
+    // B.7: timer driving the driverDot opacity pulse during handoff transitions
+    private var driverDotPulseTimer: Timer?
 
     @IBOutlet weak var loopHUDImage: WKInterfaceImage!
+    /// B.7: driver indicator overlay positioned on top of loopHUDImage.
+    /// Shows when the watch is the current handoff driver; pulses during
+    /// transitions. Wired in Interface.storyboard (both ActionHUDController
+    /// and ChartHUDController scenes).
+    @IBOutlet weak var driverDot: WKInterfaceImage!
     @IBOutlet weak var glucoseLabel: WKInterfaceLabel!
     @IBOutlet weak var eventualGlucoseLabel: WKInterfaceLabel!
 
@@ -50,6 +60,10 @@ class HUDInterfaceController: WKInterfaceController {
         loopManager.requestContextUpdate(completion: {
             self.loopManager.requestGlucoseBackfillIfNecessary()
         })
+
+        // B.7: subscribe to HandoffOrchestrator state and push driver/handoff-pending
+        // flags to the driverDot overlay.
+        subscribeToHandoffState()
     }
 
     override func didDeactivate() {
@@ -62,6 +76,11 @@ class HUDInterfaceController: WKInterfaceController {
         // Note: warmUpObserver is kept alive across deactivations so the
         // title clears even if the controller is not the current page when
         // the first iteration completes.
+
+        // B.7: drop the handoff subscription + timer until next willActivate
+        // so we don't burn cycles updating an off-screen overlay.
+        handoffStateCancellable = nil
+        stopDriverDotPulse()
     }
 
     // MARK: - B.3.a Phase 7: warm-up title
@@ -126,6 +145,63 @@ class HUDInterfaceController: WKInterfaceController {
             }
         }
 
+    }
+
+    // MARK: - B.7 driver indicator
+
+    /// B.7: subscribes to HandoffOrchestrator.shared.$handoffState and pushes
+    /// derived flags to the driverDot overlay. Idempotent — safe to call from
+    /// every willActivate (replaces any prior subscription).
+    private func subscribeToHandoffState() {
+        guard let orchestrator = HandoffOrchestrator.shared else {
+            NSLog("HUDInterfaceController: HandoffOrchestrator.shared nil at subscribeToHandoffState; driver dot will not update")
+            return
+        }
+        handoffStateCancellable = orchestrator.$handoffState
+            .receive(on: RunLoop.main)
+            .sink { [weak self] state in
+                guard let self = self else { return }
+                let driving = (state.currentOwner == .watch)
+                let pending: Bool
+                if case .handoffPending = state { pending = true } else { pending = false }
+                self.updateDriverDot(isThisDeviceDriving: driving, isHandoffPending: pending)
+            }
+    }
+
+    /// B.7: updates driverDot visibility + pulse animation based on
+    /// HandoffOrchestrator state. Called from the Combine subscription.
+    private func updateDriverDot(isThisDeviceDriving: Bool, isHandoffPending: Bool) {
+        driverDot.setHidden(!isThisDeviceDriving)
+        guard isThisDeviceDriving else {
+            stopDriverDotPulse()
+            return
+        }
+        // Make sure the dot is fully opaque when not pulsing (storyboard
+        // defaults alpha to 0.0 so the inactive state is invisible).
+        driverDot.setAlpha(1.0)
+        if isHandoffPending {
+            startDriverDotPulse()
+        } else {
+            stopDriverDotPulse()
+        }
+    }
+
+    private func startDriverDotPulse() {
+        stopDriverDotPulse()
+        var dim = false
+        driverDotPulseTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            self.driverDot.setAlpha(dim ? 1.0 : 0.4)
+            dim.toggle()
+        }
+    }
+
+    private func stopDriverDotPulse() {
+        driverDotPulseTimer?.invalidate()
+        driverDotPulseTimer = nil
+        // Leave the dot visible at full alpha so a still-driving state remains
+        // legible after pulsing ends.
+        driverDot.setAlpha(1.0)
     }
 
     @IBAction func addCarbs() {

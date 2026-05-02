@@ -25,6 +25,9 @@
                                 <group width="0.25" alignment="left" layout="vertical" id="2Qn-78-Zex">
                                     <items>
                                         <imageView alignment="center" image="loop_unknown" contentMode="center" id="Q7C-xN-eH8"/>
+                                        <imageView alpha="0.0" alignment="center" verticalAlignment="center" image="circle.fill" contentMode="center" id="b7d-rv-Act">
+                                            <color key="tintColor" white="1.0" alpha="1.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </imageView>
                                     </items>
                                 </group>
                                 <group width="0.75" alignment="left" layout="vertical" id="QDM-Gw-2Ex">
@@ -160,6 +163,7 @@
                         <outlet property="carbsButtonImage" destination="4aO-ao-Sp9" id="Nlk-SP-VmT"/>
                         <outlet property="eventualGlucoseLabel" destination="hOH-sV-9TN" id="c4T-Va-zeT"/>
                         <outlet property="glucoseLabel" destination="MHD-Is-5mK" id="MDr-iV-fr1"/>
+                        <outlet property="driverDot" destination="b7d-rv-Act" id="b7d-ol-Act"/>
                         <outlet property="loopHUDImage" destination="Q7C-xN-eH8" id="CIe-B3-umI"/>
                         <outlet property="overrideButton" destination="dYe-c2-Sfm" id="m7H-fY-Cxg"/>
                         <outlet property="overrideButtonBackground" destination="HCn-yQ-9kV" id="SXL-jK-n6U"/>
@@ -184,6 +188,9 @@
                                 <group width="0.25" alignment="left" layout="vertical" id="Z7g-qg-0wK">
                                     <items>
                                         <imageView alignment="center" image="loop_unknown" contentMode="center" id="ifw-dh-btK"/>
+                                        <imageView alpha="0.0" alignment="center" verticalAlignment="center" image="circle.fill" contentMode="center" id="b7d-rv-Cht">
+                                            <color key="tintColor" white="1.0" alpha="1.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </imageView>
                                     </items>
                                 </group>
                                 <group width="0.75" alignment="left" layout="vertical" id="nPX-XN-diX">
@@ -274,6 +281,7 @@
                         <outlet property="eventualGlucoseLabel" destination="6sn-Q8-nGV" id="tX0-mq-Heq"/>
                         <outlet property="glucoseLabel" destination="Dt1-kz-jMZ" id="MQj-0o-PaV"/>
                         <outlet property="glucoseScene" destination="9BI-AC-l6c" id="O4a-P8-cHI"/>
+                        <outlet property="driverDot" destination="b7d-rv-Cht" id="b7d-ol-Cht"/>
                         <outlet property="loopHUDImage" destination="ifw-dh-btK" id="Bc0-er-dfe"/>
                         <outlet property="table" destination="Atz-83-hgn" id="yzw-fm-hhk"/>
                     </connections>
