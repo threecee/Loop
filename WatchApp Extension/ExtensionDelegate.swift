@@ -408,12 +408,31 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
 extension ExtensionDelegate: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if activationState == .activated {
-            updateContext(session.receivedApplicationContext)
+            // B.8.2 Issue #3: at activation the OS hands us the last-received
+            // applicationContext, which under the new routing is the most-recent
+            // AlgorithmStateSnapshot. Mirror the didReceiveApplicationContext
+            // dispatch so the snapshot reaches the transport at takeover.
+            let context = session.receivedApplicationContext
+            if let data = context["phoneWatchMessage"] as? Data {
+                phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: nil)
+            } else {
+                updateContext(context)
+            }
         }
     }
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         log.default("didReceiveApplicationContext")
+        // B.8.2 Issue #3: forward applicationContext-delivered phoneWatchMessage
+        // to the transport. The phone now uses updateApplicationContext
+        // (latest-only) for AlgorithmStateSnapshot delivery instead of
+        // transferUserInfo, so we reuse the same Data convention the
+        // didReceiveUserInfo path uses.
+        if let data = applicationContext["phoneWatchMessage"] as? Data {
+            phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: nil)
+            return
+        }
+        // Legacy WatchContext fallback (preserved unchanged).
         updateContext(applicationContext)
     }
 

@@ -5,8 +5,13 @@
 //  B.8: builds an AlgorithmStateSnapshot from current Loop state and pushes
 //  it over the existing PhoneWatchTransport. Called from
 //  LoopDataManager.loopAlgorithmRunnerDidFinishLoop after every successful
-//  iteration. Uses queueMessage (NOT sendMessage) so snapshots reach the
-//  watch via background-queued transferUserInfo when the watch is unreachable.
+//  iteration.
+//
+//  B.8.2 Issue #3: delivery routes through updateApplicationContext
+//  (latest-only, intentionally overwrites) rather than transferUserInfo
+//  (FIFO queue, can backlog when watch offline). Snapshots are coalescable
+//  state — the watch only needs the freshest payload at takeover, so the
+//  OS overwriting older snapshots is the correct behavior.
 //
 
 import Foundation
@@ -23,14 +28,16 @@ protocol SnapshotTransport: AnyObject {
 /// declaring `extension <Protocol>: <Protocol>`, so we adopt on the class
 /// instead — production code passes the concrete transport here).
 extension WCSessionPhoneWatchTransport: SnapshotTransport {
-    /// Routes through `queueMessage` (not `sendMessage`) so snapshots are
-    /// background-queued via `transferUserInfo` when the watch is unreachable
-    /// (the typical state — locked / on charger / off-wrist). This is
-    /// load-bearing: B.8's whole premise is that the watch has a recent
-    /// snapshot at takeover, including in the "phone vanished without notice"
-    /// case where the most-recent push happened while the watch was offline.
+    /// B.8.2 Issue #3: routes through `updateApplicationContext` (latest-only,
+    /// intentionally overwrites). `transferUserInfo` (via `queueMessage`) is
+    /// reserved for non-coalescable events (modeSwitch, pairingHandoff,
+    /// manual user actions). AlgorithmStateSnapshot is coalescable state —
+    /// the watch only ever needs the freshest snapshot at takeover, so
+    /// allowing the OS to overwrite older queued snapshots prevents backlogs
+    /// when the watch is offline (locked / on charger / off-wrist) and
+    /// guarantees the watch reads the freshest payload immediately on resume.
     func send(_ message: PhoneWatchMessage) {
-        queueMessage(message)
+        sendApplicationContext(message)
     }
 }
 

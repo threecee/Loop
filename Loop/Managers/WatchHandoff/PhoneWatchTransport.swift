@@ -12,6 +12,7 @@
 //
 
 import Foundation
+import os.log
 import OmniBLE
 import WatchConnectivity
 
@@ -30,6 +31,7 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
     private let session: WCSession
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
+    private let log = OSLog(category: "WCSessionPhoneWatchTransport")
 
     public var isReachable: Bool { session.isReachable }
 
@@ -87,6 +89,33 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
             }
         } catch {
             // Encoding failures are non-fatal for fire-and-forget messages.
+        }
+    }
+
+    /// B.8.2 Issue #3: deliver via `WCSession.updateApplicationContext`. The OS
+    /// keeps only the latest payload — repeated calls intentionally overwrite.
+    /// Reserve `queueMessage` (transferUserInfo) for non-coalescable events
+    /// (modeSwitch, pairingHandoff, manual user actions); use this method for
+    /// coalescable state snapshots that should always read "latest only".
+    ///
+    /// The 8KB warning is log-only and does NOT block delivery — B.8.4 will
+    /// inherit the size signal in HV-1 telemetry to decide if a file-pointer
+    /// fallback is needed once buffers populate in production.
+    ///
+    /// Note: this method is intentionally not declared on the `PhoneWatchTransport`
+    /// protocol — the only consumer is the `SnapshotTransport` extension in
+    /// `AlgorithmStateSnapshotEmitter.swift`, so the protocol's external
+    /// contract does not need to grow.
+    public func sendApplicationContext(_ message: PhoneWatchMessage) {
+        do {
+            let data = try encoder.encode(message)
+            if data.count > 8 * 1024 {
+                log.default("sendApplicationContext: payload size %d bytes exceeds 8KB safety budget; B.8.4 will need fallback strategy", data.count)
+            }
+            let context: [String: Any] = ["phoneWatchMessage": data]
+            try session.updateApplicationContext(context)
+        } catch {
+            log.error("sendApplicationContext failed: %{public}@", String(describing: error))
         }
     }
 
