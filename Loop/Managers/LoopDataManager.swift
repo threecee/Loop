@@ -117,6 +117,24 @@ final class LoopDataManager {
     /// conformance below.
     private let runner: LoopAlgorithmRunner
 
+    /// B.8.4 Phase 2: snapshot of the buffers (glucose / doses / carbs)
+    /// the runner consumed on the most recent completed iteration. Populated
+    /// at the end of each `loopAlgorithmRunnerDidFinishLoop` callback by
+    /// fetching the same windows the runner uses internally:
+    /// 10h glucose, 16h doses, and the runner's already-cached
+    /// `recentCarbEntries`. The `settings` field carries empty schedules —
+    /// this cache exists solely to carry the populated buffers through to
+    /// `AlgorithmStateSnapshotEmitter.State`.
+    ///
+    /// Typed as `LoopPredictionInput` (not `LoopAlgorithmInput`) because the
+    /// upstream `LoopAlgorithmInput` lacks a public memberwise init in
+    /// LoopKit's current shape, and we don't need its `predictionDate` /
+    /// `doseRecommendationType` fields here. Phase 5a graduates this to a
+    /// runner-side `lastInput`/`lastOutput` once the runner exposes the
+    /// fully reconstructed input it actually consumed (and adds a public
+    /// init on the way).
+    private(set) var lastAlgorithmInput: LoopPredictionInput?
+
     // MARK: - Public surface (most properties forward to the runner)
 
     let loopLock = UnfairLock()
@@ -522,8 +540,56 @@ extension LoopDataManager: LoopAlgorithmRunnerDelegate {
     }
 
     func loopAlgorithmRunnerDidFinishLoop(_ runner: LoopAlgorithmRunner) {
-        // B.8: push algorithm-state snapshot to watch (no-op if emitter unwired).
-        algorithmStateSnapshotEmitter?.emit()
+        // B.8.4 Phase 2: refresh `lastAlgorithmInput` from the runner's actual
+        // fetch windows (10h glucose, 16h doses, runner's already-cached
+        // `recentCarbEntries`) before emitting the snapshot. The snapshot's
+        // emit() reads `lastAlgorithmInput` via the stateProvider closure in
+        // LoopAppManager, so the buffers are populated from the same data the
+        // runner just consumed. Settings are carried as empty schedules —
+        // this cache exists solely to ferry the buffers through to
+        // AlgorithmStateSnapshotEmitter.State.
+        let now = Date()
+        let glucoseStart = now.addingTimeInterval(-.hours(10))
+        let dosesStart = now.addingTimeInterval(-.hours(16))
+        let cachedCarbs = runner.recentCarbEntries ?? []
+
+        let group = DispatchGroup()
+        var glucoseSamples: [StoredGlucoseSample] = []
+        var doseEntries: [DoseEntry] = []
+
+        group.enter()
+        glucoseStore.getGlucoseSamples(start: glucoseStart, end: nil) { result in
+            if case .success(let samples) = result {
+                glucoseSamples = samples
+            }
+            group.leave()
+        }
+
+        group.enter()
+        doseStore.getNormalizedDoseEntries(start: dosesStart, end: nil) { result in
+            if case .success(let doses) = result {
+                doseEntries = doses
+            }
+            group.leave()
+        }
+
+        group.notify(queue: .main) { [weak self] in
+            guard let self = self else { return }
+            self.lastAlgorithmInput = LoopPredictionInput(
+                glucoseHistory: glucoseSamples,
+                doses: doseEntries,
+                carbEntries: cachedCarbs,
+                settings: LoopAlgorithmSettings(
+                    basal: [],
+                    sensitivity: [],
+                    carbRatio: [],
+                    target: []
+                )
+            )
+
+            // B.8: push algorithm-state snapshot to watch (no-op if emitter unwired).
+            self.algorithmStateSnapshotEmitter?.emit()
+        }
 
         // 5 second delay to allow stores to cache data before it is read by widget
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in

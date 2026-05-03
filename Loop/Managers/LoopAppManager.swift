@@ -414,11 +414,13 @@ class LoopAppManager: NSObject {
     /// `LoopDataManager` + `DeviceDataManager` state. Returns nil when state
     /// isn't yet available (very early launch, before pump pairing, etc.).
     ///
-    /// Phase 1 ships the wiring with empty rolling buffers
-    /// (`glucoseSamples` / `doseHistory` / `carbEntries`). Phase 2 (a
-    /// follow-up slice) populates them from store async reads. Filing the
-    /// arrays empty exercises the full pipeline so the watch tests can
-    /// assert "snapshot received" before we wire the heavy data pulls.
+    /// B.8.4 Phase 2: rolling buffers (`glucoseSamples` / `doseHistory` /
+    /// `carbEntries`) are now read from `lm.lastAlgorithmInput`, which
+    /// `LoopDataManager` refreshes at the end of each iteration via the same
+    /// 10h-glucose / 16h-doses / runner-cached-carbs windows the algorithm
+    /// itself consumes. Before the first iteration completes, the cache is
+    /// nil and the buffers fall back to empty — emit() still produces a
+    /// well-formed snapshot, the watch just can't skip warmup yet.
     ///
     /// `pumpStatus` is similarly minimal: capacity stands in for "remaining"
     /// (the live remaining is async-only) and `lastReadingDate` is `now`.
@@ -435,11 +437,12 @@ class LoopAppManager: NSObject {
             isSuspended: pumpManager.status.basalDeliveryState?.isSuspended ?? false,
             lastReadingDate: Date()
         )
+        let cachedInput = lm.lastAlgorithmInput
         return AlgorithmStateSnapshotEmitter.State(
             iterationDate: lm.lastLoopCompleted ?? Date(),
-            glucoseSamples: [],   // Phase 2 work fills these via async store reads
-            doseHistory: [],
-            carbEntries: [],
+            glucoseSamples: cachedInput?.glucoseHistory ?? [],
+            doseHistory: cachedInput?.doses ?? [],
+            carbEntries: cachedInput?.carbEntries ?? [],
             pumpStatus: pumpStatus,
             activeOverride: lm.settings.scheduleOverride
         )
