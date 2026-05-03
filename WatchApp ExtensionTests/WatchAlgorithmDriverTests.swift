@@ -634,3 +634,205 @@ final class WatchAlgorithmDriverTests: XCTestCase {
                       "isWarmingUp must remain true on fullWarmup fallback")
     }
 }
+
+// MARK: - B.8.4 Phase 6: hydration unit tests
+//
+// `WatchAlgorithmDriver.applyAlgorithmStateSnapshot(_:carbStore:doseStore:glucoseStore:)`
+// is the static async throws helper that flushes the snapshot's three buffers
+// into the runner-backing stores before the driver flips out of warmup. These
+// tests exercise the freshness guard (gating) and the buffered-write contract
+// (functional). The freshness extension method lives on `AlgorithmStateSnapshot`
+// in OmniBLE.
+//
+// Guarded with `#if !os(iOS)` to mirror the watch-only nature of the
+// production driver — the WatchApp ExtensionTests target only builds for
+// watchOS, but the guard makes the intent explicit and survives any future
+// target reshuffling.
+
+#if !os(iOS)
+
+final class WatchAlgorithmDriverHydrationTests: XCTestCase {
+
+    // MARK: - Helpers
+
+    /// Holds the three concrete stores used by the hydration test. We keep
+    /// concrete types (vs. `WatchAlgorithmStores` which wraps via protocols)
+    /// so the test can call `getGlucoseSamples` / `getDoses` / `getCarbEntries`
+    /// directly — those query helpers aren't on the algorithm-core protocols.
+    private struct ConcreteStores {
+        let carbStore: CarbStore
+        let doseStore: DoseStore
+        let glucoseStore: GlucoseStore
+    }
+
+    private func makeConcreteStores() -> ConcreteStores {
+        let cacheStore = PersistenceController(
+            directoryURL: FileManager.default.temporaryDirectory
+                .appendingPathComponent(UUID().uuidString)
+        )
+        let carbStore = CarbStore(
+            cacheStore: cacheStore,
+            cacheLength: .hours(24),
+            defaultAbsorptionTimes: LoopCoreConstants.defaultCarbAbsorptionTimes,
+            syncVersion: 0,
+            provenanceIdentifier: "test"
+        )
+        let glucoseStore = GlucoseStore(
+            cacheStore: cacheStore,
+            cacheLength: .hours(24),
+            provenanceIdentifier: "test"
+        )
+        let doseStore = DoseStore(
+            cacheStore: cacheStore,
+            cacheLength: .hours(24),
+            insulinModelProvider: PresetInsulinModelProvider(defaultRapidActingModel: nil),
+            longestEffectDuration: ExponentialInsulinModelPreset.rapidActingAdult.effectDuration,
+            basalProfile: nil,
+            insulinSensitivitySchedule: nil,
+            overrideHistory: nil,
+            lastPumpEventsReconciliation: nil,
+            provenanceIdentifier: "test"
+        )
+        return ConcreteStores(carbStore: carbStore, doseStore: doseStore, glucoseStore: glucoseStore)
+    }
+
+    private func makePumpStatus() -> PumpStatusSnapshot {
+        PumpStatusSnapshot(
+            reservoirUnitsRemaining: 100,
+            lastBasalRateUnitsPerHour: 0.5,
+            isSuspended: false,
+            lastReadingDate: Date()
+        )
+    }
+
+    /// Snapshot with an empty buffers but a fresh `phoneIterationDate`.
+    private func makeFreshSnapshot(now: Date = Date()) -> AlgorithmStateSnapshot {
+        AlgorithmStateSnapshot(
+            snapshotID: UUID(),
+            createdAt: now,
+            phoneIterationDate: now.addingTimeInterval(-30),  // 30s old → fresh
+            glucoseSamples: [],
+            doseHistory: [],
+            carbEntries: [],
+            pumpStatus: makePumpStatus(),
+            activeOverride: nil
+        )
+    }
+
+    /// Snapshot with `phoneIterationDate` 10 minutes in the past — well past
+    /// the 7-minute `maxAgeForSkipWarmup` threshold.
+    private func makeStaleSnapshot(now: Date = Date()) -> AlgorithmStateSnapshot {
+        AlgorithmStateSnapshot(
+            snapshotID: UUID(),
+            createdAt: now,
+            phoneIterationDate: now.addingTimeInterval(-10 * 60),  // 10 min old → stale
+            glucoseSamples: [],
+            doseHistory: [],
+            carbEntries: [],
+            pumpStatus: makePumpStatus(),
+            activeOverride: nil
+        )
+    }
+
+    // MARK: - Freshness guard
+
+    /// 30s-old snapshots pass the 7-minute freshness window.
+    func test_skipWarmup_freshSnapshotPassesGuard() {
+        let snapshot = makeFreshSnapshot()
+        XCTAssertTrue(snapshot.isFreshEnoughForSkipWarmup(),
+                      "Fresh snapshot (30s old) must pass the skip-warmup freshness guard")
+    }
+
+    /// 10-minute-old snapshots fail the 7-minute freshness window.
+    func test_skipWarmup_staleSnapshotFailsGuard() {
+        let snapshot = makeStaleSnapshot()
+        XCTAssertFalse(snapshot.isFreshEnoughForSkipWarmup(),
+                       "Stale snapshot (10 min old) must fail the skip-warmup freshness guard")
+    }
+
+    // MARK: - Buffer hydration
+
+    /// Verifies all three buffers (glucose / dose / carb) land in their
+    /// respective stores when `applyAlgorithmStateSnapshot` runs.
+    func test_applyAlgorithmStateSnapshot_writesAllThreeBuffers() async throws {
+        let stores = makeConcreteStores()
+        let now = Date()
+
+        var glucoseSamples: [StoredGlucoseSample] = []
+        for i in 0..<3 {
+            let offset: TimeInterval = -300 * Double(3 - i)
+            let value: Double = 100.0 + Double(i)
+            glucoseSamples.append(
+                StoredGlucoseSample(
+                    syncIdentifier: "glucose-\(i)",
+                    syncVersion: 1,
+                    startDate: now.addingTimeInterval(offset),
+                    quantity: HKQuantity(unit: .milligramsPerDeciliter, doubleValue: value)
+                )
+            )
+        }
+
+        var doseHistory: [DoseEntry] = []
+        for i in 0..<2 {
+            let startOffset: TimeInterval = -600 * Double(2 - i)
+            let endOffset: TimeInterval = startOffset + 300
+            let unitsPerHour: Double = 0.5 + Double(i) * 0.1
+            doseHistory.append(
+                DoseEntry(
+                    type: .tempBasal,
+                    startDate: now.addingTimeInterval(startOffset),
+                    endDate: now.addingTimeInterval(endOffset),
+                    value: unitsPerHour,
+                    unit: .unitsPerHour,
+                    syncIdentifier: "dose-\(i)"
+                )
+            )
+        }
+
+        let carbEntry = StoredCarbEntry(
+            startDate: now.addingTimeInterval(-1800),
+            quantity: HKQuantity(unit: .gram(), doubleValue: 25.0),
+            syncIdentifier: "carb-0",
+            syncVersion: 1,
+            absorptionTime: .hours(3)
+        )
+
+        let snapshot = AlgorithmStateSnapshot(
+            snapshotID: UUID(),
+            createdAt: now,
+            phoneIterationDate: now.addingTimeInterval(-30),
+            glucoseSamples: glucoseSamples,
+            doseHistory: doseHistory,
+            carbEntries: [carbEntry],
+            pumpStatus: makePumpStatus(),
+            activeOverride: nil
+        )
+
+        // Act
+        try await WatchAlgorithmDriver.applyAlgorithmStateSnapshot(
+            snapshot,
+            carbStore: stores.carbStore,
+            doseStore: stores.doseStore,
+            glucoseStore: stores.glucoseStore
+        )
+
+        // Assert: glucose store received 3 samples.
+        let storedGlucose = try await stores.glucoseStore.getGlucoseSamples()
+        XCTAssertEqual(storedGlucose.count, 3,
+                       "All 3 glucose samples should have been written to the glucose store")
+
+        // Assert: dose store received 2 doses. Use the basalProfile-independent
+        // `getDoses` API (vs. `getNormalizedDoseEntries`) so the test doesn't
+        // need to seed a basal profile on the test DoseStore.
+        let storedDoses = try await stores.doseStore.getDoses()
+        XCTAssertEqual(storedDoses.count, 2,
+                       "All 2 dose entries should have been written to the dose store")
+
+        // Assert: carb store received 1 entry.
+        let storedCarbs = try await stores.carbStore.getCarbEntries()
+        XCTAssertEqual(storedCarbs.count, 1,
+                       "The 1 carb entry should have been written to the carb store")
+    }
+}
+
+#endif

@@ -439,9 +439,24 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
         }
 
         // 2. Dose — pass-through, no projection.
+        //
+        // `DoseStore.addDoses` calls its completion handler TWICE on the
+        // success path: once when the dose entries land, then again after
+        // `syncPumpEventsToInsulinDeliveryStore` runs (LoopKit
+        // DoseStore.swift:856-858). Guard against double-resumption of the
+        // continuation by latching a single-shot resume; otherwise we crash
+        // with "SWIFT TASK CONTINUATION MISUSE" on every non-empty
+        // doseHistory hydration. Only the FIRST completion is consumed.
         if !snapshot.doseHistory.isEmpty {
             try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
+                let lock = NSLock()
+                var didResume = false
                 doseStore.addDoses(snapshot.doseHistory, from: nil) { error in
+                    lock.lock()
+                    let alreadyResumed = didResume
+                    didResume = true
+                    lock.unlock()
+                    guard !alreadyResumed else { return }
                     if let error = error {
                         cont.resume(throwing: error)
                     } else {
