@@ -10,17 +10,20 @@ final class WatchAlgorithmSnapshotCacheTests: XCTestCase {
 
     private var defaults: UserDefaults!
     private var sut: WatchAlgorithmSnapshotCache!
+    private var suiteName: String!
 
     override func setUp() {
         super.setUp()
-        defaults = UserDefaults(suiteName: "test.WatchAlgorithmSnapshotCache.\(UUID().uuidString)")!
+        suiteName = "test.WatchAlgorithmSnapshotCache.\(UUID().uuidString)"
+        defaults = UserDefaults(suiteName: suiteName)!
         sut = WatchAlgorithmSnapshotCache(defaults: defaults)
     }
 
     override func tearDown() {
-        defaults.removePersistentDomain(forName: defaults.dictionaryRepresentation().keys.first ?? "")
+        defaults.removePersistentDomain(forName: suiteName)
         sut = nil
         defaults = nil
+        suiteName = nil
         super.tearDown()
     }
 
