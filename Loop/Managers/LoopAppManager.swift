@@ -325,18 +325,11 @@ class LoopAppManager: NSObject {
             self.phoneWatchHandoffOrchestrator = orchestrator
 
             // B.8: wire the algorithm-state snapshot emitter into LoopDataManager.
-            // SnapshotTransport conformance lives on WCSessionPhoneWatchTransport
-            // (the concrete class), not on the PhoneWatchTransport protocol — so
-            // we need the concrete type here. The coordinator's `transport`
-            // property is protocol-typed, so cast via `as?` (production wiring
-            // always uses the WCSession-backed concrete; tests construct
-            // AlgorithmStateSnapshotEmitter directly with a CapturingTransport
-            // fake so this path isn't exercised).
-            guard let concreteTransport = self.phoneWatchCoordinator.transport as? WCSessionPhoneWatchTransport else {
-                fatalError("PhoneWatchSessionCoordinator.transport is not WCSessionPhoneWatchTransport — B.8 emitter cannot be wired")
-            }
+            // Use the concrete WCSessionPhoneWatchTransport already constructed
+            // for the coordinator — SnapshotTransport conformance lives on the
+            // concrete class, not on the PhoneWatchTransport protocol.
             let snapshotEmitter = AlgorithmStateSnapshotEmitter(
-                transport: concreteTransport,
+                transport: phoneWatchTransport,
                 stateProvider: { [weak self] in
                     self?.currentSnapshotStateOrNil()
                 }

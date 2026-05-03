@@ -24,10 +24,7 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
     @Published private(set) var lastHeartbeatSentAt: Date?
     @Published private(set) var isCounterpartReachable: Bool = false
 
-    // B.8: widened from `private` to internal so LoopAppManager can cast it
-    // to `WCSessionPhoneWatchTransport` (the concrete type that conforms to
-    // `SnapshotTransport`) when wiring `AlgorithmStateSnapshotEmitter`.
-    var transport: PhoneWatchTransport
+    private var transport: PhoneWatchTransport
     private let appBuildNumber: String
     private let clock: () -> Date
     private var heartbeat: HeartbeatScheduler?
