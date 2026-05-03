@@ -18,6 +18,9 @@ enum WarmUpDecision: Equatable {
     case fullWarmup(failedGate: WarmUpGate)
 }
 
+/// Lettered prefixes (`a_`, `b_`, `c_`) preserve declaration order in
+/// alphabetically-sorted log output and metric labels. Don't "fix" to
+/// camelCase — the prefix is intentional.
 enum WarmUpGate: String, Equatable {
     case a_snapshotAge      // snapshot missing or > 6 min old
     case b_localCGM         // no local CGM read in last 5 min

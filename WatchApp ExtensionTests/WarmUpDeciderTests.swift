@@ -97,4 +97,32 @@ final class WarmUpDeciderTests: XCTestCase {
             return XCTFail("6 min exactly should pass; got \(decision)")
         }
     }
+
+    func test_cgmExactlyAt5MinBoundary_passes() {
+        let now = Date()
+        let snap = makeSnapshot(createdAt: now)
+        let decision = WarmUpDecider.decide(
+            now: now,
+            snapshot: snap,
+            latestLocalGlucoseDate: now.addingTimeInterval(-5 * 60),
+            latestPumpStatusDate: now
+        )
+        guard case .skipWarmup = decision else {
+            return XCTFail("CGM at exactly 5 min should pass; got \(decision)")
+        }
+    }
+
+    func test_pumpStatusExactlyAt60sBoundary_passes() {
+        let now = Date()
+        let snap = makeSnapshot(createdAt: now)
+        let decision = WarmUpDecider.decide(
+            now: now,
+            snapshot: snap,
+            latestLocalGlucoseDate: now,
+            latestPumpStatusDate: now.addingTimeInterval(-60)
+        )
+        guard case .skipWarmup = decision else {
+            return XCTFail("Pump status at exactly 60 s should pass; got \(decision)")
+        }
+    }
 }
