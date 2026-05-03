@@ -117,17 +117,21 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             }
         case .modeSwitch(let ms):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ms.protocolVersion) else { return }
-            NSLog("PhoneWatchSessionCoordinator: received mode switch \(ms.targetMode.rawValue) (transition \(ms.transitionId))")
+            log.default("received mode switch %{public}@ (transition %{public}@)",
+                        String(describing: ms.targetMode.rawValue),
+                        ms.transitionId.uuidString)
             // B.2.d: forward to orchestrator (if subscribed).
             onHandoffMessage?(message)
         case .pairingHandoff(let ph):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ph.protocolVersion) else { return }
-            NSLog("PhoneWatchSessionCoordinator: received pairing handoff for pod \(ph.podId) (\(ph.pairingPayload.count) bytes)")
+            log.default("received pairing handoff for pod %{public}@ (%d bytes)",
+                        ph.podId,
+                        ph.pairingPayload.count)
             // B.2.d: forward to orchestrator (if subscribed).
             onHandoffMessage?(message)
         case .settingsSync(let sync):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: sync.protocolVersion) else { return }
-            NSLog("PhoneWatchSessionCoordinator: received settings sync (protocolVersion=\(sync.protocolVersion))")
+            log.default("received settings sync (protocolVersion=%d)", sync.protocolVersion)
             // B.3.a Phase 6: store in the shared cache so bootstraps can read it.
             WatchSettingsCache.shared.update(sync)
         case .algorithmStateSnapshot(let snap):
@@ -135,7 +139,9 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             // version field of its own. Schema compatibility is enforced at envelope
             // (PhoneWatchMessage) decode time — older receivers throw on the unknown
             // .algorithmStateSnapshot Kind raw value before the payload is parsed.
-            NSLog("PhoneWatchSessionCoordinator: received algorithm-state snapshot \(snap.snapshotID) (createdAt=\(snap.createdAt))")
+            log.default("received algorithm-state snapshot %{public}@ (createdAt=%{public}@)",
+                        snap.snapshotID.uuidString,
+                        String(describing: snap.createdAt))
             WatchAlgorithmSnapshotCache.shared.update(snap)
         }
     }

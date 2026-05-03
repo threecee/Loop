@@ -155,7 +155,12 @@ final class WatchAlgorithmBootstrap {
             latestLocalGlucoseDate: latestLocalGlucoseDate,
             latestPumpStatusDate: latestPumpStatusDate
         )
-        NSLog("WatchAlgorithmBootstrap: WarmUpDecision=\(warmUpDecision) now=\(Date()) snapshotCreatedAt=\(snapshot?.createdAt as Any) cgmDate=\(latestLocalGlucoseDate as Any) pumpDate=\(latestPumpStatusDate as Any)")
+        log.default("WarmUpDecision=%{public}@ now=%{public}@ snapshotCreatedAt=%{public}@ cgmDate=%{public}@ pumpDate=%{public}@",
+                    String(describing: warmUpDecision),
+                    ISO8601DateFormatter().string(from: Date()),
+                    String(describing: snapshot?.createdAt),
+                    String(describing: latestLocalGlucoseDate),
+                    String(describing: latestPumpStatusDate))
 
         driver = WatchAlgorithmDriver(
             carbStore: stores.carbStore,
