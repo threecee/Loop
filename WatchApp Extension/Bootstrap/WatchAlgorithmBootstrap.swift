@@ -87,13 +87,40 @@ final class WatchAlgorithmBootstrap {
             return
         }
 
+        // B.8 T12: read cached snapshot + freshness inputs to decide whether
+        // to skip warmup. Falling back to today's behavior when any gate
+        // fails (decision = .fullWarmup, driver init keeps isWarmingUp=true).
+        //
+        // Freshness-input choices:
+        //  - latestLocalGlucoseDate: GlucoseStoreProtocol.latestGlucose?.startDate
+        //    is the standard "most recent CGM sample" handle; matches what the
+        //    runner itself reads when scheduling effects.
+        //  - latestPumpStatusDate: PumpManager.lastSync (LoopKit protocol,
+        //    Date?). nil here is the conservative default — when the pump
+        //    manager isn't yet constructed (provider returns nil) or hasn't
+        //    completed its first reply, Gate C fails and the watch falls back
+        //    to today's full warmup. Pediatric T1D safety dominates: prefer
+        //    nil over a wrong-but-plausible value.
+        let pumpManager = pumpManagerProvider()
+        let snapshot = WatchAlgorithmSnapshotCache.shared.current
+        let latestLocalGlucoseDate = stores.glucoseStore.latestGlucose?.startDate
+        let latestPumpStatusDate = pumpManager?.lastSync
+        let warmUpDecision = WarmUpDecider.decide(
+            now: Date(),
+            snapshot: snapshot,
+            latestLocalGlucoseDate: latestLocalGlucoseDate,
+            latestPumpStatusDate: latestPumpStatusDate
+        )
+        NSLog("WatchAlgorithmBootstrap: WarmUpDecision = \(warmUpDecision)")
+
         driver = WatchAlgorithmDriver(
             carbStore: stores.carbStore,
             doseStore: stores.doseStore,
             glucoseStore: stores.glucoseStore,
             dosingDecisionStore: stores.dosingDecisionStore,
             settingsSnapshot: settings,
-            pumpManager: pumpManagerProvider()  // B.6: nil if not yet constructed
+            pumpManager: pumpManager,  // B.6: nil if not yet constructed
+            warmUpDecision: warmUpDecision  // B.8 T12
         )
     }
 
