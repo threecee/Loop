@@ -188,6 +188,11 @@ final class HandoffOrchestrator: ObservableObject {
             // PhoneWatchSessionCoordinator (cache update); the watch
             // orchestrator has nothing to do here. T9 leaves this as a no-op.
             break
+        case .algorithmStateSnapshotPointer:
+            // B.8.4: pointer→inline rewrap happens at the ExtensionDelegate
+            // edge before the transport decodes; the watch orchestrator
+            // never sees pointers. No-op to keep the switch exhaustive.
+            break
         }
     }
 

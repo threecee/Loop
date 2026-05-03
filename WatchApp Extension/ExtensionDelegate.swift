@@ -60,6 +60,36 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     private var notifications: [NSObjectProtocol] = []
     private var handoffStateCancellable: AnyCancellable?
 
+    /// B.8.4: shared App Group file used as the file-pointer fallback for
+    /// oversized algorithm-state snapshot payloads. Mirrors the path used
+    /// by `WCSessionPhoneWatchTransport` on the phone side.
+    private static let snapshotFileURL: URL =
+        HandoffSettings.appGroupContainerURL.appendingPathComponent("snapshot.json")
+
+    /// B.8.4: highest snapshot-pointer sequence the watch has seen this
+    /// process lifetime. Pointer messages with sequence ≤ this are dropped
+    /// as out-of-order (or replay). In-memory only — restart resets to 0,
+    /// in which case the worst case is the watch reads the file once on
+    /// the first post-relaunch pointer, which is benign.
+    private var lastSeenSnapshotSequence: UInt64 = 0
+
+    /// B.8.4: dedicated decoder for the pointer→inline rewrap path. Mirrors
+    /// the date-encoding strategy used by `WCSessionPhoneWatchTransport`.
+    private let snapshotDecoder: JSONDecoder = {
+        let d = JSONDecoder()
+        d.dateDecodingStrategy = .secondsSince1970
+        return d
+    }()
+
+    /// B.8.4: dedicated encoder for re-wrapping the file-loaded snapshot
+    /// as an inline `PhoneWatchMessage.algorithmStateSnapshot(_)` so it
+    /// can flow through the existing transport dispatch path.
+    private let snapshotEncoder: JSONEncoder = {
+        let e = JSONEncoder()
+        e.dateEncodingStrategy = .secondsSince1970
+        return e
+    }()
+
     static func shared() -> ExtensionDelegate {
         return WKExtension.shared().extensionDelegate
     }
@@ -414,7 +444,7 @@ extension ExtensionDelegate: WCSessionDelegate {
             // dispatch so the snapshot reaches the transport at takeover.
             let context = session.receivedApplicationContext
             if let data = context["phoneWatchMessage"] as? Data {
-                phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: nil)
+                handlePhoneWatchMessageData(data)
             } else {
                 updateContext(context)
             }
@@ -429,11 +459,60 @@ extension ExtensionDelegate: WCSessionDelegate {
         // transferUserInfo, so we reuse the same Data convention the
         // didReceiveUserInfo path uses.
         if let data = applicationContext["phoneWatchMessage"] as? Data {
-            phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: nil)
+            handlePhoneWatchMessageData(data)
             return
         }
         // Legacy WatchContext fallback (preserved unchanged).
         updateContext(applicationContext)
+    }
+
+    /// B.8.4: dispatch helper for applicationContext-delivered
+    /// `phoneWatchMessage` Data. Recognizes the file-pointer fallback case
+    /// (`algorithmStateSnapshotPointer`), validates monotonic sequence,
+    /// reads the snapshot from the App Group file, re-wraps as inline
+    /// `algorithmStateSnapshot`, and forwards through the transport so
+    /// the existing B.8 cache + B.8.4 driver hydration path runs as if
+    /// the payload had arrived inline. Inline messages (small snapshots,
+    /// or any non-snapshot envelope) bypass this special-casing.
+    private func handlePhoneWatchMessageData(_ data: Data) {
+        // Try to decode the envelope first — only the pointer case needs
+        // the file-read shim. Decode failures fall through to the transport
+        // which handles its own errors.
+        if let message = try? snapshotDecoder.decode(PhoneWatchMessage.self, from: data),
+           case .algorithmStateSnapshotPointer(let sequence) = message {
+            handleSnapshotPointer(sequence: sequence)
+            return
+        }
+        // Inline path (B.8.2): hand straight to the transport.
+        phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: nil)
+    }
+
+    /// B.8.4: pointer-message handler. Drops out-of-order/replayed pointers
+    /// (sequence ≤ lastSeen), reads `<AppGroup>/snapshot.json`, re-wraps the
+    /// payload as an inline `.algorithmStateSnapshot`, and forwards through
+    /// the existing transport dispatch.
+    private func handleSnapshotPointer(sequence: UInt64) {
+        guard sequence > lastSeenSnapshotSequence else {
+            log.default("snapshot pointer seq=%llu ≤ lastSeen=%llu — ignoring out-of-order/replay",
+                        sequence, lastSeenSnapshotSequence)
+            return
+        }
+        do {
+            let payloadData = try Data(contentsOf: Self.snapshotFileURL)
+            let snapshot = try snapshotDecoder.decode(AlgorithmStateSnapshot.self, from: payloadData)
+            // Update lastSeen only after the read succeeds. If the file
+            // was missing/corrupt we leave lastSeen alone so that a retry
+            // with the same sequence (e.g., the OS re-delivers at activation)
+            // can succeed once the file lands.
+            lastSeenSnapshotSequence = sequence
+            let inlineMessage = PhoneWatchMessage.algorithmStateSnapshot(snapshot)
+            let inlineData = try snapshotEncoder.encode(inlineMessage)
+            phoneWatchTransport?.handleIncomingMessageData(inlineData, replyHandler: nil)
+            log.default("snapshot pointer seq=%llu read %d bytes from snapshot.json", sequence, payloadData.count)
+        } catch {
+            log.error("snapshot pointer seq=%llu read/decode failed: %{public}@",
+                      sequence, String(describing: error))
+        }
     }
 
     // This method is called on a background thread of your app

@@ -143,6 +143,15 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
                         snap.snapshotID.uuidString,
                         String(describing: snap.createdAt))
             WatchAlgorithmSnapshotCache.shared.update(snap)
+        case .algorithmStateSnapshotPointer:
+            // B.8.4: ExtensionDelegate.handlePhoneWatchMessageData converts
+            // pointer messages into inline `.algorithmStateSnapshot` messages
+            // (after reading the file from the App Group container) before
+            // forwarding them to the transport. So this branch is unreachable
+            // in production — kept as a defensive no-op so the switch stays
+            // exhaustive. If this ever fires, log it loudly: it means the
+            // pointer slipped past the rewrap shim.
+            log.error("unexpected algorithmStateSnapshotPointer at coordinator — pointer should have been re-wrapped at ExtensionDelegate")
         }
     }
 }

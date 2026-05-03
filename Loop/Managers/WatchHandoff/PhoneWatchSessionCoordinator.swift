@@ -155,6 +155,10 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             // B.8 prep: snapshots are phone → watch only; the phone never
             // receives one. No-op to keep the switch exhaustive.
             break
+        case .algorithmStateSnapshotPointer:
+            // B.8.4: snapshot-pointer fallback is phone → watch only; the
+            // phone never receives one. No-op to keep the switch exhaustive.
+            break
         }
     }
 }

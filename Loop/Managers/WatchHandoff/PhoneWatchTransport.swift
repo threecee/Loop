@@ -33,6 +33,23 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
     private let decoder = JSONDecoder()
     private let log = OSLog(category: "WCSessionPhoneWatchTransport")
 
+    /// B.8.4: shared App Group file used as the file-pointer fallback
+    /// for oversized algorithm-state snapshot payloads. Both phone and
+    /// watch resolve the same path via `HandoffSettings.appGroupContainerURL`.
+    private static let snapshotFileURL: URL =
+        HandoffSettings.appGroupContainerURL.appendingPathComponent("snapshot.json")
+
+    /// B.8.4: monotonically-increasing sequence number persisted in the
+    /// shared App Group UserDefaults so it survives process death. The
+    /// watch ignores pointer messages whose sequence is ≤ the highest it
+    /// has seen, providing replay/out-of-order safety.
+    private static let sequenceKey = "B.8.4.snapshotSequence"
+
+    /// 8 KB applicationContext soft budget. Snapshots strictly larger than
+    /// this fall back to the file-pointer path; smaller snapshots ride
+    /// inline as before (B.8.2 path).
+    private static let applicationContextSizeBudget = 8 * 1024
+
     public var isReachable: Bool { session.isReachable }
 
     public init(session: WCSession = .default) {
@@ -98,9 +115,13 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
     /// (modeSwitch, pairingHandoff, manual user actions); use this method for
     /// coalescable state snapshots that should always read "latest only".
     ///
-    /// The 8KB warning is log-only and does NOT block delivery — B.8.4 will
-    /// inherit the size signal in HV-1 telemetry to decide if a file-pointer
-    /// fallback is needed once buffers populate in production.
+    /// B.8.4: if a `.algorithmStateSnapshot` payload exceeds the 8 KB
+    /// applicationContext budget, write the encoded payload to
+    /// `<AppGroup>/snapshot.json` (atomic) and instead deliver a tiny
+    /// `.algorithmStateSnapshotPointer(sequence:)` message via
+    /// applicationContext. The watch sees the pointer, reads the file, and
+    /// re-wraps as if the payload had arrived inline. Smaller payloads
+    /// continue using the inline applicationContext path unchanged.
     ///
     /// Note: this method is intentionally not declared on the `PhoneWatchTransport`
     /// protocol — the only consumer is the `SnapshotTransport` extension in
@@ -109,14 +130,45 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
     public func sendApplicationContext(_ message: PhoneWatchMessage) {
         do {
             let data = try encoder.encode(message)
-            if data.count > 8 * 1024 {
-                log.default("sendApplicationContext: payload size %d bytes exceeds 8KB safety budget; B.8.4 will need fallback strategy", data.count)
+
+            // B.8.4: file-pointer fallback for oversized snapshot payloads.
+            if case .algorithmStateSnapshot = message,
+               data.count > Self.applicationContextSizeBudget {
+                try data.write(to: Self.snapshotFileURL, options: .atomic)
+                let nextSeq = nextSnapshotSequence()
+                let pointer = PhoneWatchMessage.algorithmStateSnapshotPointer(sequence: nextSeq)
+                let pointerData = try encoder.encode(pointer)
+                let context: [String: Any] = ["phoneWatchMessage": pointerData]
+                try session.updateApplicationContext(context)
+                log.default("sendApplicationContext: large snapshot (%d bytes) written to file; sent pointer seq=%llu",
+                            data.count, nextSeq)
+                return
             }
+
+            // Small payload — use applicationContext directly (B.8.2 path).
             let context: [String: Any] = ["phoneWatchMessage": data]
             try session.updateApplicationContext(context)
         } catch {
             log.error("sendApplicationContext failed: %{public}@", String(describing: error))
         }
+    }
+
+    /// B.8.4: monotonic sequence number for snapshot-pointer messages.
+    /// Persisted in App Group UserDefaults under `sequenceKey` so it
+    /// survives phone process death; reset to 0 only if the App Group
+    /// container is deleted (full app uninstall).
+    ///
+    /// `UInt64` does not round-trip cleanly through UserDefaults' `Any?` —
+    /// values larger than `Int64.max` would coerce to `Double` and lose
+    /// precision. We store as `Int64` (and read it back) since a strictly
+    /// monotonic counter incremented every loop iteration cannot realistically
+    /// approach `Int64.max` (2⁶³ - 1 ≈ 9.2 × 10¹⁸) in any human lifetime.
+    private func nextSnapshotSequence() -> UInt64 {
+        let defaults = HandoffSettings.appGroupDefaults
+        let current = defaults.object(forKey: Self.sequenceKey) as? Int64 ?? 0
+        let next = current &+ 1  // wrapping add — defensive, see comment above
+        defaults.set(next, forKey: Self.sequenceKey)
+        return UInt64(bitPattern: next)
     }
 
     /// Public hook called by WatchDataManager when a `WCSession` callback
