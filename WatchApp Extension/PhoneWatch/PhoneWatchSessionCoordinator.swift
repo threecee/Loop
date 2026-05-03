@@ -131,7 +131,10 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             // B.3.a Phase 6: store in the shared cache so bootstraps can read it.
             WatchSettingsCache.shared.update(sync)
         case .algorithmStateSnapshot(let snap):
-            guard PhoneWatchProtocol.shouldAccept(incomingVersion: PhoneWatchProtocol.currentVersion) else { return }
+            // No per-payload protocolVersion check: AlgorithmStateSnapshot has no
+            // version field of its own. Schema compatibility is enforced at envelope
+            // (PhoneWatchMessage) decode time — older receivers throw on the unknown
+            // .algorithmStateSnapshot Kind raw value before the payload is parsed.
             NSLog("PhoneWatchSessionCoordinator: received algorithm-state snapshot \(snap.snapshotID) (createdAt=\(snap.createdAt))")
             WatchAlgorithmSnapshotCache.shared.update(snap)
         }
