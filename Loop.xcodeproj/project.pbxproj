@@ -699,6 +699,8 @@
 		WB2D00000000010B822 /* AlgorithmStateSnapshotEmitterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B802 /* AlgorithmStateSnapshotEmitterTests.swift */; };
 		WB2D00000000010B823 /* WatchAlgorithmSnapshotCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B803 /* WatchAlgorithmSnapshotCache.swift */; };
 		WB2D00000000010B824 /* WatchAlgorithmSnapshotCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B804 /* WatchAlgorithmSnapshotCacheTests.swift */; };
+		WB2D00000000010B825 /* WarmUpDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B805 /* WarmUpDecider.swift */; };
+		WB2D00000000010B826 /* WarmUpDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B806 /* WarmUpDeciderTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1667,6 +1669,8 @@
 		WB2D00000000010B802 /* AlgorithmStateSnapshotEmitterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshotEmitterTests.swift; sourceTree = "<group>"; };
 		WB2D00000000010B803 /* WatchAlgorithmSnapshotCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmSnapshotCache.swift; path = "WatchApp Extension/PhoneWatch/WatchAlgorithmSnapshotCache.swift"; sourceTree = SOURCE_ROOT; };
 		WB2D00000000010B804 /* WatchAlgorithmSnapshotCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmSnapshotCacheTests.swift; path = "WatchApp ExtensionTests/WatchAlgorithmSnapshotCacheTests.swift"; sourceTree = SOURCE_ROOT; };
+		WB2D00000000010B805 /* WarmUpDecider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WarmUpDecider.swift; path = "WatchApp Extension/Algorithm/WarmUpDecider.swift"; sourceTree = SOURCE_ROOT; };
+		WB2D00000000010B806 /* WarmUpDeciderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WarmUpDeciderTests.swift; path = "WatchApp ExtensionTests/WarmUpDeciderTests.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2092,6 +2096,7 @@
 				8AF24B0CE7C845F694F5C2BB /* PhoneWatch */,
 				F08D133C35ED4AB09F27A7E1 /* Handoff */,
 				8DE36B527BF5692D99C62778 /* Bootstrap */,
+				WB2D00000000010B807 /* Algorithm */,
 				D70F92345646BF6A14334DF2 /* BackgroundTasks */,
 			);
 			path = "WatchApp Extension";
@@ -2784,6 +2789,15 @@
 			path = Bootstrap;
 			sourceTree = "<group>";
 		};
+		WB2D00000000010B807 /* Algorithm */ = {
+			isa = PBXGroup;
+			children = (
+				WB2D00000000010B805 /* WarmUpDecider.swift */,
+			);
+			name = Algorithm;
+			path = Algorithm;
+			sourceTree = "<group>";
+		};
 		8F1BBD887A2C4ACEAA438DE0 /* WatchApp ExtensionTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -2807,6 +2821,7 @@
 				B6E5F6010002B6E5F6010002 /* WatchAlgorithmDriverTests.swift */,
 				B5D000000004 /* WatchPumpManagerSettingsTests.swift */,
 				WB2D00000000010B804 /* WatchAlgorithmSnapshotCacheTests.swift */,
+				WB2D00000000010B806 /* WarmUpDeciderTests.swift */,
 			);
 			path = "WatchApp ExtensionTests";
 			sourceTree = "<group>";
@@ -4053,6 +4068,7 @@
 				B6E5F6010001B6E5F6010001 /* WatchAlgorithmDriverTests.swift in Sources */,
 				B5D000000003 /* WatchPumpManagerSettingsTests.swift in Sources */,
 				WB2D00000000010B824 /* WatchAlgorithmSnapshotCacheTests.swift in Sources */,
+				WB2D00000000010B826 /* WarmUpDeciderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4359,6 +4375,7 @@
 				2FE4F4E4DBCC44AFABCE2735 /* HeartbeatScheduler.swift in Sources */,
 				6969CD7061C34FB1B52A2520 /* WatchSettingsCache.swift in Sources */,
 				WB2D00000000010B823 /* WatchAlgorithmSnapshotCache.swift in Sources */,
+				WB2D00000000010B825 /* WarmUpDecider.swift in Sources */,
 				CB151124CFD54014AACC19B4 /* HandoffPolicyEngine.swift in Sources */,
 				AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */,
 				049A1126B9804AFFBB289978 /* HandoffOrchestrator.swift in Sources */,
