@@ -38,8 +38,8 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
 
     public init(session: WCSession = .default) {
         self.session = session
-        encoder.dateEncodingStrategy = .iso8601
-        decoder.dateDecodingStrategy = .iso8601
+        encoder.dateEncodingStrategy = .secondsSince1970
+        decoder.dateDecodingStrategy = .secondsSince1970
         // No delegate assignment, no activate(). ExtensionDelegate owns both.
     }
 

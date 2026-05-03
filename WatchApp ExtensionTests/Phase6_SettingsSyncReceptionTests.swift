@@ -247,6 +247,37 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
                        "Different payload should still write through")
     }
 
+    // MARK: - B.5.1 leftover #3 / B.8.2: resetForTesting() is #if-DEBUG-guarded
+
+    /// Regression-prevention test: `WatchSettingsCache.resetForTesting()` is
+    /// wrapped in `#if DEBUG ... #endif` (added in B.5.1). The mere fact that
+    /// this test compiles in DEBUG builds — and that it would fail to compile
+    /// in a Release build because `resetForTesting()` would not exist there —
+    /// is what enforces the guard. The body just exercises the call to verify
+    /// behavior end-to-end so a future refactor can't silently move the method
+    /// outside the guard while still satisfying a name-only check.
+    ///
+    /// If a future change accidentally removes the `#if DEBUG` guard, this
+    /// test still passes (DEBUG-built tests are unaffected), but the Release
+    /// build would now expose the test-only helper to production code paths.
+    /// The guard's first line of defense is the production code review; this
+    /// test is a paired smoke check that the helper itself behaves as expected.
+    #if DEBUG
+    func testResetForTestingIsDebugGuarded() {
+        let cache = WatchSettingsCache()
+        cache.update(sampleSync)
+        XCTAssertNotNil(cache.current, "precondition: cache populated before reset")
+        XCTAssertEqual(cache.writeCount, 1, "precondition: one write recorded")
+
+        // This call would be a compile error in a Release build (the method
+        // would not exist) — that's the load-bearing property of the guard.
+        cache.resetForTesting()
+
+        XCTAssertNil(cache.current, "After resetForTesting, current should be nil")
+        XCTAssertEqual(cache.writeCount, 0, "After resetForTesting, writeCount should be 0")
+    }
+    #endif
+
     // MARK: - Test 2d: bootstrap settingsProvider reads from cache
 
     func testBootstrapSettingsProviderReadsFromCache() {

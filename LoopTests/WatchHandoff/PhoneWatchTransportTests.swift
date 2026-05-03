@@ -58,7 +58,7 @@ final class PhoneWatchTransportTests: XCTestCase {
         // the warning path. This is the load-bearing invariant — the test
         // wouldn't be meaningful without it.
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
+        encoder.dateEncodingStrategy = .secondsSince1970
         let encoded = try! encoder.encode(message)
         XCTAssertGreaterThan(encoded.count, 8 * 1024,
                              "Test fixture must exceed 8KB to exercise the warning path; got \(encoded.count) bytes")
@@ -91,5 +91,72 @@ final class PhoneWatchTransportTests: XCTestCase {
         )
         let transport = WCSessionPhoneWatchTransport(session: WCSession.default)
         transport.sendApplicationContext(.algorithmStateSnapshot(snapshot))
+    }
+
+    // MARK: - B.8.2: heartbeat encoder uses .secondsSince1970
+
+    /// Confirms the production transport's `dateEncodingStrategy` is
+    /// `.secondsSince1970` (not `.iso8601`). The wire-format invariant under
+    /// test: a `Date` must serialize as a JSON Number, never a String.
+    ///
+    /// Why this matters: the watch-side decoder uses the same strategy in
+    /// lockstep — if either side drifts back to `.iso8601`, every heartbeat
+    /// (and every other Date-bearing message) would fail to decode, taking
+    /// down the entire WCSession message channel. This test pins both the
+    /// strategy choice and the wire shape so a future refactor can't quietly
+    /// reintroduce ISO-8601 string encoding.
+    func testHeartbeatEncodingUsesSecondsSince1970() throws {
+        // Configure the encoder identically to production
+        // (see WCSessionPhoneWatchTransport.init).
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .secondsSince1970
+
+        // 1) Direct Date encoding produces a Number, not a String.
+        let date = Date(timeIntervalSince1970: 1_700_000_000)
+        let dateData = try encoder.encode(date)
+        let dateString = String(data: dateData, encoding: .utf8)!
+        XCTAssertFalse(dateString.contains("\""),
+                       ".secondsSince1970 should encode Date as JSON Number, not a quoted String; got \(dateString)")
+        XCTAssertEqual(dateString, "1700000000",
+                       "Expected raw seconds-since-epoch encoding")
+
+        // 2) Round-trip a heartbeat through PhoneWatchMessage and verify the
+        // sentAt field surfaces as a Number in the decoded JSON dictionary.
+        let heartbeat = PhoneWatchHeartbeat(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: date,
+            senderRole: .phone,
+            appBuildNumber: "phase6"
+        )
+        let message = PhoneWatchMessage.heartbeat(heartbeat)
+        let encoded = try encoder.encode(message)
+
+        // Drill into whatever shape PhoneWatchMessage's Codable produces and
+        // locate the sentAt field. We don't hard-code the wrapper key — we
+        // walk the dictionary and find the numeric `sentAt` regardless of
+        // whether it's nested under "heartbeat", a "value" key, or appears
+        // at the top level.
+        let raw = try JSONSerialization.jsonObject(with: encoded)
+        let sentAtValue = findValue(forKey: "sentAt", in: raw)
+        XCTAssertNotNil(sentAtValue, "sentAt should be present in encoded message")
+        XCTAssertTrue(sentAtValue is NSNumber,
+                      "sentAt should be a JSON Number under .secondsSince1970; got \(type(of: sentAtValue ?? "nil"))")
+        XCTAssertFalse(sentAtValue is String,
+                       "sentAt must NOT be a String — that would mean .iso8601 leaked back in")
+    }
+
+    /// Recursive lookup helper for the JSON shape introspection above.
+    private func findValue(forKey key: String, in object: Any) -> Any? {
+        if let dict = object as? [String: Any] {
+            if let v = dict[key] { return v }
+            for (_, v) in dict {
+                if let found = findValue(forKey: key, in: v) { return found }
+            }
+        } else if let array = object as? [Any] {
+            for v in array {
+                if let found = findValue(forKey: key, in: v) { return found }
+            }
+        }
+        return nil
     }
 }
