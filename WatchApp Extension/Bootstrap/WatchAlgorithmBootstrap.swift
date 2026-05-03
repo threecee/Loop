@@ -104,6 +104,10 @@ final class WatchAlgorithmBootstrap {
         let pumpManager = pumpManagerProvider()
         let snapshot = WatchAlgorithmSnapshotCache.shared.current
         let latestLocalGlucoseDate = stores.glucoseStore.latestGlucose?.startDate
+        // OmniBLE specifics: pumpManager.lastSync == lastInsulinMeasurements.validTime,
+        // which advances on every status reply. Safe interpretation as Gate C's "pump
+        // status reply within last 60 s." If the fork ever supports a non-OmniBLE pump,
+        // re-verify lastSync semantics for that manager.
         let latestPumpStatusDate = pumpManager?.lastSync
         let warmUpDecision = WarmUpDecider.decide(
             now: Date(),
@@ -111,7 +115,7 @@ final class WatchAlgorithmBootstrap {
             latestLocalGlucoseDate: latestLocalGlucoseDate,
             latestPumpStatusDate: latestPumpStatusDate
         )
-        NSLog("WatchAlgorithmBootstrap: WarmUpDecision = \(warmUpDecision)")
+        NSLog("WatchAlgorithmBootstrap: WarmUpDecision=\(warmUpDecision) now=\(Date()) snapshotCreatedAt=\(snapshot?.createdAt as Any) cgmDate=\(latestLocalGlucoseDate as Any) pumpDate=\(latestPumpStatusDate as Any)")
 
         driver = WatchAlgorithmDriver(
             carbStore: stores.carbStore,
