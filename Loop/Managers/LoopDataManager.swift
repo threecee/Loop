@@ -62,6 +62,10 @@ final class LoopDataManager {
 
     private let analyticsServicesManager: AnalyticsServicesManager
 
+    /// B.8: end-of-iteration algorithm-state snapshot emitter. Wired up by
+    /// LoopAppManager during init.
+    weak var algorithmStateSnapshotEmitter: AlgorithmStateSnapshotEmitter?
+
     private let trustedTimeOffset: () -> TimeInterval
 
     private let now: () -> Date
@@ -494,6 +498,9 @@ extension LoopDataManager: LoopAlgorithmRunnerDelegate {
     }
 
     func loopAlgorithmRunnerDidFinishLoop(_ runner: LoopAlgorithmRunner) {
+        // B.8: push algorithm-state snapshot to watch (no-op if emitter unwired).
+        algorithmStateSnapshotEmitter?.emit()
+
         // 5 second delay to allow stores to cache data before it is read by widget
         DispatchQueue.main.asyncAfter(deadline: .now() + 5) { [weak self] in
             self?.widgetLog.default("Refreshing widget. Reason: Loop completed")
