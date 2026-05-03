@@ -1,5 +1,5 @@
 //
-//  WatchAlgorithmEndToEndTests.swift
+//  WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift
 //  WatchApp ExtensionTests
 //
 //  B.8 Phase 3 — end-to-end snapshot-flow scenarios for the watch algorithm
@@ -13,22 +13,17 @@
 //      didRecommend DOES record a `.warmingUp` suppression (today's
 //      pre-B.8 fallback behavior, preserved verbatim).
 //
-//  The init-time isWarmingUp derivation is unit-tested in
-//  WatchAlgorithmDriverTests.test_init_skipsWarmupWhenDecisionSaysSkip /
-//  test_init_isWarmingUpWhenDecisionSaysFullWarmup. These tests go further
-//  by driving an actual recommendation through the didRecommend delegate
-//  hook and inspecting the dosing-decision store, which is the seam that
-//  matters for the iOS event log.
+//  Complements:
+//    * `WatchAlgorithmDriverTests` — init-only assertions on isWarmingUp
+//      derivation from WarmUpDecision.
+//    * `OmniBLE/OmniBLETests/Integration/WatchAlgorithmEndToEndTests` —
+//      heavyweight PodSimulator-backed dose-enactment chain (cannot reach
+//      `WatchAlgorithmSnapshotCache` because the cache is wrapped in
+//      `#if !os(iOS)` and not exported via WatchAlgorithmKit).
 //
 //  Modeled on Phase7_WarmingUpTest.swift (lightweight in-process driver
 //  construction, no PodSimulator) plus the RecordingDecisionStore /
 //  recommendation-driving idiom from WatchAlgorithmDriverTests.swift.
-//
-//  The heavyweight PodSimulator-backed end-to-end test (algorithm runs
-//  against an emulated pod) lives at
-//  OmniBLETests/Integration/WatchAlgorithmEndToEndTests.swift — that one
-//  cannot reach `WatchAlgorithmSnapshotCache` because the cache is wrapped
-//  in `#if !os(iOS)` and not exported via WatchAlgorithmKit.
 //
 
 import XCTest
@@ -39,7 +34,7 @@ import OmniBLE  // for AlgorithmStateSnapshot, PumpStatusSnapshot
 import WatchAlgorithmKit  // for WatchAlgorithmDriver, WarmUpDecision, WatchDoseSuppressionReason
 @testable import WatchApp_Extension  // for WatchAlgorithmSnapshotCache.shared / resetForTesting()
 
-final class WatchAlgorithmEndToEndTests: XCTestCase {
+final class WatchAlgorithmDriverSnapshotFlowEndToEndTests: XCTestCase {
 
     // MARK: - Lifecycle
 
@@ -197,16 +192,30 @@ final class WatchAlgorithmEndToEndTests: XCTestCase {
         wait(for: [exp], timeout: 5.0)
 
         // The warmingUp gate (gate 1) must NOT have fired. A different gate
-        // (here, .noPumpManager — gate 4) may have suppressed because this
-        // lightweight harness has no pump; that's fine — the snapshot path's
-        // contract is "skip the warmup-window suppression," not "guarantee
-        // a dose enacts."
+        // (here, gate 2 .automaticDosingDisabled — see the positive assertion
+        // below) suppresses because this lightweight harness uses the default
+        // `WatchSettingsSnapshot` whose `automaticDosingEnabled` is false.
+        // That's fine — the snapshot path's contract is "skip the
+        // warmup-window suppression," not "guarantee a dose enacts."
         let warmingUpRecorded = store.storedDecisions.contains { decision in
             decision.reason == WatchDoseSuppressionReason.warmingUp.rawValue
         }
         XCTAssertFalse(
             warmingUpRecorded,
             "Snapshot-fresh path must NOT suppress with warmingUp reason; recorded reasons: \(store.storedDecisions.map { $0.reason ?? "<nil>" })"
+        )
+
+        // Positive assertion: gate 2 (automaticDosingDisabled) must fire in
+        // this lightweight harness because the test WatchSettingsSnapshot
+        // defaults `automaticDosingEnabled` to false. This confirms
+        // `recordSuppressed` actually ran — without it, the negative-only
+        // assertion above would pass on a silent no-op (empty store).
+        XCTAssertEqual(store.storedDecisions.count, 1,
+                       "Fresh-snapshot path must still record exactly one decision (gate 2)")
+        XCTAssertEqual(
+            store.storedDecisions.first?.reason,
+            WatchDoseSuppressionReason.automaticDosingDisabled.rawValue,
+            "Fresh-snapshot path skips gate 1 (warmingUp) and falls through to gate 2 (automaticDosingDisabled)"
         )
     }
 

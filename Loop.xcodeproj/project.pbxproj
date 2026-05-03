@@ -702,7 +702,7 @@
 		WB2D00000000010B824 /* WatchAlgorithmSnapshotCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B804 /* WatchAlgorithmSnapshotCacheTests.swift */; };
 		WB2D00000000010B825 /* WarmUpDecider.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B805 /* WarmUpDecider.swift */; };
 		WB2D00000000010B826 /* WarmUpDeciderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B806 /* WarmUpDeciderTests.swift */; };
-		WB2D00000000010B828 /* WatchAlgorithmEndToEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B808 /* WatchAlgorithmEndToEndTests.swift */; };
+		WB2D00000000010B828 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B808 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1674,7 +1674,7 @@
 		WB2D00000000010B804 /* WatchAlgorithmSnapshotCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmSnapshotCacheTests.swift; path = "WatchApp ExtensionTests/WatchAlgorithmSnapshotCacheTests.swift"; sourceTree = SOURCE_ROOT; };
 		WB2D00000000010B805 /* WarmUpDecider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WarmUpDecider.swift; path = "WatchApp Extension/Algorithm/WarmUpDecider.swift"; sourceTree = SOURCE_ROOT; };
 		WB2D00000000010B806 /* WarmUpDeciderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WarmUpDeciderTests.swift; path = "WatchApp ExtensionTests/WarmUpDeciderTests.swift"; sourceTree = SOURCE_ROOT; };
-		WB2D00000000010B808 /* WatchAlgorithmEndToEndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmEndToEndTests.swift; path = "WatchApp ExtensionTests/WatchAlgorithmEndToEndTests.swift"; sourceTree = SOURCE_ROOT; };
+		WB2D00000000010B808 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift; path = "WatchApp ExtensionTests/WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2827,7 +2827,7 @@
 				B5D000000004 /* WatchPumpManagerSettingsTests.swift */,
 				WB2D00000000010B804 /* WatchAlgorithmSnapshotCacheTests.swift */,
 				WB2D00000000010B806 /* WarmUpDeciderTests.swift */,
-				WB2D00000000010B808 /* WatchAlgorithmEndToEndTests.swift */,
+				WB2D00000000010B808 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift */,
 			);
 			path = "WatchApp ExtensionTests";
 			sourceTree = "<group>";
@@ -4076,7 +4076,7 @@
 				B5D000000003 /* WatchPumpManagerSettingsTests.swift in Sources */,
 				WB2D00000000010B824 /* WatchAlgorithmSnapshotCacheTests.swift in Sources */,
 				WB2D00000000010B826 /* WarmUpDeciderTests.swift in Sources */,
-				WB2D00000000010B828 /* WatchAlgorithmEndToEndTests.swift in Sources */,
+				WB2D00000000010B828 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
