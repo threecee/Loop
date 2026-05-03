@@ -206,6 +206,10 @@ final class HandoffOrchestrator: ObservableObject {
         case .settingsSync:
             // Settings sync is phone → watch only; phone ignores inbound.
             break
+        case .algorithmStateSnapshot:
+            // B.8 prep: snapshots are phone → watch only; phone ignores any
+            // inbound. Substantive handling (defensive ignore log) lands in T7.
+            break
         }
     }
 

@@ -184,6 +184,11 @@ final class HandoffOrchestrator: ObservableObject {
             // Handled upstream by PhoneWatchSessionCoordinator (stored in
             // WatchSettingsCache.shared). No state-machine event to fire.
             break
+        case .algorithmStateSnapshot:
+            // B.8 prep: snapshot routing will be owned by
+            // PhoneWatchSessionCoordinator (cache update); the watch
+            // orchestrator has nothing to do here. T9 leaves this as a no-op.
+            break
         }
     }
 

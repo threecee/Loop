@@ -130,6 +130,11 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             NSLog("PhoneWatchSessionCoordinator: received settings sync (protocolVersion=\(sync.protocolVersion))")
             // B.3.a Phase 6: store in the shared cache so bootstraps can read it.
             WatchSettingsCache.shared.update(sync)
+        case .algorithmStateSnapshot:
+            // B.8 prep: keep the switch exhaustive. T9 will replace this break
+            // with `WatchAlgorithmSnapshotCache.shared.update(snap)` once the
+            // cache type exists (T8).
+            break
         }
     }
 }

@@ -151,6 +151,10 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             // Settings sync is phone → watch only; the phone never receives one.
             // No-op to avoid a compiler warning on the exhaustive switch.
             break
+        case .algorithmStateSnapshot:
+            // B.8 prep: snapshots are phone → watch only; the phone never
+            // receives one. No-op to keep the switch exhaustive.
+            break
         }
     }
 }
