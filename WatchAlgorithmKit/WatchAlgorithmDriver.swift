@@ -237,7 +237,12 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
                 pumpManager: PumpManager? = nil,                    // B.6: dose-emission target (nil → suppress all)
                 isWarmingUpOverride: Bool? = nil,                   // B.6: test-only override
                 recoveryDefaults: UserDefaults? = nil,              // B.5: dose recovery tripwire defaults (nil → resolve App Group at use)
-                warmUpDecision: WarmUpDecision? = nil) {            // B.8: production callers pass WarmUpDecider's verdict to derive isWarmingUp
+                /// B.8: optional warmup decision. When non-nil and
+                /// `isWarmingUpOverride` is nil, the init derives `isWarmingUp`
+                /// (and `didCompleteFirstIteration`) from this decision.
+                /// **Ignored when `isWarmingUpOverride` is non-nil** — the B.6
+                /// test override always wins.
+                warmUpDecision: WarmUpDecision? = nil) {
         self.settingsSnapshot = settingsSnapshot
         self.pumpManager = pumpManager
         self.dosingDecisionStore = dosingDecisionStore
@@ -314,6 +319,11 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
         // Setting didCompleteFirstIteration=true on .skipWarmup short-circuits
         // the "first iteration just completed → flip isWarmingUp to false"
         // notification path (mirrors the override-false branch above).
+        #if DEBUG
+        if isWarmingUpOverride != nil, warmUpDecision != nil {
+            assertionFailure("WatchAlgorithmDriver: both isWarmingUpOverride and warmUpDecision passed — override wins, decision ignored. Pick one.")
+        }
+        #endif
         if isWarmingUpOverride == nil, let decision = warmUpDecision {
             switch decision {
             case .skipWarmup:
