@@ -108,6 +108,7 @@
 		3ED3199F2EB65AFE00820BCF /* LocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED3199E2EB65AFE00820BCF /* LocalizedString.swift */; };
 		3ED319A12EB65B4100820BCF /* Bootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED319A02EB65B4100820BCF /* Bootstrap.swift */; };
 		3ED319A32EB65DA800820BCF /* LiveActivityManagerProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED319A22EB65DA300820BCF /* LiveActivityManagerProxy.swift */; };
+		41E16892046A430BEA983FAA /* placeholder-steady-state.json in Resources */ = {isa = PBXBuildFile; fileRef = AE422F9AFE414A4BFE4617EE /* placeholder-steady-state.json */; };
 		424B8F84E3BC1E5FBA6AED89 /* DoseStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D380024EADE7C005E2F50 /* DoseStoreProtocol.swift */; };
 		43027F0F1DFE0EC900C51989 /* HKUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F526D5E1DF2459000A04910 /* HKUnit.swift */; };
 		4302F4E11D4E9C8900F0FCAF /* TextFieldTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4302F4E01D4E9C8900F0FCAF /* TextFieldTableViewController.swift */; };
@@ -229,6 +230,7 @@
 		43FCEEAD221A66780013DD30 /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FCEEAC221A66780013DD30 /* DateFormatter.swift */; };
 		43FCEEB1221A863E0013DD30 /* StatusChartsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FCEEB0221A863E0013DD30 /* StatusChartsManager.swift */; };
 		48F2DBD3AE984404B89EDD58 /* HandoffPolicyEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F24DCAB37AC4B38A4C082D6 /* HandoffPolicyEngineTests.swift */; };
+		4B0CAF3106DB478E083E007C /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; };
 		4B875BF25CCD3FCCA8B979B9 /* LoopError+Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8898032AA9103B8BA09BBBD /* LoopError+Issue.swift */; };
 		4E52BE6D4676405C85EC6CF0 /* ShadowStateSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2B417993644643920F4455 /* ShadowStateSchedulerTests.swift */; };
 		4F08DE8F1E7BB871006741EA /* CollectionType+Loop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F08DE8E1E7BB871006741EA /* CollectionType+Loop.swift */; };
@@ -277,6 +279,7 @@
 		61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */; };
 		623575103230CD309CD8E120 /* LoopAlgorithmCore-watchOS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9F68F63F200483A5D11B40F2 /* LoopAlgorithmCore-watchOS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		62E7554AE77F4726836D0DE5 /* GlucoseReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */; };
+		631CCA2FE86B6397F34B1EF9 /* placeholder-predicted-hypo.json in Resources */ = {isa = PBXBuildFile; fileRef = B53A30055A8FD963007C15CA /* placeholder-predicted-hypo.json */; };
 		65A87A4BEFD4945EF357AC02 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FFCF21EAE05D00AF44BF /* LoopCore.framework */; };
 		6969CD7061C34FB1B52A2520 /* WatchSettingsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FBF47F733B45829957F54F /* WatchSettingsCache.swift */; };
 		69AACEC5CC8F42D288AD3070 /* SharedStateBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */; };
@@ -365,6 +368,7 @@
 		8B50B27346166D01CB3C5CDB /* LoopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 436A0DA41D236A2A00104B24 /* LoopError.swift */; };
 		94720A4691BB98B503831216 /* WatchAlgorithmBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46EDAF9CDCEA3FE587F73869 /* WatchAlgorithmBootstrap.swift */; };
 		959452C233E5B601203A3BAF /* LoopAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C56AC3C4371558534B519CC /* LoopAlgorithmRunner.swift */; };
+		95D34918A38CDF004407F45D /* placeholder-post-meal-carbs.json in Resources */ = {isa = PBXBuildFile; fileRef = 0587169FD2F83110E041A6DF /* placeholder-post-meal-carbs.json */; };
 		963CAA955EC64CD5B6F8E46F /* HealthKitWriterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */; };
 		9817C257844B492E94927FEF /* GlucoseReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB043638C14C2799375D54 /* GlucoseReading.swift */; };
 		9F983AAC6CD9BEB4A75F0E69 /* DosingDecisionStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98A55EE24EDD6E60008715D /* DosingDecisionStoreProtocol.swift */; };
@@ -674,6 +678,7 @@
 		E9C58A8024DB529A00487A17 /* insulin_effect.json in Resources */ = {isa = PBXBuildFile; fileRef = E9C58A7B24DB529A00487A17 /* insulin_effect.json */; };
 		F018AC8966B1FFDF783DE88E /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9002A21EB209400AF44BF /* LoopCore.framework */; };
 		F0415E0FCEE9BB765C7D01BB /* GlucoseBasedApplicationFactorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC389F72A2B620B0066E2E8 /* GlucoseBasedApplicationFactorStrategy.swift */; };
+		F4EF2C98D2257C1300C4FA11 /* ReconciliationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78167ABF468C3D65EEEE147 /* ReconciliationTests.swift */; };
 		F61569B1F68EBE8CFBB4E99F /* HKUnit+LocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C482251645A52AFF8E9DF32 /* HKUnit+LocalizedString.swift */; };
 		F71A7C135799A2B9347C6191 /* Base32 in Frameworks */ = {isa = PBXBuildFile; productRef = A4E0D971969D82C9A61515FA /* Base32 */; };
 		F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */; };
@@ -852,6 +857,13 @@
 			remoteGlobalIDString = 43D9001A21EB209400AF44BF;
 			remoteInfo = "LoopCore-watchOS";
 		};
+		E86A0D5D98521DD3A7334ABC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 43776F841B8022E90074EA36 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B6F100000001;
+			remoteInfo = WatchAlgorithmKit;
+		};
 		E9B07F92253BBA6500BAD8F8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 43776F841B8022E90074EA36 /* Project object */;
@@ -949,6 +961,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0587169FD2F83110E041A6DF /* placeholder-post-meal-carbs.json */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 1; lastKnownFileType = text.json; path = "placeholder-post-meal-carbs.json"; sourceTree = "<group>"; };
 		0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HealthKitWriterTests.swift; path = "WatchApp ExtensionTests/HealthKitWriterTests.swift"; sourceTree = SOURCE_ROOT; };
 		083F0EBC357920F44DB22F42 /* LoopAlgorithmReconciliationFixture.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoopAlgorithmReconciliationFixture.swift; sourceTree = "<group>"; };
 		091FD4801D540EC2D6AAE6F6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -1407,6 +1420,7 @@
 		A9F703762489D8AA00C98AD8 /* PersistentDeviceLog+SimulatedCoreData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PersistentDeviceLog+SimulatedCoreData.swift"; sourceTree = "<group>"; };
 		A9FB75F0252BE320004C7D3F /* BolusDosingDecision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BolusDosingDecision.swift; sourceTree = "<group>"; };
 		ABA68CD9C72F40D7972637CA /* GlucoseReadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseReadingTests.swift; path = "WatchApp ExtensionTests/GlucoseReadingTests.swift"; sourceTree = SOURCE_ROOT; };
+		AE422F9AFE414A4BFE4617EE /* placeholder-steady-state.json */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 1; lastKnownFileType = text.json; path = "placeholder-steady-state.json"; sourceTree = "<group>"; };
 		B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WatchApp ExtensionTests/Phase4_RemoteDataServicesManagerImportTest.swift"; sourceTree = SOURCE_ROOT; };
 		B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HandoffOrchestrator.swift; path = "WatchApp Extension/Handoff/HandoffOrchestrator.swift"; sourceTree = SOURCE_ROOT; };
 		B4001CED28CBBC82002FB414 /* AlertManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertManagementView.swift; sourceTree = "<group>"; };
@@ -1438,6 +1452,7 @@
 		B4E96D5C248A82A2002DABAD /* StatusBarHUDView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatusBarHUDView.xib; sourceTree = "<group>"; };
 		B4F3D25024AF890C0095CE44 /* BluetoothStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothStateManager.swift; sourceTree = "<group>"; };
 		B4FEEF7C24B8A71F00A8DF9B /* DeviceDataManager+DeviceStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DeviceDataManager+DeviceStatus.swift"; sourceTree = "<group>"; };
+		B53A30055A8FD963007C15CA /* placeholder-predicted-hypo.json */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 1; lastKnownFileType = text.json; path = "placeholder-predicted-hypo.json"; sourceTree = "<group>"; };
 		B5D000000002 /* WatchDoseRecoveryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDoseRecoveryStore.swift; sourceTree = "<group>"; };
 		B5D000000004 /* WatchPumpManagerSettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchPumpManagerSettingsTests.swift; path = WatchPumpManagerSettingsTests.swift; sourceTree = "<group>"; };
 		B66D1F202E6A5D6500471149 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -1573,7 +1588,9 @@
 		DDC389FB2A2BC6670066E2E8 /* SettingsView+algorithmExperimentsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView+algorithmExperimentsSection.swift"; sourceTree = "<group>"; };
 		DDC389FD2A2C4C830066E2E8 /* GlucoseBasedApplicationFactorSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseBasedApplicationFactorSelectionView.swift; sourceTree = "<group>"; };
 		E01203786D1373BA05C3B25C /* LoopAlgorithmCoreImportTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = LoopAlgorithmCoreImportTest.swift; path = "WatchApp ExtensionTests/LoopAlgorithmCoreImportTest.swift"; sourceTree = SOURCE_ROOT; };
+		E3E6CCE8B94C253474772A11 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E4EB788C8906424B87D0D8DF /* GlucoseReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseReaderTests.swift; path = "WatchApp ExtensionTests/GlucoseReaderTests.swift"; sourceTree = SOURCE_ROOT; };
+		E78167ABF468C3D65EEEE147 /* ReconciliationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReconciliationTests.swift; sourceTree = "<group>"; };
 		E90909CC24E34AC500F963D2 /* high_and_rising_with_cob_momentum_effect.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = high_and_rising_with_cob_momentum_effect.json; sourceTree = "<group>"; };
 		E90909CD24E34AC500F963D2 /* high_and_rising_with_cob_insulin_effect.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = high_and_rising_with_cob_insulin_effect.json; sourceTree = "<group>"; };
 		E90909CE24E34AC500F963D2 /* high_and_rising_with_cob_predicted_glucose.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = high_and_rising_with_cob_predicted_glucose.json; sourceTree = "<group>"; };
@@ -1781,6 +1798,7 @@
 			files = (
 				C15A8C492A7305B1009D736B /* SwiftCharts in Frameworks */,
 				WB2CA1000000000012 /* OmniBLE.framework in Frameworks */,
+				4B0CAF3106DB478E083E007C /* WatchAlgorithmKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1848,6 +1866,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		148A93DA8557C4A06728E71A /* LoopAlgorithmReconciliationTests */ = {
+			isa = PBXGroup;
+			children = (
+				4BBA4A5347B475C41D2607BA /* Fixtures */,
+			);
+			name = LoopAlgorithmReconciliationTests;
+			path = LoopAlgorithmReconciliationTests;
+			sourceTree = "<group>";
+		};
 		14B1736128AED9EC006CCD7C /* Loop Widget Extension */ = {
 			isa = PBXGroup;
 			children = (
@@ -1894,6 +1921,7 @@
 				A9F5F1F4251050EC00E7C8A4 /* ZipArchiveTests.swift */,
 				C1D476B32A8ED179002C1C87 /* LoopAlgorithmTests.swift */,
 				8314754816B026AB26EA37A2 /* LoopAlgorithmRunnerCaptureTests.swift */,
+				E78167ABF468C3D65EEEE147 /* ReconciliationTests.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -2026,6 +2054,7 @@
 				5F530310052376CA3C3C34DC /* LoopAlgorithmCore */,
 				B6F100000010 /* WatchAlgorithmKit */,
 				0CB297036FF4DD6B83889E05 /* NightscoutServiceKit.framework */,
+				148A93DA8557C4A06728E71A /* LoopAlgorithmReconciliationTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2402,6 +2431,18 @@
 				WB2CA10000000000A1 /* WatchHandoff */,
 			);
 			path = LoopTests;
+			sourceTree = "<group>";
+		};
+		4BBA4A5347B475C41D2607BA /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				AE422F9AFE414A4BFE4617EE /* placeholder-steady-state.json */,
+				0587169FD2F83110E041A6DF /* placeholder-post-meal-carbs.json */,
+				B53A30055A8FD963007C15CA /* placeholder-predicted-hypo.json */,
+				E3E6CCE8B94C253474772A11 /* README.md */,
+			);
+			name = Fixtures;
+			path = Fixtures;
 			sourceTree = "<group>";
 		};
 		4F26F497AABC4BD3892E5224 /* Sensor */ = {
@@ -3389,6 +3430,7 @@
 			);
 			dependencies = (
 				43E2D9111D20C581004DA55F /* PBXTargetDependency */,
+				171F36CA3909BFEE5F4FE78B /* PBXTargetDependency */,
 			);
 			name = LoopTests;
 			packageProductDependencies = (
@@ -3819,6 +3861,9 @@
 				E93E86CB24E2E02200FF40C8 /* high_and_stable_carb_effect.json in Resources */,
 				E9C58A7C24DB529A00487A17 /* momentum_effect_bouncing.json in Resources */,
 				E90909E024E34F1600F963D2 /* low_and_falling_momentum_effect.json in Resources */,
+				41E16892046A430BEA983FAA /* placeholder-steady-state.json in Resources */,
+				95D34918A38CDF004407F45D /* placeholder-post-meal-carbs.json in Resources */,
+				631CCA2FE86B6397F34B1EF9 /* placeholder-predicted-hypo.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4503,6 +4548,7 @@
 				A9C1719725366F780053BCBD /* WatchHistoricalGlucoseTest.swift in Sources */,
 				E93E86B224DDE21D00FF40C8 /* MockCarbStore.swift in Sources */,
 				F97119FBB15A39EE62A0C9C9 /* LoopAlgorithmRunnerCaptureTests.swift in Sources */,
+				F4EF2C98D2257C1300C4FA11 /* ReconciliationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4633,6 +4679,12 @@
 			isa = PBXTargetDependency;
 			target = 14B1735B28AED9EC006CCD7C /* Loop Widget Extension */;
 			targetProxy = 14B1736728AED9EE006CCD7C /* PBXContainerItemProxy */;
+		};
+		171F36CA3909BFEE5F4FE78B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = WatchAlgorithmKit;
+			target = B6F100000001 /* WatchAlgorithmKit */;
+			targetProxy = E86A0D5D98521DD3A7334ABC /* PBXContainerItemProxy */;
 		};
 		1ADC950AFD96405591506C85 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

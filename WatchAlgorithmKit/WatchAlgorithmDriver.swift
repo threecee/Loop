@@ -477,6 +477,47 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
     /// "construction succeeded" rather than driving the algorithm; this
     /// accessor is intentionally minimal.
     public var underlyingRunner: LoopAlgorithmRunner { runner }
+
+    #if DEBUG
+    /// B.8.4 Phase 5b: re-runs the watch's algorithm against a captured input
+    /// (the wrapper Phase 5a introduced) and returns the produced output in
+    /// the same wrapper shape. Used by `LoopAlgorithmReconciliationTests` to
+    /// assert byte-identical behavior between the iOS `LoopAlgorithmRunner`
+    /// (which produced the captured `expectedOutput`) and the watch's runner
+    /// invocation path on the same input.
+    ///
+    /// **Current status — placeholder.** Fully reconstructing a runner from a
+    /// `CapturedAlgorithmInput` requires settings + stores + provider shims
+    /// that the wrapper deliberately does NOT carry (per Phase 5a's design
+    /// note: the wrapper holds the predictionInput, not the full driver
+    /// surroundings). The reconciliation test target ships in a stub form:
+    /// the harness exists, the 3 scenarios are wired, but the actual replay
+    /// throws `ReconciliationUnsupported.requiresFullerFixture` so callers
+    /// `XCTSkip`. Carl extends the wrapper + this helper in a follow-up once
+    /// real captures land in `LoopAlgorithmReconciliationTests/Fixtures/`.
+    ///
+    /// The signature is locked: `CapturedAlgorithmInput → CapturedAlgorithmOutput`.
+    /// Future implementations replace the body without touching the test.
+    public static func runForReconciliation(_ input: CapturedAlgorithmInput) throws -> CapturedAlgorithmOutput {
+        throw ReconciliationUnsupported.requiresFullerFixture
+    }
+
+    /// B.8.4 Phase 5b: error type signaling the reconciliation harness can't
+    /// yet replay this fixture (the wrapper doesn't carry enough state to
+    /// reconstruct a `LoopAlgorithmRunner`). The test target translates this
+    /// into `XCTSkip` so CI stays green while real captures + a fuller
+    /// reconstruction path are still in flight.
+    public enum ReconciliationUnsupported: Error, CustomStringConvertible {
+        case requiresFullerFixture
+
+        public var description: String {
+            switch self {
+            case .requiresFullerFixture:
+                return "WatchAlgorithmDriver.runForReconciliation: wrapper-only fixture cannot reconstruct a runner; awaiting fuller capture format (B.8.4 Phase 5b stub)"
+            }
+        }
+    }
+    #endif
 }
 
 // MARK: - Notification names (B.3.a Phase 7)
