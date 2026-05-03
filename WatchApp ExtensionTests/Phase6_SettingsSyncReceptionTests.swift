@@ -9,12 +9,34 @@
 //
 
 import XCTest
+import Combine
 import LoopKit
 import OmniBLE  // for PhoneWatchSettingsSync, HandoffState
 import WatchAlgorithmKit  // for WatchSettingsSnapshot (B.6 Phase 4a-bis)
 @testable import WatchApp_Extension
 
 final class Phase6_SettingsSyncReceptionTests: XCTestCase {
+
+    // MARK: - B.8.3 helper: isolated UserDefaults suite per test
+
+    private var isolatedSuiteNames: [String] = []
+
+    /// Returns a fresh, isolated `UserDefaults` suite scoped to this test.
+    /// Suites are cleaned up in `tearDown()` to keep the device's defaults
+    /// area clean across runs.
+    private func isolatedDefaults(testName: String = #function) -> UserDefaults {
+        let suiteName = "B8.3.\(testName).\(UUID().uuidString)"
+        isolatedSuiteNames.append(suiteName)
+        return UserDefaults(suiteName: suiteName)!
+    }
+
+    override func tearDown() {
+        for suiteName in isolatedSuiteNames {
+            UserDefaults().removePersistentDomain(forName: suiteName)
+        }
+        isolatedSuiteNames.removeAll()
+        super.tearDown()
+    }
 
     private let sampleSync = PhoneWatchSettingsSync(
         protocolVersion: PhoneWatchProtocol.currentVersion,
@@ -44,7 +66,7 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
     // MARK: - Test 2a: cache stores incoming sync
 
     func testWatchSettingsCacheStoresSync() {
-        let cache = WatchSettingsCache()
+        let cache = WatchSettingsCache(appGroupDefaults: isolatedDefaults())
         XCTAssertNil(cache.current, "cache should be empty before first sync")
 
         cache.update(sampleSync)
@@ -188,7 +210,7 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
     /// round-trip unchanged, so the watch-side bootstrap reads the same
     /// identifier the phone emitted.
     func testTimeZoneRoundTripsThroughCache() {
-        let cache = WatchSettingsCache()
+        let cache = WatchSettingsCache(appGroupDefaults: isolatedDefaults())
         let sync = PhoneWatchSettingsSync(
             protocolVersion: PhoneWatchProtocol.currentVersion,
             sentAt: Date(),
@@ -211,25 +233,33 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
                        "timeZone identifier must survive cache round-trip")
     }
 
-    // MARK: - B.8.2 Issue #4: watch-side equality short-circuit
+    // MARK: - B.8.2 Issue #4 + B.8.3: watch-side equality short-circuit (sink-based)
 
     /// `WatchSettingsCache.update(_:)` should treat a second identical sync
-    /// as a no-op: the in-memory `current` stays put and the test-only
-    /// `writeCount` counter does not increment. Defends against the case
-    /// where the phone's dedup cache is empty after launch and re-emits a
-    /// payload the watch has already absorbed.
+    /// as a no-op: the publisher does NOT fire and `current` stays put.
+    /// Defends against the case where the phone's dedup cache is empty after
+    /// launch and re-emits a payload the watch has already absorbed.
+    ///
+    /// B.8.3 migration: replaces the B.8.2 `writeCount`-based assertion with
+    /// a sink counter on the new `publisher`. Production no longer carries
+    /// the `#if DEBUG writeCount` instrumentation.
     func testUpdateShortCircuitsOnEqualPayload() {
-        let cache = WatchSettingsCache()
+        let testDefaults = isolatedDefaults()
+        let cache = WatchSettingsCache(appGroupDefaults: testDefaults)
+
+        var emissions = 0
+        let cancellable = cache.publisher
+            .dropFirst()  // skip CurrentValueSubject's initial nil replay
+            .sink { _ in emissions += 1 }
 
         cache.update(sampleSync)
-        let firstWriteCount = cache.writeCount
-        XCTAssertEqual(firstWriteCount, 1, "first update should write")
+        XCTAssertEqual(emissions, 1, "first update should fire publisher once")
 
         cache.update(sampleSync)
-        XCTAssertEqual(cache.writeCount, firstWriteCount,
-                       "Identical sync should be a no-op (no write past the equality guard)")
+        XCTAssertEqual(emissions, 1,
+                       "Identical sync should be a no-op (no second publisher fire)")
 
-        // Sanity: a different sync still writes.
+        // Sanity: a different sync still fires the publisher.
         let mutated = PhoneWatchSettingsSync(
             protocolVersion: sampleSync.protocolVersion,
             sentAt: sampleSync.sentAt,
@@ -243,45 +273,147 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
             nightscoutConfig: sampleSync.nightscoutConfig
         )
         cache.update(mutated)
-        XCTAssertEqual(cache.writeCount, firstWriteCount + 1,
-                       "Different payload should still write through")
+        XCTAssertEqual(emissions, 2, "Different payload should fire publisher")
+
+        _ = cancellable  // keep alive
     }
 
-    // MARK: - B.5.1 leftover #3 / B.8.2: resetForTesting() is #if-DEBUG-guarded
+    // MARK: - B.8.3: hydration from persisted last-good on init
+
+    /// On init, the cache should hydrate `current` from the App Group
+    /// `UserDefaults` key `WatchSettingsCache.lastGood`, so a watch-app cold
+    /// start has settings available before any fresh `.settingsSync` arrives.
+    func testHydratesFromPersistedLastGoodOnInit() {
+        let testDefaults = isolatedDefaults()
+        testDefaults.set(codable: sampleSync, forKey: "WatchSettingsCache.lastGood")
+
+        let cache = WatchSettingsCache(appGroupDefaults: testDefaults)
+
+        XCTAssertEqual(cache.current, sampleSync,
+                       "Cache should hydrate current from persisted lastGood on init")
+    }
+
+    // MARK: - B.8.3: publisher fires on update
+
+    /// `update(_:)` past the equality guard should fire the publisher exactly
+    /// once. The CurrentValueSubject also replays the existing value (nil in
+    /// this test, no persistence) on subscribe.
+    func testPublisherFiresOnUpdate() {
+        let testDefaults = isolatedDefaults()
+        let cache = WatchSettingsCache(appGroupDefaults: testDefaults)
+
+        var emissions: [PhoneWatchSettingsSync?] = []
+        let cancellable = cache.publisher
+            .sink { emissions.append($0) }
+
+        XCTAssertEqual(emissions.count, 1,
+                       "CurrentValueSubject should replay current value on subscribe")
+        XCTAssertNil(emissions[0],
+                     "Initial replay should be nil (no persistence in this test)")
+
+        cache.update(sampleSync)
+        XCTAssertEqual(emissions.count, 2, "Update should fire publisher once")
+        XCTAssertEqual(emissions[1], sampleSync)
+
+        _ = cancellable
+    }
+
+    // MARK: - B.8.3: publisher does NOT fire on equal payload
+
+    /// Subscribers that `.dropFirst()` past the replay should see ZERO
+    /// emissions when an identical sync is applied a second time.
+    func testPublisherDoesNotFireOnEqualPayload() {
+        let testDefaults = isolatedDefaults()
+        let cache = WatchSettingsCache(appGroupDefaults: testDefaults)
+
+        cache.update(sampleSync)
+
+        var laterEmissions = 0
+        let cancellable = cache.publisher
+            .dropFirst()  // skip the CurrentValueSubject replay of the existing value
+            .sink { _ in laterEmissions += 1 }
+
+        cache.update(sampleSync)
+        XCTAssertEqual(laterEmissions, 0,
+                       "Identical payload should not fire publisher")
+
+        _ = cancellable
+    }
+
+    // MARK: - B.8.3: late subscriber receives hydrated value via replay
+
+    /// A subscriber attaching AFTER init should receive the hydrated value
+    /// thanks to `CurrentValueSubject` replay-on-subscribe semantics.
+    func testPublisherEmitsHydratedValueOnSubscribe() {
+        let testDefaults = isolatedDefaults()
+        testDefaults.set(codable: sampleSync, forKey: "WatchSettingsCache.lastGood")
+        let cache = WatchSettingsCache(appGroupDefaults: testDefaults)
+
+        var receivedValue: PhoneWatchSettingsSync?
+        let cancellable = cache.publisher
+            .compactMap { $0 }
+            .sink { receivedValue = $0 }
+
+        XCTAssertEqual(receivedValue, sampleSync,
+                       "Late subscriber should receive hydrated value via CurrentValueSubject")
+
+        _ = cancellable
+    }
+
+    // MARK: - B.8.3: update(_:) persists to disk
+
+    /// `update(_:)` should write through to App Group `UserDefaults` so a
+    /// later cache instance pointed at the same defaults hydrates from disk.
+    func testUpdatePersistsToDisk() {
+        let testDefaults = isolatedDefaults()
+        let cache1 = WatchSettingsCache(appGroupDefaults: testDefaults)
+        cache1.update(sampleSync)
+
+        // A SECOND cache instance pointing at the same defaults must
+        // hydrate `current` from what cache1 wrote.
+        let cache2 = WatchSettingsCache(appGroupDefaults: testDefaults)
+
+        XCTAssertEqual(cache2.current, sampleSync,
+                       "Second cache instance should hydrate from disk written by first")
+    }
+
+    // MARK: - B.5.1 leftover #3 / B.8.2 / B.8.3: resetForTesting() is #if-DEBUG-guarded
 
     /// Regression-prevention test: `WatchSettingsCache.resetForTesting()` is
     /// wrapped in `#if DEBUG ... #endif` (added in B.5.1). The mere fact that
     /// this test compiles in DEBUG builds — and that it would fail to compile
     /// in a Release build because `resetForTesting()` would not exist there —
-    /// is what enforces the guard. The body just exercises the call to verify
+    /// is what enforces the guard. The body exercises the call to verify
     /// behavior end-to-end so a future refactor can't silently move the method
     /// outside the guard while still satisfying a name-only check.
     ///
-    /// If a future change accidentally removes the `#if DEBUG` guard, this
-    /// test still passes (DEBUG-built tests are unaffected), but the Release
-    /// build would now expose the test-only helper to production code paths.
-    /// The guard's first line of defense is the production code review; this
-    /// test is a paired smoke check that the helper itself behaves as expected.
+    /// B.8.3: `resetForTesting()` body now also clears the persisted
+    /// `WatchSettingsCache.lastGood` key alongside the in-memory subject.
     #if DEBUG
     func testResetForTestingIsDebugGuarded() {
-        let cache = WatchSettingsCache()
+        let testDefaults = isolatedDefaults()
+        let cache = WatchSettingsCache(appGroupDefaults: testDefaults)
         cache.update(sampleSync)
         XCTAssertNotNil(cache.current, "precondition: cache populated before reset")
-        XCTAssertEqual(cache.writeCount, 1, "precondition: one write recorded")
+        XCTAssertNotNil(testDefaults.codableValue(forKey: "WatchSettingsCache.lastGood",
+                                                  as: PhoneWatchSettingsSync.self),
+                        "precondition: persisted lastGood present before reset")
 
         // This call would be a compile error in a Release build (the method
         // would not exist) — that's the load-bearing property of the guard.
         cache.resetForTesting()
 
         XCTAssertNil(cache.current, "After resetForTesting, current should be nil")
-        XCTAssertEqual(cache.writeCount, 0, "After resetForTesting, writeCount should be 0")
+        XCTAssertNil(testDefaults.codableValue(forKey: "WatchSettingsCache.lastGood",
+                                                as: PhoneWatchSettingsSync.self),
+                     "After resetForTesting, persisted lastGood should be removed")
     }
     #endif
 
     // MARK: - Test 2d: bootstrap settingsProvider reads from cache
 
     func testBootstrapSettingsProviderReadsFromCache() {
-        let cache = WatchSettingsCache()
+        let cache = WatchSettingsCache(appGroupDefaults: isolatedDefaults())
         // Provider returns nil until cache has been populated.
         let bootstrap = WatchAlgorithmBootstrap(
             storesProvider: { nil },
