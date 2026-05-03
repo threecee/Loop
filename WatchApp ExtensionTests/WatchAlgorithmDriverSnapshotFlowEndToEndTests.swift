@@ -178,8 +178,16 @@ final class WatchAlgorithmDriverSnapshotFlowEndToEndTests: XCTestCase {
         defer { WatchAlgorithmSnapshotCache.shared.resetForTesting() }
 
         let (driver, store) = makeDriver(warmUpDecision: .skipWarmup(snapshot: snapshot))
+        // B.8.4: hydration runs asynchronously inside a Task launched from
+        // init; the .skipWarmup flag flip is gated on hydration success.
+        // With empty buffers in this fixture, the Task completes very
+        // quickly — wait for the flag transition before asserting.
+        let warmUpDone = expectation(for: NSPredicate(block: { (obj, _) in
+            (obj as? WatchAlgorithmDriver)?.isWarmingUp == false
+        }), evaluatedWith: driver, handler: nil)
+        wait(for: [warmUpDone], timeout: 5.0)
         XCTAssertFalse(driver.isWarmingUp,
-                       ".skipWarmup must drive isWarmingUp to false at init")
+                       ".skipWarmup must drive isWarmingUp to false after hydration")
 
         // Drive a recommendation through the didRecommend delegate hook —
         // same idiom as WatchAlgorithmDriverTests' suppression tests.

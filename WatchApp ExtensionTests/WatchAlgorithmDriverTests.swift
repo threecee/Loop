@@ -610,6 +610,14 @@ final class WatchAlgorithmDriverTests: XCTestCase {
             isWarmingUpOverride: nil,
             warmUpDecision: .skipWarmup(snapshot: snap)
         )
+        // B.8.4: hydration runs asynchronously inside a Task launched from
+        // init; the .skipWarmup flag flip is gated on hydration success.
+        // With empty buffers in this fixture, the Task completes very
+        // quickly — wait for the flag transition before asserting.
+        let exp = expectation(for: NSPredicate(block: { (obj, _) in
+            (obj as? WatchAlgorithmDriver)?.isWarmingUp == false
+        }), evaluatedWith: driver, handler: nil)
+        wait(for: [exp], timeout: 5.0)
         XCTAssertFalse(driver.isWarmingUp,
                        "isWarmingUp must be false when WarmUpDecider returns skipWarmup")
     }

@@ -185,6 +185,14 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
     private let settingsSnapshot: WatchSettingsSnapshot
     private let log = OSLog(subsystem: "com.loopkit.Loop.WatchApp", category: "WatchAlgorithmDriver")
 
+    /// B.8.4: stores retained for snapshot hydration in the `.skipWarmup`
+    /// path. The runner already holds its own references; these handles let
+    /// `applyAlgorithmStateSnapshot(_:into:)` write directly to the same
+    /// instances without re-plumbing through the runner.
+    private let carbStore: CarbStoreProtocol
+    private let doseStore: DoseStoreProtocol
+    private let glucoseStore: GlucoseStoreProtocol
+
     /// B.6: Pump manager for dose enactment. Nil during construction or when
     /// the watch hasn't yet been wired to an OmniBLEPumpManager — the
     /// didRecommend override treats nil as "suppress all doses."
@@ -248,6 +256,12 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
         self.dosingDecisionStore = dosingDecisionStore
         self.isWarmingUpOverride = isWarmingUpOverride
         self.recoveryDefaults = recoveryDefaults
+        // B.8.4: retain store references so the .skipWarmup hydration path
+        // can write the snapshot's buffers without re-routing through the
+        // runner. The runner gets its own copies below.
+        self.carbStore = carbStore
+        self.doseStore = doseStore
+        self.glucoseStore = glucoseStore
 
         // B.6 Phase 4c: copy schedules from settings to doseStore so the
         // algorithm runner can read them. LoopAlgorithmRunner reads
@@ -326,12 +340,133 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
         #endif
         if isWarmingUpOverride == nil, let decision = warmUpDecision {
             switch decision {
-            case .skipWarmup:
-                self.isWarmingUp = false
-                self.didCompleteFirstIteration = true
+            case .skipWarmup(let snapshot):
+                // B.8.4: hydrate stores from snapshot before flipping out of
+                // warmup. Pediatric T1D safety: prefer warmup over potentially
+                // stale state. Worst case during the brief async hydration
+                // window is "extra warmup time" — never "premature dosing"
+                // because isWarmingUp defaults to true and only flips to false
+                // on hydration success.
+                guard snapshot.isFreshEnoughForSkipWarmup() else {
+                    let ageSec = Date().timeIntervalSince(snapshot.phoneIterationDate)
+                    log.error("Snapshot too old (%{public}.0fs); rejecting skip-warmup, falling back to full warmup",
+                              ageSec)
+                    self.isWarmingUp = true
+                    self.didCompleteFirstIteration = false
+                    break
+                }
+                let carbStoreRef = self.carbStore
+                let doseStoreRef = self.doseStore
+                let glucoseStoreRef = self.glucoseStore
+                Task { [weak self] in
+                    guard let self = self else { return }
+                    do {
+                        try await Self.applyAlgorithmStateSnapshot(
+                            snapshot,
+                            carbStore: carbStoreRef,
+                            doseStore: doseStoreRef,
+                            glucoseStore: glucoseStoreRef
+                        )
+                        await MainActor.run {
+                            self.isWarmingUp = false
+                            self.didCompleteFirstIteration = true
+                        }
+                        self.log.default(
+                            "skipWarmup: hydrated %{public}d glucose / %{public}d dose / %{public}d carb entries from snapshot %{public}@",
+                            snapshot.glucoseSamples.count,
+                            snapshot.doseHistory.count,
+                            snapshot.carbEntries.count,
+                            snapshot.snapshotID.uuidString
+                        )
+                    } catch {
+                        self.log.error("Snapshot hydration failed; remaining in warmup: %{public}@",
+                                       String(describing: error))
+                        // Don't flip flags — driver stays in warmup state (safe default).
+                    }
+                }
             case .fullWarmup:
                 self.isWarmingUp = true
                 self.didCompleteFirstIteration = false
+            }
+        }
+    }
+
+    // MARK: - B.8.4 snapshot hydration
+
+    /// Writes the snapshot's glucose / dose / carb buffers into the supplied
+    /// stores. Called from the `.skipWarmup` switch case in `init` (via a
+    /// detached Task) so the watch can dose immediately after handoff without
+    /// waiting for a fresh round-trip through the algorithm's first warm-up
+    /// iteration.
+    ///
+    /// Projection rules (Stored → New, per Phase 1 discovery):
+    /// - `StoredGlucoseSample → NewGlucoseSample`: trivial field mapping;
+    ///   `syncIdentifier` falls back to a fresh UUID for de-dup safety when
+    ///   the stored value is `nil`, and `syncVersion` defaults to 1.
+    /// - `[DoseEntry]`: passes through unchanged via `DoseStoreProtocol.addDoses`.
+    /// - `StoredCarbEntry → NewCarbEntry`: trivial mapping; `CarbStoreProtocol`
+    ///   has no batch insert, so each entry is added sequentially.
+    static func applyAlgorithmStateSnapshot(
+        _ snapshot: AlgorithmStateSnapshot,
+        carbStore: CarbStoreProtocol,
+        doseStore: DoseStoreProtocol,
+        glucoseStore: GlucoseStoreProtocol
+    ) async throws {
+        // 1. Glucose — projection required.
+        let newGlucoseSamples: [NewGlucoseSample] = snapshot.glucoseSamples.map { stored in
+            NewGlucoseSample(
+                date: stored.startDate,
+                quantity: stored.quantity,
+                condition: stored.condition,
+                trend: stored.trend,
+                trendRate: stored.trendRate,
+                isDisplayOnly: stored.isDisplayOnly,
+                wasUserEntered: stored.wasUserEntered,
+                syncIdentifier: stored.syncIdentifier ?? UUID().uuidString,
+                syncVersion: stored.syncVersion ?? 1,
+                device: stored.device
+            )
+        }
+        if !newGlucoseSamples.isEmpty {
+            try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
+                glucoseStore.addGlucoseSamples(newGlucoseSamples) { result in
+                    switch result {
+                    case .success: cont.resume()
+                    case .failure(let error): cont.resume(throwing: error)
+                    }
+                }
+            }
+        }
+
+        // 2. Dose — pass-through, no projection.
+        if !snapshot.doseHistory.isEmpty {
+            try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
+                doseStore.addDoses(snapshot.doseHistory, from: nil) { error in
+                    if let error = error {
+                        cont.resume(throwing: error)
+                    } else {
+                        cont.resume()
+                    }
+                }
+            }
+        }
+
+        // 3. Carbs — singular insert; loop sequentially.
+        for stored in snapshot.carbEntries {
+            let newEntry = NewCarbEntry(
+                date: stored.userCreatedDate ?? stored.startDate,
+                quantity: stored.quantity,
+                startDate: stored.startDate,
+                foodType: stored.foodType,
+                absorptionTime: stored.absorptionTime
+            )
+            try await withCheckedThrowingContinuation { (cont: CheckedContinuation<Void, Error>) in
+                carbStore.addCarbEntry(newEntry) { result in
+                    switch result {
+                    case .success: cont.resume()
+                    case .failure(let error): cont.resume(throwing: error)
+                    }
+                }
             }
         }
     }
