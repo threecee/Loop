@@ -341,3 +341,18 @@ final class HandoffOrchestrator: ObservableObject {
         }
     }
 }
+
+// MARK: - B.8.2 Issue #1: WatchHandoffNotifying conformance
+
+/// Bridges `LoopDataManager`'s non-isolated settings-change callsite into the
+/// orchestrator's `@MainActor` world. The protocol method is `nonisolated`
+/// (callable from any isolation context) and hops to MainActor before invoking
+/// `emitSettingsSync()`. Equivalent to the existing `notifySettingsChanged()`
+/// trigger but reachable from the `LoopAlgorithmRunnerDelegate` callback.
+extension HandoffOrchestrator: WatchHandoffNotifying {
+    nonisolated func notifySettingsChangedFromAlgorithm() {
+        Task { @MainActor [weak self] in
+            self?.emitSettingsSync()
+        }
+    }
+}

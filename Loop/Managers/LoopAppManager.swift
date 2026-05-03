@@ -323,6 +323,11 @@ class LoopAppManager: NSObject {
             orchestrator.start()
             self.phoneWatchHandoffOrchestrator = orchestrator
 
+            // B.8.2 Issue #1: reverse-wire the orchestrator into LoopDataManager so
+            // every settings mutation fans out to the watch handoff pipeline (mirrors
+            // the algorithmStateSnapshotEmitter wire-up below).
+            self.deviceDataManager?.loopManager?.watchHandoffOrchestrator = orchestrator
+
             // B.8: wire the algorithm-state snapshot emitter into LoopDataManager.
             // Use the concrete WCSessionPhoneWatchTransport already constructed
             // for the coordinator — SnapshotTransport conformance lives on the

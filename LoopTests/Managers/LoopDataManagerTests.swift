@@ -196,6 +196,39 @@ class LoopDataManagerTests: XCTestCase {
     }
 }
 
+// MARK: - B.8.2 Issue #1: settings-change fan-out to watch handoff
+
+/// Mock conforming to `WatchHandoffNotifying` so we can assert exactly one
+/// fan-out call per settings mutation without standing up a full
+/// `HandoffOrchestrator` (which is `@MainActor`, requires a
+/// `PhoneWatchSessionCoordinator`, state machine, policy engine, ownership,
+/// etc. — too heavy for a focused unit test).
+private final class MockWatchHandoffNotifier: WatchHandoffNotifying {
+    var notifySettingsChangedCallCount = 0
+    func notifySettingsChangedFromAlgorithm() {
+        notifySettingsChangedCallCount += 1
+    }
+}
+
+extension LoopDataManagerTests {
+    func testSettingsChangeFansOutToWatchHandoffOrchestrator() {
+        setUp(for: .flatAndStable)
+        let mock = MockWatchHandoffNotifier()
+        loopDataManager.watchHandoffOrchestrator = mock
+
+        XCTAssertEqual(mock.notifySettingsChangedCallCount, 0,
+                       "Pre-condition: no fan-out before any settings change")
+
+        // mutateSettings synchronously invokes
+        // `loopAlgorithmRunner(_:settingsDidChange:)` on the delegate, which
+        // is where the fan-out call lives.
+        loopDataManager.mutateSettings { $0.maximumBolus = 5.0 }
+
+        XCTAssertEqual(mock.notifySettingsChangedCallCount, 1,
+                       "Settings change should fan out exactly once to watch handoff")
+    }
+}
+
 extension LoopDataManagerTests {
     public var bundle: Bundle {
         return Bundle(for: type(of: self))

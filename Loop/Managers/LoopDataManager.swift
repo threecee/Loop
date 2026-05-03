@@ -30,6 +30,25 @@ protocol PresetActivationObserver: AnyObject {
     func presetDeactivated(context: TemporaryScheduleOverride.Context)
 }
 
+/// B.8.2 Issue #1: fan-out hook so settings mutations on the phone flow into
+/// the watch handoff pipeline (`HandoffOrchestrator.emitSettingsSync()`).
+///
+/// Protocol-typed so unit tests can substitute a lightweight mock without
+/// constructing a full `HandoffOrchestrator` (`@MainActor` class with heavy
+/// collaborator graph). The method is intentionally non-isolated so the
+/// non-isolated `LoopAlgorithmRunnerDelegate.loopAlgorithmRunner(_:settingsDidChange:)`
+/// callsite can invoke it synchronously; the production conformance on
+/// `HandoffOrchestrator` (defined in HandoffOrchestrator.swift) hops to
+/// `MainActor` internally via `Task { @MainActor in ... }`.
+///
+/// The method is named `notifySettingsChangedFromAlgorithm()` to disambiguate
+/// from the existing `@MainActor func notifySettingsChanged()` on
+/// `HandoffOrchestrator` (called from the system time-zone observer in `init`)
+/// — the two satisfy different isolation contracts and must not collide.
+protocol WatchHandoffNotifying: AnyObject {
+    func notifySettingsChangedFromAlgorithm()
+}
+
 final class LoopDataManager {
     enum LoopUpdateContext: Int {
         case insulin
@@ -65,6 +84,11 @@ final class LoopDataManager {
     /// B.8: end-of-iteration algorithm-state snapshot emitter. Wired up by
     /// LoopAppManager during init.
     weak var algorithmStateSnapshotEmitter: AlgorithmStateSnapshotEmitter?
+
+    /// B.8.2 Issue #1: weak ref so settings changes fan out to the watch
+    /// handoff pipeline. Optional + weak: builds without the watch path still
+    /// compile, and the orchestrator's lifetime is owned by `LoopAppManager`.
+    weak var watchHandoffOrchestrator: WatchHandoffNotifying?
 
     private let trustedTimeOffset: () -> TimeInterval
 
@@ -526,6 +550,13 @@ extension LoopDataManager: LoopAlgorithmRunnerDelegate {
 
     func loopAlgorithmRunner(_ runner: LoopAlgorithmRunner,
                              settingsDidChange impact: LoopAlgorithmSettingsChangeImpact) {
+        // B.8.2 Issue #1: fan out settings changes to the watch handoff pipeline
+        // so the watch never doses from stale ISF/CR/target/max-basal/max-bolus/
+        // suspend-threshold/dosingEnabled. `dosingEnabled` is only mutated here
+        // (and at init), so settings edits AND loop-on/off transitions both flow
+        // through this single fan-out — no separate Combine subscription needed.
+        self.watchHandoffOrchestrator?.notifySettingsChangedFromAlgorithm()
+
         let oldValue = impact.oldSettings
         let newValue = impact.newSettings
 
