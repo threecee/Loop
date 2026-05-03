@@ -85,8 +85,7 @@ final class HandoffOrchestrator: ObservableObject {
          stateMachine: HandoffStateMachine,
          policyEngine: HandoffPolicyEngine,
          shadowScheduler: ShadowStateScheduler,
-         userDefaults: UserDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)
-            ?? UserDefaults.standard,
+         userDefaults: UserDefaults = HandoffSettings.appGroupDefaults,
          phoneStableDebounceOverride: TimeInterval? = nil) {
         self.coordinator = coordinator
         self.stateMachine = stateMachine

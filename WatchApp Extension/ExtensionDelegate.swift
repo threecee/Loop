@@ -137,7 +137,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         self.extendedRuntimeCoordinator = runtime
 
         // B.2.d — handoff orchestrator (subscribes to coordinator's onHandoffMessage)
-        let appGroupDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) ?? UserDefaults.standard
+        let appGroupDefaults = HandoffSettings.appGroupDefaults
         let settings = HandoffSettings.load(from: appGroupDefaults)
         let policyEngine = HandoffPolicyEngine(
             coordinator: coordinator,
@@ -268,7 +268,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         // B.5: check for interrupted dose recovery tripwire on app launch.
         // If a stale entry (>60s old) is found, it gets logged at .error
         // and cleared. Pod history is the source of truth.
-        let recoveryDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) ?? .standard
+        let recoveryDefaults = HandoffSettings.appGroupDefaults
         WatchDoseRecoveryStore.checkAndClearStale(in: recoveryDefaults)
         // B.3.a Phase 5: schedule the first background poll wake. Must happen
         // after WKExtension has the delegate wired up, otherwise the call

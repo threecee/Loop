@@ -532,9 +532,7 @@ extension WatchAlgorithmDriver: LoopAlgorithmRunnerDelegate {
         // B.5: record dose-in-flight tripwire BEFORE BLE command. Cleared
         // in completion (both success + error branches, including the
         // early-return temp basal error path).
-        let defaults = recoveryDefaults
-            ?? UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)
-            ?? .standard
+        let defaults = recoveryDefaults ?? HandoffSettings.appGroupDefaults
         WatchDoseRecoveryStore.recordStart(
             description: String(describing: recommendation),
             to: defaults

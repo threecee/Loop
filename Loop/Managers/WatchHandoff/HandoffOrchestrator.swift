@@ -78,8 +78,7 @@ final class HandoffOrchestrator: ObservableObject {
          stateMachine: HandoffStateMachine,
          policyEngine: HandoffPolicyEngine,
          shadowScheduler: ShadowStateScheduler,
-         userDefaults: UserDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)
-            ?? UserDefaults.standard,
+         userDefaults: UserDefaults = HandoffSettings.appGroupDefaults,
          pumpManager: OmniBLEPodOwner? = nil,
          settingsSyncProvider: (() -> PhoneWatchSettingsSync?)? = nil,
          phoneStableDebounceOverride: TimeInterval? = nil) {

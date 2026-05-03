@@ -301,8 +301,7 @@ class LoopAppManager: NSObject {
             phoneWatchCoordinator.start()
 
             // B.2.d: instantiate and start handoff orchestrator + policy + scheduler.
-            let appGroupDefaults = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier)
-                ?? UserDefaults.standard
+            let appGroupDefaults = HandoffSettings.appGroupDefaults
             let handoffSettings = HandoffSettings.load(from: appGroupDefaults)
             let stateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .phone)
             let policyEngine = HandoffPolicyEngine(

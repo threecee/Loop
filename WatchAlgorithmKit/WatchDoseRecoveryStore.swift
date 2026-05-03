@@ -11,6 +11,7 @@
 //
 
 import Foundation
+import OmniBLE  // for UserDefaults+Codable extension (B.8.1 mechanical /simplify)
 import os.log
 
 public struct WatchDoseRecoveryStore {
@@ -40,9 +41,7 @@ public struct WatchDoseRecoveryStore {
                                    to defaults: UserDefaults,
                                    now: Date = Date()) {
         let entry = Entry(startedAt: now, description: description)
-        if let data = try? JSONEncoder().encode(entry) {
-            defaults.set(data, forKey: key)
-        }
+        defaults.set(codable: entry, forKey: key)
     }
 
     /// Clear the recorded entry. Call AFTER pumpManager completion fires
@@ -53,8 +52,7 @@ public struct WatchDoseRecoveryStore {
 
     /// Load the recorded entry, if any.
     public static func load(from defaults: UserDefaults) -> Entry? {
-        guard let data = defaults.data(forKey: key) else { return nil }
-        return try? JSONDecoder().decode(Entry.self, from: data)
+        return defaults.codableValue(forKey: key, as: Entry.self)
     }
 
     /// Inspect for stale entries on app launch. If found AND older than

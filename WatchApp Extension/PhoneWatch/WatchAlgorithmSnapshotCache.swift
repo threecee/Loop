@@ -22,17 +22,14 @@ final class WatchAlgorithmSnapshotCache {
     init(defaults: UserDefaults? = nil) {
         if let defaults {
             self.defaults = defaults
-        } else if let appGroup = UserDefaults(suiteName: HandoffSettings.appGroupIdentifier) {
-            self.defaults = appGroup
         } else {
-            fatalError("WatchAlgorithmSnapshotCache: App Group suite '\(HandoffSettings.appGroupIdentifier)' unavailable — entitlement misconfigured")
+            self.defaults = HandoffSettings.appGroupDefaults
         }
     }
 
     /// The most recent snapshot received. nil until first `update(_:)`.
     var current: AlgorithmStateSnapshot? {
-        guard let data = defaults.data(forKey: Self.userDefaultsKey) else { return nil }
-        return try? JSONDecoder().decode(AlgorithmStateSnapshot.self, from: data)
+        return defaults.codableValue(forKey: Self.userDefaultsKey, as: AlgorithmStateSnapshot.self)
     }
 
     /// Stores the snapshot if it's newer than the cached one (monotonic guard).
@@ -50,8 +47,7 @@ final class WatchAlgorithmSnapshotCache {
         if let existing = current, snapshot.createdAt <= existing.createdAt {
             return
         }
-        guard let data = try? JSONEncoder().encode(snapshot) else { return }
-        defaults.set(data, forKey: Self.userDefaultsKey)
+        defaults.set(codable: snapshot, forKey: Self.userDefaultsKey)
     }
 
     #if DEBUG
