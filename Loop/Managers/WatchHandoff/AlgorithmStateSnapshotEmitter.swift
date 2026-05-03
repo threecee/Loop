@@ -5,7 +5,8 @@
 //  B.8: builds an AlgorithmStateSnapshot from current Loop state and pushes
 //  it over the existing PhoneWatchTransport. Called from
 //  LoopDataManager.loopAlgorithmRunnerDidFinishLoop after every successful
-//  iteration. Fire-and-forget; transport handles immediate vs queued delivery.
+//  iteration. Uses queueMessage (NOT sendMessage) so snapshots reach the
+//  watch via background-queued transferUserInfo when the watch is unreachable.
 //
 
 import Foundation
@@ -22,8 +23,14 @@ protocol SnapshotTransport: AnyObject {
 /// declaring `extension <Protocol>: <Protocol>`, so we adopt on the class
 /// instead — production code passes the concrete transport here).
 extension WCSessionPhoneWatchTransport: SnapshotTransport {
+    /// Routes through `queueMessage` (not `sendMessage`) so snapshots are
+    /// background-queued via `transferUserInfo` when the watch is unreachable
+    /// (the typical state — locked / on charger / off-wrist). This is
+    /// load-bearing: B.8's whole premise is that the watch has a recent
+    /// snapshot at takeover, including in the "phone vanished without notice"
+    /// case where the most-recent push happened while the watch was offline.
     func send(_ message: PhoneWatchMessage) {
-        sendMessage(message, reply: nil, onError: { _ in })
+        queueMessage(message)
     }
 }
 
