@@ -35,6 +35,15 @@ class HUDInterfaceController: WKInterfaceController {
     override func willActivate() {
         super.willActivate()
 
+        // B.7: size the driver dot to roughly half the loop-ring image's
+        // diameter. The storyboard image is the `circle.fill` SF Symbol whose
+        // default rendering is much smaller than we want; setting an explicit
+        // point-size config makes it visible at-a-glance.
+        let dotConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .regular)
+        if let dot = UIImage(systemName: "circle.fill", withConfiguration: dotConfig) {
+            driverDot.setImage(dot)
+        }
+
         update()
         updateWarmUpTitle()
 
@@ -106,7 +115,7 @@ class HUDInterfaceController: WKInterfaceController {
 
         let date = activeContext.loopLastRunDate
         let isClosedLoop = activeContext.isClosedLoop ?? false
-        loopHUDImage.setLoopImage(isClosedLoop: isClosedLoop, {
+        let loopState: LoopImage = {
             if let date = date {
                 switch date.timeIntervalSinceNow {
                 case let t where t > .minutes(-6):
@@ -119,7 +128,11 @@ class HUDInterfaceController: WKInterfaceController {
             } else {
                 return .unknown
             }
-        }())
+        }()
+        loopHUDImage.setLoopImage(isClosedLoop: isClosedLoop, loopState)
+        // B.7: keep the driver dot's tint matched to the loop ring's freshness
+        // color so it reads as part of the same indicator.
+        driverDot.setTintColor(driverDotTintColor(for: loopState))
 
         if date != nil {
             glucoseLabel.setText(NSLocalizedString("– – –", comment: "No glucose value representation (3 dashes for mg/dL)"))
@@ -202,6 +215,19 @@ class HUDInterfaceController: WKInterfaceController {
         // Leave the dot visible at full alpha so a still-driving state remains
         // legible after pulsing ends.
         driverDot.setAlpha(1.0)
+    }
+
+    /// Maps the loop ring's freshness state to the driver-dot tint so the
+    /// indicator reads as a unit. Approximates the colors baked into the
+    /// `loop_<state>_<open|closed>` PNG assets. RGB literals because the
+    /// `system…` color symbols are unavailable on watchOS.
+    private func driverDotTintColor(for state: LoopImage) -> UIColor {
+        switch state {
+        case .fresh:   return UIColor(red: 0.18, green: 0.76, blue: 0.36, alpha: 1) // #2EC25B
+        case .aging:   return UIColor(red: 1.00, green: 0.65, blue: 0.00, alpha: 1) // #FFA500
+        case .stale:   return UIColor(red: 1.00, green: 0.23, blue: 0.19, alpha: 1) // #FF3B30
+        case .unknown: return UIColor(red: 0.56, green: 0.56, blue: 0.58, alpha: 1) // #8E8E93
+        }
     }
 
     @IBAction func addCarbs() {

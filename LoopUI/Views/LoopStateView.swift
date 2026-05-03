@@ -19,6 +19,7 @@ final class LoopStateView: UIView {
 
     private func updateTintColor() {
         shapeLayer.strokeColor = tintColor.cgColor
+        innerLayer.fillColor = tintColor.cgColor
     }
 
     var open = false {
@@ -109,10 +110,11 @@ final class LoopStateView: UIView {
     }
 
     /// Inner indicator layer. Hidden by default until `isThisDeviceDriving`
-    /// flips to true.
+    /// flips to true. Filled with the view's tint color so it visually
+    /// matches the outer ring.
     private lazy var innerLayer: CAShapeLayer = {
         let layer = CAShapeLayer()
-        layer.fillColor = UIColor.white.cgColor
+        layer.fillColor = tintColor.cgColor
         layer.strokeColor = UIColor.clear.cgColor
         layer.isHidden = true
         self.layer.addSublayer(layer)
@@ -143,7 +145,7 @@ final class LoopStateView: UIView {
     private func drawInnerPath() -> CGPath {
         let center = CGPoint(x: bounds.midX, y: bounds.midY)
         let outerRadius = min(bounds.width / 2, bounds.height / 2) - shapeLayer.lineWidth / 2
-        let innerRadius = outerRadius / 4
+        let innerRadius = outerRadius / 2
         let path = UIBezierPath(
             arcCenter: center,
             radius: innerRadius,
