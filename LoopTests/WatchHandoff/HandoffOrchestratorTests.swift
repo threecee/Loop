@@ -5,6 +5,7 @@
 
 import XCTest
 import Combine
+import LoopKit
 import OmniBLE
 @testable import Loop
 
@@ -204,6 +205,112 @@ final class HandoffOrchestratorTests: XCTestCase {
         orchestrator.ownership.commandsAllowed = false  // start in suppressed state
         orchestrator.execute([.resumeIssuingPodCommands])
         XCTAssertTrue(orchestrator.ownership.commandsAllowed)
+    }
+
+    // MARK: - B.8.2 Issue #4: phone-side settings-sync dedup
+
+    /// Helper for the dedup tests below. Builds a fresh orchestrator wired
+    /// to the test's `coordinator`/`coordinatorTransport` and a mutable
+    /// `currentSync` reference so a test can change the payload between
+    /// notify calls.
+    private func makeOrchestratorForDedup(
+        currentSync: @escaping () -> PhoneWatchSettingsSync?
+    ) -> HandoffOrchestrator {
+        let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
+        return HandoffOrchestrator(
+            coordinator: coordinator,
+            stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone,
+                                              appGroupDefaults: isolatedDefaults()),
+            policyEngine: HandoffPolicyEngine(
+                coordinator: stub,
+                settings: HandoffSettings(),
+                clock: { [unowned self] in self.clock },
+                emit: { _ in }
+            ),
+            shadowScheduler: ShadowStateScheduler(
+                clock: { [unowned self] in self.clock },
+                fire: {}
+            ),
+            userDefaults: UserDefaults(suiteName: "test.handoff-dedup.\(UUID())")!,
+            pumpManager: nil,
+            settingsSyncProvider: currentSync,
+            phoneStableDebounceOverride: 0.05
+        )
+    }
+
+    private static func makeFixtureSync(maximumBolus: Double = 10.0) -> PhoneWatchSettingsSync {
+        PhoneWatchSettingsSync(
+            protocolVersion: PhoneWatchProtocol.currentVersion,
+            sentAt: Date(timeIntervalSince1970: 1_700_000_000),
+            basalScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 1.0)],
+            insulinSensitivityScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 50.0)],
+            carbRatioScheduleItems: [RepeatingScheduleValue(startTime: 0, value: 10.0)],
+            glucoseTargetRangeScheduleItems: [
+                RepeatingScheduleValue(startTime: 0, value: DoubleRange(minValue: 100, maxValue: 120))
+            ],
+            maximumBolusUnits: maximumBolus,
+            maximumBasalRatePerHourUnits: 4.0,
+            suspendThresholdMgdL: 72.0,
+            nightscoutConfig: nil
+        )
+    }
+
+    private func settingsSyncCount(in transport: MockPhoneWatchTransport) -> Int {
+        transport.queuedMessages.filter {
+            if case .settingsSync = $0 { return true }; return false
+        }.count
+    }
+
+    /// Phone-side dedup: two consecutive notifySettingsChanged() calls with
+    /// the same payload should result in only one queued .settingsSync. A
+    /// payload change after that should send again.
+    func testEmitSettingsSyncDeduplicatesIdenticalPayload() {
+        // Replace the default orchestrator with one wired to a mutable sync.
+        orchestrator?.stop()
+        var currentSync: PhoneWatchSettingsSync? = Self.makeFixtureSync()
+        orchestrator = makeOrchestratorForDedup(currentSync: { currentSync })
+
+        // Drain anything queued during construction (no start() called here).
+        coordinatorTransport.queuedMessages.removeAll()
+
+        orchestrator.notifySettingsChanged()
+        XCTAssertEqual(settingsSyncCount(in: coordinatorTransport), 1,
+                       "First emission should send")
+
+        orchestrator.notifySettingsChanged()
+        XCTAssertEqual(settingsSyncCount(in: coordinatorTransport), 1,
+                       "Identical payload should not re-send")
+
+        currentSync = Self.makeFixtureSync(maximumBolus: 7.5)
+        orchestrator.notifySettingsChanged()
+        XCTAssertEqual(settingsSyncCount(in: coordinatorTransport), 2,
+                       "Different payload should send")
+    }
+
+    /// stop() clears the lastEmittedSync cache so a fresh start emits at
+    /// least once even if the payload is byte-identical to the previous run.
+    func testStopClearsLastEmittedSync() {
+        orchestrator?.stop()
+        let fixedSync = Self.makeFixtureSync()
+        orchestrator = makeOrchestratorForDedup(currentSync: { fixedSync })
+
+        coordinatorTransport.queuedMessages.removeAll()
+
+        orchestrator.notifySettingsChanged()
+        XCTAssertEqual(settingsSyncCount(in: coordinatorTransport), 1)
+
+        orchestrator.stop()
+        orchestrator.start()
+        // start() schedules an emit on a Task; the test stays on @MainActor,
+        // so spinning one runloop tick lets that Task run before we count.
+        let exp = expectation(description: "drain main runloop after start")
+        DispatchQueue.main.async { exp.fulfill() }
+        wait(for: [exp], timeout: 1.0)
+
+        // After stop/start, lastEmittedSync was cleared, so the first emit
+        // (from start() trigger point 1) should re-send.
+        XCTAssertGreaterThanOrEqual(settingsSyncCount(in: coordinatorTransport), 2,
+                       "After stop/start cycle, identical payload should re-emit")
     }
 
     func test_reachabilityFlipOn_marksStableAfterDebounce() async throws {

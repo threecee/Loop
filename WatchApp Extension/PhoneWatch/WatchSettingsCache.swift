@@ -32,9 +32,24 @@ final class WatchSettingsCache {
     /// `nil` until the first sync arrives.
     private(set) var current: PhoneWatchSettingsSync?
 
+    #if DEBUG
+    /// B.8.2 Issue #4: test-only counter incremented on every actual write
+    /// past the equality guard. Lets the dedup test assert no-op behavior
+    /// without having to mock UserDefaults. Production code never reads this.
+    private(set) var writeCount: Int = 0
+    #endif
+
     /// Called by `ExtensionDelegate` when a `.settingsSync` message arrives.
     func update(_ sync: PhoneWatchSettingsSync) {
+        // B.8.2 Issue #4: skip duplicate payloads. The phone-side dedup is
+        // empty after launch, so identical syncs may arrive once per app
+        // start. PhoneWatchSettingsSync is Equatable; structural compare is
+        // cheap and saves a publisher fire (B.8.3) + any downstream work.
+        guard sync != current else { return }
         current = sync
+        #if DEBUG
+        writeCount += 1
+        #endif
     }
 
     #if DEBUG
@@ -44,6 +59,7 @@ final class WatchSettingsCache {
     /// compile-time error rather than a runtime footgun.
     func resetForTesting() {
         current = nil
+        writeCount = 0
     }
     #endif
 }

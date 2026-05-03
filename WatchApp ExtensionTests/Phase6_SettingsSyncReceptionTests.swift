@@ -211,6 +211,42 @@ final class Phase6_SettingsSyncReceptionTests: XCTestCase {
                        "timeZone identifier must survive cache round-trip")
     }
 
+    // MARK: - B.8.2 Issue #4: watch-side equality short-circuit
+
+    /// `WatchSettingsCache.update(_:)` should treat a second identical sync
+    /// as a no-op: the in-memory `current` stays put and the test-only
+    /// `writeCount` counter does not increment. Defends against the case
+    /// where the phone's dedup cache is empty after launch and re-emits a
+    /// payload the watch has already absorbed.
+    func testUpdateShortCircuitsOnEqualPayload() {
+        let cache = WatchSettingsCache()
+
+        cache.update(sampleSync)
+        let firstWriteCount = cache.writeCount
+        XCTAssertEqual(firstWriteCount, 1, "first update should write")
+
+        cache.update(sampleSync)
+        XCTAssertEqual(cache.writeCount, firstWriteCount,
+                       "Identical sync should be a no-op (no write past the equality guard)")
+
+        // Sanity: a different sync still writes.
+        let mutated = PhoneWatchSettingsSync(
+            protocolVersion: sampleSync.protocolVersion,
+            sentAt: sampleSync.sentAt,
+            basalScheduleItems: sampleSync.basalScheduleItems,
+            insulinSensitivityScheduleItems: sampleSync.insulinSensitivityScheduleItems,
+            carbRatioScheduleItems: sampleSync.carbRatioScheduleItems,
+            glucoseTargetRangeScheduleItems: sampleSync.glucoseTargetRangeScheduleItems,
+            maximumBolusUnits: 7.5,                      // changed
+            maximumBasalRatePerHourUnits: sampleSync.maximumBasalRatePerHourUnits,
+            suspendThresholdMgdL: sampleSync.suspendThresholdMgdL,
+            nightscoutConfig: sampleSync.nightscoutConfig
+        )
+        cache.update(mutated)
+        XCTAssertEqual(cache.writeCount, firstWriteCount + 1,
+                       "Different payload should still write through")
+    }
+
     // MARK: - Test 2d: bootstrap settingsProvider reads from cache
 
     func testBootstrapSettingsProviderReadsFromCache() {

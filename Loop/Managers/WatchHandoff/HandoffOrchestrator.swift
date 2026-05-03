@@ -65,6 +65,11 @@ final class HandoffOrchestrator: ObservableObject {
     /// from LoopDataManager / ServicesManager. Returns nil when not yet ready.
     private let settingsSyncProvider: (() -> PhoneWatchSettingsSync?)?
 
+    /// B.8.2 Issue #4: dedup guard. Phone bails on `emitSettingsSync()` when
+    /// the provider yields a payload byte-identical to the last one we sent.
+    /// Cleared in `stop()` so a fresh `start()` always emits at least once.
+    private var lastEmittedSync: PhoneWatchSettingsSync?
+
     /// B.2.e: replaces the previous `lastReceivedPayload` field — accessor
     /// now forwards to ownership's cache (single source of truth).
     var cachedPayload: OmniBLEHandoffPayload? { ownership.cachedPayload }
@@ -169,6 +174,10 @@ final class HandoffOrchestrator: ObservableObject {
         phoneStableDebounce?.cancel()
         phoneStableDebounce = nil
         cancellables.removeAll()
+        // B.8.2 Issue #4: clear the dedup cache so a subsequent start()
+        // always emits at least once (the watch may have lost the cached
+        // value across an app restart).
+        lastEmittedSync = nil
     }
 
     func userRequestHandoff(to target: HandoffOwner) {
@@ -302,6 +311,15 @@ final class HandoffOrchestrator: ObservableObject {
     func emitSettingsSync() {
         guard let provider = settingsSyncProvider,
               let sync = provider() else { return }
+        // B.8.2 Issue #4: skip if the payload is unchanged since our last
+        // emission. PhoneWatchSettingsSync is Equatable, so this is a cheap
+        // structural compare that saves CPU + a WCSession queue slot when
+        // multiple change-fanout sources fire in quick succession.
+        guard sync != lastEmittedSync else {
+            log.default("emitSettingsSync skipped: payload unchanged")
+            return
+        }
+        lastEmittedSync = sync
         coordinator.sendSettingsSync(sync)
     }
 
