@@ -695,6 +695,8 @@
 		WB2D000000000100027 /* SettingsSyncEmissionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100007 /* SettingsSyncEmissionTests.swift */; };
 		WB2D00000000010002B /* WatchHandoffSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010000B /* WatchHandoffSection.swift */; };
 		WB2D00000000010002C /* WatchHandoffEventLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010000C /* WatchHandoffEventLogView.swift */; };
+		WB2D00000000010B821 /* AlgorithmStateSnapshotEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B801 /* AlgorithmStateSnapshotEmitter.swift */; };
+		WB2D00000000010B822 /* AlgorithmStateSnapshotEmitterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D00000000010B802 /* AlgorithmStateSnapshotEmitterTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1659,6 +1661,8 @@
 		WB2D000000000100007 /* SettingsSyncEmissionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSyncEmissionTests.swift; sourceTree = "<group>"; };
 		WB2D00000000010000B /* WatchHandoffSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchHandoffSection.swift; sourceTree = "<group>"; };
 		WB2D00000000010000C /* WatchHandoffEventLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchHandoffEventLogView.swift; sourceTree = "<group>"; };
+		WB2D00000000010B801 /* AlgorithmStateSnapshotEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshotEmitter.swift; sourceTree = "<group>"; };
+		WB2D00000000010B802 /* AlgorithmStateSnapshotEmitterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmStateSnapshotEmitterTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3125,6 +3129,7 @@
 				WB2D000000000100002 /* ShadowStateScheduler.swift */,
 				WB2D000000000100003 /* HandoffOrchestrator.swift */,
 				WB2D000000000100008 /* HandoffBlockedError.swift */,
+				WB2D00000000010B801 /* AlgorithmStateSnapshotEmitter.swift */,
 			);
 			path = WatchHandoff;
 			sourceTree = "<group>";
@@ -3138,6 +3143,7 @@
 				WB2D000000000100005 /* ShadowStateSchedulerTests.swift */,
 				WB2D000000000100006 /* HandoffOrchestratorTests.swift */,
 				WB2D000000000100007 /* SettingsSyncEmissionTests.swift */,
+				WB2D00000000010B802 /* AlgorithmStateSnapshotEmitterTests.swift */,
 			);
 			path = WatchHandoff;
 			sourceTree = "<group>";
@@ -4055,6 +4061,7 @@
 				WB2D000000000100022 /* ShadowStateScheduler.swift in Sources */,
 				WB2D000000000100023 /* HandoffOrchestrator.swift in Sources */,
 				WB2D000000000100028 /* HandoffBlockedError.swift in Sources */,
+				WB2D00000000010B821 /* AlgorithmStateSnapshotEmitter.swift in Sources */,
 				WB2D00000000010002B /* WatchHandoffSection.swift in Sources */,
 				WB2D00000000010002C /* WatchHandoffEventLogView.swift in Sources */,
 				C17824A51E1AD4D100D9D25C /* ManualBolusRecommendation.swift in Sources */,
@@ -4415,6 +4422,7 @@
 				WB2D000000000100025 /* ShadowStateSchedulerTests.swift in Sources */,
 				WB2D000000000100026 /* HandoffOrchestratorTests.swift in Sources */,
 				WB2D000000000100027 /* SettingsSyncEmissionTests.swift in Sources */,
+				WB2D00000000010B822 /* AlgorithmStateSnapshotEmitterTests.swift in Sources */,
 				A9DF02CB24F72B9E00B7C988 /* CriticalEventLogTests.swift in Sources */,
 				1D80313D24746274002810DF /* AlertStoreTests.swift in Sources */,
 				C1777A6625A125F100595963 /* ManualEntryDoseViewModelTests.swift in Sources */,
