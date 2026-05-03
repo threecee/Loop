@@ -12,20 +12,7 @@
 
 import Foundation
 import OmniBLE
-
-enum WarmUpDecision: Equatable {
-    case skipWarmup(snapshot: AlgorithmStateSnapshot)
-    case fullWarmup(failedGate: WarmUpGate)
-}
-
-/// Lettered prefixes (`a_`, `b_`, `c_`) preserve declaration order in
-/// alphabetically-sorted log output and metric labels. Don't "fix" to
-/// camelCase — the prefix is intentional.
-enum WarmUpGate: String, Equatable {
-    case a_snapshotAge      // snapshot missing or > 6 min old
-    case b_localCGM         // no local CGM read in last 5 min
-    case c_pumpStatus       // no pump status reply in last 60 s
-}
+import WatchAlgorithmKit  // for WarmUpDecision / WarmUpGate (B.8 T11 relocation)
 
 enum WarmUpDecider {
 

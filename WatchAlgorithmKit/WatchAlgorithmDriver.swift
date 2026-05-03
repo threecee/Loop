@@ -236,7 +236,8 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
                 trustedTimeOffset: @escaping () -> TimeInterval = { 0 },
                 pumpManager: PumpManager? = nil,                    // B.6: dose-emission target (nil → suppress all)
                 isWarmingUpOverride: Bool? = nil,                   // B.6: test-only override
-                recoveryDefaults: UserDefaults? = nil) {            // B.5: dose recovery tripwire defaults (nil → resolve App Group at use)
+                recoveryDefaults: UserDefaults? = nil,              // B.5: dose recovery tripwire defaults (nil → resolve App Group at use)
+                warmUpDecision: WarmUpDecision? = nil) {            // B.8: production callers pass WarmUpDecider's verdict to derive isWarmingUp
         self.settingsSnapshot = settingsSnapshot
         self.pumpManager = pumpManager
         self.dosingDecisionStore = dosingDecisionStore
@@ -304,6 +305,23 @@ public final class WatchAlgorithmDriver: NSObject, ObservableObject {
             self.isWarmingUp = override
             if !override {
                 self.didCompleteFirstIteration = true
+            }
+        }
+
+        // B.8: derive isWarmingUp from WarmUpDecider's verdict when provided.
+        // The B.6 isWarmingUpOverride takes precedence (test path); production
+        // callers pass warmUpDecision and leave isWarmingUpOverride nil.
+        // Setting didCompleteFirstIteration=true on .skipWarmup short-circuits
+        // the "first iteration just completed → flip isWarmingUp to false"
+        // notification path (mirrors the override-false branch above).
+        if isWarmingUpOverride == nil, let decision = warmUpDecision {
+            switch decision {
+            case .skipWarmup:
+                self.isWarmingUp = false
+                self.didCompleteFirstIteration = true
+            case .fullWarmup:
+                self.isWarmingUp = true
+                self.didCompleteFirstIteration = false
             }
         }
     }

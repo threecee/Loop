@@ -165,7 +165,8 @@ final class WatchAlgorithmDriverTests: XCTestCase {
         automaticDosingEnabled: Bool = true,
         isAutomaticDosingAllowed: Bool = true,
         isWarmingUpOverride: Bool? = false,
-        recoveryDefaults: UserDefaults? = nil   // B.5
+        recoveryDefaults: UserDefaults? = nil,  // B.5
+        warmUpDecision: WarmUpDecision? = nil   // B.8
     ) -> (driver: WatchAlgorithmDriver, store: RecordingDecisionStore) {
         let store = RecordingDecisionStore()
         let snapshot = WatchSettingsSnapshot(
@@ -181,9 +182,27 @@ final class WatchAlgorithmDriverTests: XCTestCase {
             settingsSnapshot: snapshot,
             pumpManager: pumpManager,
             isWarmingUpOverride: isWarmingUpOverride,
-            recoveryDefaults: recoveryDefaults
+            recoveryDefaults: recoveryDefaults,
+            warmUpDecision: warmUpDecision
         )
         return (driver, store)
+    }
+
+    // B.8: shared sample snapshot for warmup-decision tests.
+    private func makeSampleSnapshot() -> AlgorithmStateSnapshot {
+        AlgorithmStateSnapshot(
+            snapshotID: UUID(),
+            createdAt: Date(),
+            phoneIterationDate: Date(),
+            glucoseSamples: [],
+            doseHistory: [],
+            carbEntries: [],
+            pumpStatus: PumpStatusSnapshot(reservoirUnitsRemaining: 100,
+                                           lastBasalRateUnitsPerHour: 0.5,
+                                           isSuspended: false,
+                                           lastReadingDate: Date()),
+            activeOverride: nil
+        )
     }
 
     private func sampleRecommendation()
@@ -576,5 +595,34 @@ final class WatchAlgorithmDriverTests: XCTestCase {
                        "temp basal failure should short-circuit before bolus")
         XCTAssertNil(WatchDoseRecoveryStore.load(from: defaults),
                      "Early-return temp basal error path should still clear the recovery store")
+    }
+
+    // MARK: - B.8: warmup decision derivation at init
+
+    /// `.skipWarmup(snapshot:)` must drive `isWarmingUp` to `false` at init.
+    /// This is the production path that B.8 introduces: when the cache + CGM +
+    /// pump-status freshness gates all pass, the driver bypasses warmup and
+    /// is immediately eligible to dose.
+    func test_init_skipsWarmupWhenDecisionSaysSkip() {
+        let snap = makeSampleSnapshot()
+        let (driver, _) = makeDriver(
+            pumpManager: nil,
+            isWarmingUpOverride: nil,
+            warmUpDecision: .skipWarmup(snapshot: snap)
+        )
+        XCTAssertFalse(driver.isWarmingUp,
+                       "isWarmingUp must be false when WarmUpDecider returns skipWarmup")
+    }
+
+    /// `.fullWarmup(failedGate:)` keeps the pre-B.8 behavior: `isWarmingUp`
+    /// stays `true` until the runner completes a full iteration.
+    func test_init_isWarmingUpWhenDecisionSaysFullWarmup() {
+        let (driver, _) = makeDriver(
+            pumpManager: nil,
+            isWarmingUpOverride: nil,
+            warmUpDecision: .fullWarmup(failedGate: .a_snapshotAge)
+        )
+        XCTAssertTrue(driver.isWarmingUp,
+                      "isWarmingUp must remain true on fullWarmup fallback")
     }
 }

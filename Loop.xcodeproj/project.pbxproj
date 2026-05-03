@@ -10,6 +10,7 @@
 		B6F100000020 /* WatchAlgorithmDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000013 /* WatchAlgorithmDriver.swift */; };
 		B6F100000021 /* WatchAlgorithmStores.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000014 /* WatchAlgorithmStores.swift */; };
 		B5D000000001 /* WatchDoseRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D000000002 /* WatchDoseRecoveryStore.swift */; };
+		B8D100000001 /* WarmUpDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D100000002 /* WarmUpDecision.swift */; };
 		B6F100000022 /* OSLog+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F100000015 /* OSLog+Convenience.swift */; };
 		B6F100000030 /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; };
 		B6F100000031 /* WatchAlgorithmKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -946,6 +947,7 @@
 		B6F100000013 /* WatchAlgorithmDriver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmDriver.swift; sourceTree = "<group>"; };
 		B6F100000014 /* WatchAlgorithmStores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchAlgorithmStores.swift; sourceTree = "<group>"; };
 		B5D000000002 /* WatchDoseRecoveryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDoseRecoveryStore.swift; sourceTree = "<group>"; };
+		B8D100000002 /* WarmUpDecision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmUpDecision.swift; sourceTree = "<group>"; };
 		B6F100000015 /* OSLog+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+Convenience.swift"; sourceTree = "<group>"; };
 		0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HealthKitWriterTests.swift; path = "WatchApp ExtensionTests/HealthKitWriterTests.swift"; sourceTree = SOURCE_ROOT; };
 		091FD4801D540EC2D6AAE6F6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -2563,6 +2565,7 @@
 				B6F100000013 /* WatchAlgorithmDriver.swift */,
 				B6F100000014 /* WatchAlgorithmStores.swift */,
 				B5D000000002 /* WatchDoseRecoveryStore.swift */,
+				B8D100000002 /* WarmUpDecision.swift */,
 				B6F100000015 /* OSLog+Convenience.swift */,
 				B6F100000012 /* Info.plist */,
 			);
@@ -3982,6 +3985,7 @@
 				B6F100000020 /* WatchAlgorithmDriver.swift in Sources */,
 				B6F100000021 /* WatchAlgorithmStores.swift in Sources */,
 				B5D000000001 /* WatchDoseRecoveryStore.swift in Sources */,
+				B8D100000001 /* WarmUpDecision.swift in Sources */,
 				B6F100000022 /* OSLog+Convenience.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
