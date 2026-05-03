@@ -97,6 +97,12 @@ class LoopAppManager: NSObject {
     // observe it.
     @MainActor private(set) var phoneWatchHandoffOrchestrator: HandoffOrchestrator?
 
+    // B.8: emitter that pushes AlgorithmStateSnapshot to the watch after every
+    // successful Loop iteration. LoopAppManager owns the strong reference;
+    // LoopDataManager holds a weak back-pointer (`weak var
+    // algorithmStateSnapshotEmitter`).
+    @MainActor private var algorithmStateSnapshotEmitter: AlgorithmStateSnapshotEmitter?
+
     private var overrideHistory = UserDefaults.appGroup?.overrideHistory ?? TemporaryScheduleOverrideHistory.init()
 
     private var state: State = .initialize
@@ -317,6 +323,26 @@ class LoopAppManager: NSObject {
             HandoffOrchestrator.shared = orchestrator
             orchestrator.start()
             self.phoneWatchHandoffOrchestrator = orchestrator
+
+            // B.8: wire the algorithm-state snapshot emitter into LoopDataManager.
+            // SnapshotTransport conformance lives on WCSessionPhoneWatchTransport
+            // (the concrete class), not on the PhoneWatchTransport protocol — so
+            // we need the concrete type here. The coordinator's `transport`
+            // property is protocol-typed, so cast via `as?` (production wiring
+            // always uses the WCSession-backed concrete; tests construct
+            // AlgorithmStateSnapshotEmitter directly with a CapturingTransport
+            // fake so this path isn't exercised).
+            guard let concreteTransport = self.phoneWatchCoordinator.transport as? WCSessionPhoneWatchTransport else {
+                fatalError("PhoneWatchSessionCoordinator.transport is not WCSessionPhoneWatchTransport — B.8 emitter cannot be wired")
+            }
+            let snapshotEmitter = AlgorithmStateSnapshotEmitter(
+                transport: concreteTransport,
+                stateProvider: { [weak self] in
+                    self?.currentSnapshotStateOrNil()
+                }
+            )
+            self.algorithmStateSnapshotEmitter = snapshotEmitter
+            self.deviceDataManager?.loopManager?.algorithmStateSnapshotEmitter = snapshotEmitter
         }
 
         state = state.next
@@ -384,6 +410,41 @@ class LoopAppManager: NSObject {
             // different TimeZone.current. Read at emission time so each fresh
             // sync reflects the phone's current zone.
             timeZone: TimeZone.current.identifier
+        )
+    }
+
+    /// B.8: build an `AlgorithmStateSnapshotEmitter.State` from current
+    /// `LoopDataManager` + `DeviceDataManager` state. Returns nil when state
+    /// isn't yet available (very early launch, before pump pairing, etc.).
+    ///
+    /// Phase 1 ships the wiring with empty rolling buffers
+    /// (`glucoseSamples` / `doseHistory` / `carbEntries`). Phase 2 (a
+    /// follow-up slice) populates them from store async reads. Filing the
+    /// arrays empty exercises the full pipeline so the watch tests can
+    /// assert "snapshot received" before we wire the heavy data pulls.
+    ///
+    /// `pumpStatus` is similarly minimal: capacity stands in for "remaining"
+    /// (the live remaining is async-only) and `lastReadingDate` is `now`.
+    /// The snapshot is a hint at takeover; the live pod is authoritative
+    /// once bonded, so a sketchy `pumpStatus` is acceptable in Phase 1.
+    @MainActor
+    private func currentSnapshotStateOrNil() -> AlgorithmStateSnapshotEmitter.State? {
+        guard let lm = self.deviceDataManager?.loopManager,
+              let pumpManager = self.deviceDataManager?.pumpManager
+        else { return nil }
+        let pumpStatus = PumpStatusSnapshot(
+            reservoirUnitsRemaining: pumpManager.pumpReservoirCapacity,
+            lastBasalRateUnitsPerHour: nil,
+            isSuspended: pumpManager.status.basalDeliveryState?.isSuspended ?? false,
+            lastReadingDate: Date()
+        )
+        return AlgorithmStateSnapshotEmitter.State(
+            iterationDate: lm.lastLoopCompleted ?? Date(),
+            glucoseSamples: [],   // Phase 2 work fills these via async store reads
+            doseHistory: [],
+            carbEntries: [],
+            pumpStatus: pumpStatus,
+            activeOverride: lm.settings.scheduleOverride
         )
     }
 
