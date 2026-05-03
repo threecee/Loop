@@ -14,6 +14,7 @@
 #if !os(iOS)
 
 import Foundation
+import Combine
 import LoopKit
 import NightscoutServiceKit
 import OmniBLE  // for HandoffState
@@ -33,6 +34,14 @@ final class WatchRemoteCommandBootstrap {
     private let settingsProvider: () -> WatchSettingsSnapshot?
     private let supportingStoresProvider: () -> WatchRemoteCommandStores?
 
+    /// B.8.3: tracks the most recent handoff state so `retryIfNeeded()`
+    /// (publisher sink) can short-circuit unless we're in `.watchDriver`.
+    private var lastHandoffState: HandoffState = .phoneDriver
+
+    /// B.8.3: subscription to `WatchSettingsCache.shared.publisher`. Holds
+    /// the cancellable so the bootstrap's lifetime governs the subscription.
+    private var settingsCancellable: AnyCancellable?
+
     /// - Parameters:
     ///   - storesProvider: Returns the same stores bundle used by the
     ///     algorithm (CarbStore + GlucoseStore + DoseStore + DosingDecisionStore).
@@ -46,6 +55,13 @@ final class WatchRemoteCommandBootstrap {
         self.storesProvider = storesProvider
         self.supportingStoresProvider = supportingStoresProvider
         self.settingsProvider = settingsProvider
+        // B.8.3: re-attempt startIfNeeded() on any settings arrival. Gated on
+        // lastHandoffState == .watchDriver inside retryIfNeeded() so a settings
+        // arrival in .phoneDriver doesn't inappropriately build a manager.
+        settingsCancellable = WatchSettingsCache.shared.publisher
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.retryIfNeeded() }
     }
 
     /// B.3.a Phase 6 convenience init: takes a `PhoneWatchSettingsSync`
@@ -59,10 +75,20 @@ final class WatchRemoteCommandBootstrap {
             guard let sync = syncProvider() else { return nil }
             return WatchSettingsSnapshot(fromSync: sync)
         }
+        // B.8.3: re-attempt startIfNeeded() on any settings arrival. Gated on
+        // lastHandoffState == .watchDriver inside retryIfNeeded() so a settings
+        // arrival in .phoneDriver doesn't inappropriately build a manager.
+        settingsCancellable = WatchSettingsCache.shared.publisher
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.retryIfNeeded() }
     }
 
     /// Updates the bootstrap in response to a handoff-state change.
     func update(handoffState: HandoffState) {
+        // B.8.3: record before delegating so retryIfNeeded() (publisher sink)
+        // gates correctly on the most recent state.
+        lastHandoffState = handoffState
         switch handoffState {
         case .watchDriver:
             startIfNeeded()
@@ -86,6 +112,14 @@ final class WatchRemoteCommandBootstrap {
     }
 
     // MARK: - Private
+
+    /// B.8.3: settings publisher subscription target. Gated on
+    /// `lastHandoffState == .watchDriver` so a settings arrival in any other
+    /// state doesn't inappropriately build a manager.
+    private func retryIfNeeded() {
+        guard case .watchDriver = lastHandoffState else { return }
+        startIfNeeded()
+    }
 
     private func startIfNeeded() {
         guard manager == nil else { return }

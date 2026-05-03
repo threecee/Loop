@@ -288,6 +288,7 @@
 		4FF4D1011E18375000846527 /* WatchContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FF4D0FF1E18374700846527 /* WatchContext.swift */; };
 		503149FBE22CF89F3553A3A7 /* WatchRemoteCommandBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AA4AFC96E2BE1D43C5BD62 /* WatchRemoteCommandBootstrap.swift */; };
 		61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */; };
+		B83000000001 /* WatchAlgorithmBootstrapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83000000002 /* WatchAlgorithmBootstrapTests.swift */; };
 		F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */; };
 		A1B2C3D4E5F60001A1B2C3D4 /* Phase7_WarmingUpTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */; };
 		B6E5F6010001B6E5F6010001 /* WatchAlgorithmDriverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6E5F6010002B6E5F6010002 /* WatchAlgorithmDriverTests.swift */; };
@@ -1010,6 +1011,7 @@
 		2859EFF609E844A5BF478FD1 /* ExtendedRuntimeCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtendedRuntimeCoordinatorTests.swift; path = "WatchApp ExtensionTests/ExtendedRuntimeCoordinatorTests.swift"; sourceTree = SOURCE_ROOT; };
 		3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseCacheTests.swift; path = "WatchApp ExtensionTests/GlucoseCacheTests.swift"; sourceTree = SOURCE_ROOT; };
 		327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase5_BootstrapsTest.swift; path = Phase5_BootstrapsTest.swift; sourceTree = "<group>"; };
+		B83000000002 /* WatchAlgorithmBootstrapTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmBootstrapTests.swift; path = WatchAlgorithmBootstrapTests.swift; sourceTree = "<group>"; };
 		F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase6_SettingsSyncReceptionTests.swift; path = Phase6_SettingsSyncReceptionTests.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase7_WarmingUpTest.swift; path = Phase7_WarmingUpTest.swift; sourceTree = "<group>"; };
 		B6E5F6010002B6E5F6010002 /* WatchAlgorithmDriverTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmDriverTests.swift; path = WatchAlgorithmDriverTests.swift; sourceTree = "<group>"; };
@@ -2825,6 +2827,7 @@
 				631C894D174F9241F016AEA9 /* NightscoutServiceLoadingTest.swift */,
 				B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */,
 				327475C948AA3168CFFA67AF /* Phase5_BootstrapsTest.swift */,
+				B83000000002 /* WatchAlgorithmBootstrapTests.swift */,
 				F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */,
 				A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */,
 				B6E5F6010002B6E5F6010002 /* WatchAlgorithmDriverTests.swift */,
@@ -4076,6 +4079,7 @@
 				6D1200C021BC36840A3A5727 /* NightscoutServiceLoadingTest.swift in Sources */,
 				BCE0D1D6CD31C643DD469207 /* Phase4_RemoteDataServicesManagerImportTest.swift in Sources */,
 				61110585D07AA55DDB4F410A /* Phase5_BootstrapsTest.swift in Sources */,
+				B83000000001 /* WatchAlgorithmBootstrapTests.swift in Sources */,
 				F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */,
 				A1B2C3D4E5F60001A1B2C3D4 /* Phase7_WarmingUpTest.swift in Sources */,
 				B6E5F6010001B6E5F6010001 /* WatchAlgorithmDriverTests.swift in Sources */,

@@ -17,9 +17,11 @@
 #if !os(iOS)
 
 import Foundation
+import Combine
 import LoopAlgorithmCore
 import LoopKit
 import OmniBLE  // for HandoffState
+import os.log
 import WatchAlgorithmKit  // for WatchAlgorithmDriver, WatchAlgorithmStores, WatchSettingsSnapshot
 
 final class WatchAlgorithmBootstrap {
@@ -28,9 +30,20 @@ final class WatchAlgorithmBootstrap {
     /// `private(set)` for tests.
     private(set) var driver: WatchAlgorithmDriver?
 
+    private let log = OSLog(category: "WatchAlgorithmBootstrap")
+
     private let storesProvider: () -> WatchAlgorithmStores?
     private let settingsProvider: () -> WatchSettingsSnapshot?
     private let pumpManagerProvider: () -> PumpManager?  // B.6
+
+    /// B.8.3: tracks the most recent handoff state so `retryIfNeeded()`
+    /// (publisher sink) can short-circuit unless we're in `.watchDriver`.
+    /// Default `.phoneDriver` matches the production bootstrap-time state.
+    private var lastHandoffState: HandoffState = .phoneDriver
+
+    /// B.8.3: subscription to `WatchSettingsCache.shared.publisher`. Holds
+    /// the cancellable so the bootstrap's lifetime governs the subscription.
+    private var settingsCancellable: AnyCancellable?
 
     /// - Parameters:
     ///   - storesProvider: Returns the watch-side stores bundle, or nil if
@@ -47,6 +60,13 @@ final class WatchAlgorithmBootstrap {
         self.storesProvider = storesProvider
         self.settingsProvider = settingsProvider
         self.pumpManagerProvider = pumpManagerProvider
+        // B.8.3: re-attempt startIfNeeded() on any settings arrival. Gated on
+        // lastHandoffState == .watchDriver inside retryIfNeeded() so a settings
+        // arrival in .phoneDriver doesn't inappropriately build a driver.
+        settingsCancellable = WatchSettingsCache.shared.publisher
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.retryIfNeeded() }
     }
 
     /// B.3.a Phase 6 convenience init: takes a `PhoneWatchSettingsSync`
@@ -61,12 +81,22 @@ final class WatchAlgorithmBootstrap {
             return WatchSettingsSnapshot(fromSync: sync)
         }
         self.pumpManagerProvider = pumpManagerProvider
+        // B.8.3: re-attempt startIfNeeded() on any settings arrival. Gated on
+        // lastHandoffState == .watchDriver inside retryIfNeeded() so a settings
+        // arrival in .phoneDriver doesn't inappropriately build a driver.
+        settingsCancellable = WatchSettingsCache.shared.publisher
+            .compactMap { $0 }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.retryIfNeeded() }
     }
 
     /// Updates the bootstrap in response to a handoff-state change.
     /// Idempotent: repeated `.watchDriver` updates do not rebuild the
     /// driver; non-driver states tear it down.
     func update(handoffState: HandoffState) {
+        // B.8.3: record before delegating so retryIfNeeded() (publisher sink)
+        // gates correctly on the most recent state.
+        lastHandoffState = handoffState
         switch handoffState {
         case .watchDriver:
             startIfNeeded()
@@ -76,6 +106,16 @@ final class WatchAlgorithmBootstrap {
     }
 
     // MARK: - Private
+
+    /// B.8.3: settings publisher subscription target. Gated on
+    /// `lastHandoffState == .watchDriver` so a settings arrival in any other
+    /// state doesn't inappropriately build a driver. Catches the
+    /// "settings arrived AFTER `.watchDriver` entry but bootstrap returned
+    /// early because cache was empty" case.
+    private func retryIfNeeded() {
+        guard case .watchDriver = lastHandoffState else { return }
+        startIfNeeded()
+    }
 
     private func startIfNeeded() {
         guard driver == nil else { return }
