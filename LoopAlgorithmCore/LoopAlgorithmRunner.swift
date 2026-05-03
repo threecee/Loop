@@ -331,6 +331,30 @@ public final class LoopAlgorithmRunner {
     /// `updateRemoteRecommendation()` consumes it.
     public var remoteRecommendationNeedsUpdating: Bool = false
 
+    #if DEBUG
+    /// B.8.4 Phase 5a: most recent fully-assembled algorithm input, retained
+    /// for fixture capture by `captureFixtureForReconciliation(name:)`.
+    /// Populated by the iOS shim's `loopAlgorithmRunnerDidFinishLoop` callback
+    /// (which is the only site that has the buffers + settings + dose-type
+    /// gathered together). Stored as the Loop-side `CapturedAlgorithmInput`
+    /// wrapper because LoopKit's `LoopAlgorithmInput` lacks a public init —
+    /// see comments in `LoopAlgorithmReconciliationFixture.swift` for why.
+    /// DEBUG-only — production neither writes nor reads.
+    private(set) public var lastInput: CapturedAlgorithmInput?
+
+    /// B.8.4 Phase 5a: most recent algorithm output, retained alongside
+    /// `lastInput` for fixture capture. Populated at the same callback site.
+    private(set) public var lastOutput: CapturedAlgorithmOutput?
+
+    /// B.8.4 Phase 5a: hook the iOS shim calls after a completed iteration so
+    /// the runner retains the input + output that produced this iteration.
+    /// DEBUG-only — production code paths skip this entirely.
+    public func recordIterationFixture(input: CapturedAlgorithmInput, output: CapturedAlgorithmOutput) {
+        self.lastInput = input
+        self.lastOutput = output
+    }
+    #endif
+
     // MARK: Init
 
     public init(
@@ -1911,6 +1935,42 @@ public final class LoopAlgorithmRunner {
         mutateSettings { settings in settings.scheduleOverride = override }
     }
 }
+
+// MARK: - B.8.4 Phase 5a: reconciliation fixture capture
+
+#if DEBUG
+extension LoopAlgorithmRunner {
+    /// B.8.4: writes the input + expected output of the most recent iteration
+    /// to a JSON fixture file. Triggered manually via Xcode debugger LLDB:
+    ///   (lldb) expr (LoopAppManager.shared.loopDataManager.runner as! LoopAlgorithmRunner).captureFixtureForReconciliation(name: "steady-state")
+    /// Fixture lands at /tmp/loop-reconciliation-<name>.json. Carl copies the
+    /// file into Loop/bin/replay/<name>.json + commits.
+    ///
+    /// DEBUG-only. Production builds never see this method.
+    public func captureFixtureForReconciliation(name: String) {
+        guard let lastInput = self.lastInput, let lastOutput = self.lastOutput else {
+            print("[B.8.4] captureFixtureForReconciliation: no recent iteration recorded")
+            return
+        }
+        let fixture = LoopAlgorithmReconciliationFixture(
+            name: name,
+            capturedAt: Date(),
+            input: lastInput,
+            expectedOutput: lastOutput
+        )
+        let url = URL(fileURLWithPath: "/tmp/loop-reconciliation-\(name).json")
+        do {
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            let data = try encoder.encode(fixture)
+            try data.write(to: url, options: .atomic)
+            print("[B.8.4] Captured fixture '\(name)' (\(data.count) bytes) -> \(url.path)")
+        } catch {
+            print("[B.8.4] captureFixtureForReconciliation failed: \(error)")
+        }
+    }
+}
+#endif
 
 // MARK: - AutomaticDosingStatus bridge
 

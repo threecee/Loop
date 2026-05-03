@@ -575,7 +575,7 @@ extension LoopDataManager: LoopAlgorithmRunnerDelegate {
 
         group.notify(queue: .main) { [weak self] in
             guard let self = self else { return }
-            self.lastAlgorithmInput = LoopPredictionInput(
+            let predictionInput = LoopPredictionInput(
                 glucoseHistory: glucoseSamples,
                 doses: doseEntries,
                 carbEntries: cachedCarbs,
@@ -586,6 +586,33 @@ extension LoopDataManager: LoopAlgorithmRunnerDelegate {
                     target: []
                 )
             )
+            self.lastAlgorithmInput = predictionInput
+
+            // B.8.4 Phase 5a: also hand the assembled algorithm input + output
+            // (as the Loop-side Codable wrappers) back to the runner so a
+            // debugger session can call `runner.captureFixtureForReconciliation(name:)`
+            // and dump a JSON fixture for the Phase 5b reconciliation tests.
+            // DEBUG-only; production builds skip this whole block.
+            #if DEBUG
+            let dosingType: DoseRecommendationType
+            switch self.runner.settings.automaticDosingStrategy {
+            case .automaticBolus:
+                dosingType = .automaticBolus
+            case .tempBasalOnly:
+                dosingType = .tempBasal
+            }
+            let capturedInput = CapturedAlgorithmInput(
+                predictionInput: predictionInput,
+                predictionDate: now,
+                doseRecommendationType: dosingType
+            )
+            let capturedOutput = CapturedAlgorithmOutput(
+                predictedGlucose: runner.predictedGlucose ?? [],
+                doseRecommendation: runner.recommendedAutomaticDose?.recommendation
+                    ?? AutomaticDoseRecommendation(basalAdjustment: nil)
+            )
+            runner.recordIterationFixture(input: capturedInput, output: capturedOutput)
+            #endif
 
             // B.8: push algorithm-state snapshot to watch (no-op if emitter unwired).
             self.algorithmStateSnapshotEmitter?.emit()
