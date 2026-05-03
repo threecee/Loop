@@ -13,7 +13,6 @@
 //
 
 import SwiftUI
-import OmniBLE
 
 struct WatchHandoffSection: View {
     @ObservedObject var orchestrator: HandoffOrchestrator
@@ -21,11 +20,12 @@ struct WatchHandoffSection: View {
     var body: some View {
         Section("Watch Handoff") {
             currentStateRow
-            modePicker
             manualTriggerButton
             NavigationLink("Recent activity") {
                 WatchHandoffEventLogView(orchestrator: orchestrator)
             }
+            Link("How handoff works",
+                 destination: URL(string: "https://threecee.github.io/myloop-watch-dynamics")!)
         }
     }
 
@@ -44,32 +44,6 @@ struct WatchHandoffSection: View {
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
-            }
-        }
-    }
-
-    private var modePicker: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Mode")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Picker("Mode", selection: Binding(
-                get: { orchestrator.settings.mode },
-                set: { newMode in
-                    var settings = orchestrator.settings
-                    settings.mode = newMode
-                    orchestrator.updateSettings(settings)
-                }
-            )) {
-                Text("Manual only").tag(HandoffMode.manual)
-                Text("Manual + auto-revert").tag(HandoffMode.manualWithAutoRevert)
-                Text("Automatic").tag(HandoffMode.automatic)
-            }
-            .pickerStyle(.inline)
-            if orchestrator.settings.mode != .manual {
-                Text("⚠ Hardware verification pending — works in Simulator; real-pod take-over not yet field-tested")
-                    .font(.caption2)
-                    .foregroundStyle(.orange)
             }
         }
     }
