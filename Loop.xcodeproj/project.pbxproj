@@ -89,6 +89,7 @@
 		2CCA6A8E7E60C1A9E04A5D8F /* BackgroundPollScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DBACE90FE46C046D7C944F5 /* BackgroundPollScheduler.swift */; };
 		2FFC656074A640528A5BB726 /* GlucoseCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */; };
 		3426CED8DE01DBC9C7CD4CEC /* TokenRotationPropagationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4399104D30D388AAE501CDED /* TokenRotationPropagationTests.swift */; };
+		B11C1000000000010001 /* DriverTokenNightscoutSpliceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11C1000000000010002 /* DriverTokenNightscoutSpliceTests.swift */; };
 		38427E2F72593F1C7CAE926E /* LoopAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C56AC3C4371558534B519CC /* LoopAlgorithmRunner.swift */; };
 		38DF13981D282D91F0AE31B8 /* LoopAlgorithmCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F65A857180A0FF1A84C30F8 /* LoopAlgorithmCore.swift */; };
 		3ED3198A2EB659E600820BCF /* GlucoseLiveActivityConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED319882EB659E600820BCF /* GlucoseLiveActivityConfiguration.swift */; };
@@ -507,6 +508,7 @@
 		BD0E9F31DE3DB654047A29DC /* LoopAlgorithmReconciliationFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 083F0EBC357920F44DB22F42 /* LoopAlgorithmReconciliationFixture.swift */; };
 		BD4C39DED97D9F36F6CB9CBF /* LoopRemoteCareUploaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EACC43922342454E0BE3B4FD /* LoopRemoteCareUploaderTests.swift */; };
 		BD6F6DAB5780A11DD05B8ADB /* NightscoutServiceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB297036FF4DD6B83889E05 /* NightscoutServiceKit.framework */; };
+		B11C1000000000020001 /* NightscoutServiceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CB297036FF4DD6B83889E05 /* NightscoutServiceKit.framework */; };
 		BFBB35CB4405597DC0103C18 /* ConstantApplicationFactorStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDC389F92A2B62470066E2E8 /* ConstantApplicationFactorStrategy.swift */; };
 		C110888D2A3913C600BA4898 /* BuildDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = C110888C2A3913C600BA4898 /* BuildDetails.swift */; };
 		C11B9D5B286778A800500CF8 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = C11B9D5A286778A800500CF8 /* SwiftCharts */; };
@@ -1098,6 +1100,7 @@
 		439897341CD2F7DE00223065 /* NSTimeInterval.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSTimeInterval.swift; sourceTree = "<group>"; };
 		439897361CD2F80600223065 /* AnalyticsServicesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AnalyticsServicesManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		4399104D30D388AAE501CDED /* TokenRotationPropagationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TokenRotationPropagationTests.swift; sourceTree = "<group>"; };
+		B11C1000000000010002 /* DriverTokenNightscoutSpliceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DriverTokenNightscoutSpliceTests.swift; sourceTree = "<group>"; };
 		439A7941211F631C0041B75F /* RootNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigationController.swift; sourceTree = "<group>"; };
 		439A7943211FE22F0041B75F /* NSUserActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSUserActivity.swift; sourceTree = "<group>"; };
 		439BED291E76093C00B0AED5 /* CGMManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMManager.swift; sourceTree = "<group>"; };
@@ -1786,6 +1789,7 @@
 				C15A8C492A7305B1009D736B /* SwiftCharts in Frameworks */,
 				WB2CA1000000000012 /* OmniBLE.framework in Frameworks */,
 				4B0CAF3106DB478E083E007C /* WatchAlgorithmKit.framework in Frameworks */,
+				B11C1000000000020001 /* NightscoutServiceKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3199,6 +3203,7 @@
 				WB2D00000000010B802 /* AlgorithmStateSnapshotEmitterTests.swift */,
 				WB2D000000000B82E1 /* PhoneWatchTransportTests.swift */,
 				4399104D30D388AAE501CDED /* TokenRotationPropagationTests.swift */,
+				B11C1000000000010002 /* DriverTokenNightscoutSpliceTests.swift */,
 			);
 			path = WatchHandoff;
 			sourceTree = "<group>";
@@ -3313,6 +3318,7 @@
 				C1F00C5F285A802A006302C5 /* SwiftCharts */,
 				C1D6EE9F2A06C7270047DE5C /* MKRingProgressView */,
 				C1735B1D2A0809830082BB8A /* ZIPFoundation */,
+				A4E0D971969D82C9A61515FA /* Base32 */,
 			);
 			productName = Loop;
 			productReference = 43776F8C1B8022E90074EA36 /* Loop.app */;
@@ -4523,6 +4529,7 @@
 				B85AAA0002000000F0000000 /* PredictionInputEffectTests.swift in Sources */,
 				BD4C39DED97D9F36F6CB9CBF /* LoopRemoteCareUploaderTests.swift in Sources */,
 				3426CED8DE01DBC9C7CD4CEC /* TokenRotationPropagationTests.swift in Sources */,
+				B11C1000000000010001 /* DriverTokenNightscoutSpliceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

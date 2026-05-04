@@ -15,6 +15,7 @@ import MockKit
 import HealthKit
 import WidgetKit
 import OmniBLE
+import NightscoutServiceKit
 
 #if targetEnvironment(simulator)
 enum SimulatorError: Error {
@@ -296,6 +297,13 @@ class LoopAppManager: NSObject {
             // 6-component bootstrap chain. Phone passes pumpManager +
             // settingsSyncProvider; nil for the three watch-only closures
             // (settings-sync receive, snapshot receive, lazy pump-manager).
+            //
+            // B.11.2.1: also pass `nightscoutAPISecretProvider` so the
+            // orchestrator can sign driver-token rendezvous payloads
+            // (B.11.2 producer). The closure looks up the active
+            // NightscoutService at call time so it picks up any
+            // post-boot configuration changes (api-secret rotation, etc.).
+            let servicesManagerForSecret = self.deviceDataManager.servicesManager
             let stack = HandoffStack.assemble(
                 role: .phone,
                 pumpManager: deviceDataManager.pumpManager as? OmniBLEPumpManager,
@@ -306,6 +314,21 @@ class LoopAppManager: NSObject {
                     // RemoteCareUploader (B.11.1) can target the watch when
                     // the watch is the BLE driver.
                     APNsTokenStore().save(publication)
+                },
+                nightscoutAPISecretProvider: { [weak servicesManagerForSecret] in
+                    // Late-binding: lookup is per-call, so the orchestrator
+                    // sees the current api-secret if the user reconfigures
+                    // Nightscout after launch. Returns "" if no
+                    // NightscoutService is active or its secret is unset —
+                    // matches the "publish unsigned rendezvous" fallback in
+                    // B.11.2 (DriverTokenRendezvous spec Risks #4).
+                    guard let services = servicesManagerForSecret?.activeServices else { return "" }
+                    for service in services {
+                        if let ns = service as? NightscoutService, let secret = ns.apiSecret, !secret.isEmpty {
+                            return secret
+                        }
+                    }
+                    return ""
                 }
             )
 
@@ -329,6 +352,32 @@ class LoopAppManager: NSObject {
             // Start the stack components in dependency order.
             stack.coordinator.start()
             stack.orchestrator.start()
+
+            // B.11.2.1: wire the driver-token provider closure on every
+            // active NightscoutService so each Nightscout devicestatus
+            // upload carries the rendezvous at JSON path
+            // `loop.testingDetails.driverToken`. The closure returns nil
+            // when not currently driver, when peer token is missing, or
+            // when the api secret is empty — and `StoredDosingDecision`'s
+            // deviceStatus extension omits the `testingDetails` field
+            // entirely in that case so caretakers don't see stale entries.
+            //
+            // Known limitation (B.11.2.1): if the user adds a fresh
+            // NightscoutService *after* this point (i.e., never had one
+            // configured at launch), the provider closure won't be set on
+            // the new instance. Mitigation deferred to B.11.2.2 (would
+            // require adding a service-added hook to ServicesManager).
+            // Restored services are picked up here because
+            // ServicesManager.init runs restoreState() before this point.
+            let orchestratorForToken = stack.orchestrator
+            let driverTokenProvider: () -> [String: Any]? = { [weak orchestratorForToken] in
+                return orchestratorForToken?.buildSignedRendezvous()?.dictionaryRepresentation
+            }
+            for service in self.deviceDataManager.servicesManager.activeServices {
+                if let ns = service as? NightscoutService {
+                    ns.driverTokenProvider = driverTokenProvider
+                }
+            }
 
             // Retain references on self for lifecycle + observation.
             self.phoneWatchCoordinator = stack.coordinator
