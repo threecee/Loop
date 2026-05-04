@@ -142,7 +142,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     /// any one shouldn't prevent the others from running.
     private func bootstrapPhoneWatchStack() {
         // WCSession transport + coordinator + heartbeat
-        let transport = WCSessionPhoneWatchTransport()
+        let transport = WCSessionPhoneWatchTransport(role: .watch)
         let coordinator = PhoneWatchSessionCoordinator(transport: transport)
         coordinator.start()
         self.phoneWatchTransport = transport

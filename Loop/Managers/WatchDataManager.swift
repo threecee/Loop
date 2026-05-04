@@ -12,6 +12,7 @@ import WatchConnectivity
 import LoopAlgorithmCore
 import LoopKit
 import LoopCore
+import OmniBLE
 
 final class WatchDataManager: NSObject {
 

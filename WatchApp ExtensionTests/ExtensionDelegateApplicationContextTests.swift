@@ -40,7 +40,7 @@ final class ExtensionDelegateApplicationContextTests: XCTestCase {
     }
 
     func testDidReceiveApplicationContextDispatchesToHandler() {
-        let transport = WCSessionPhoneWatchTransport()
+        let transport = WCSessionPhoneWatchTransport(role: .watch)
         var received: [PhoneWatchMessage] = []
         transport.onIncomingMessage = { received.append($0) }
 
@@ -82,7 +82,7 @@ final class ExtensionDelegateApplicationContextTests: XCTestCase {
     }
 
     func testDidReceiveApplicationContextWithoutPhoneWatchMessageFallsThrough() {
-        let transport = WCSessionPhoneWatchTransport()
+        let transport = WCSessionPhoneWatchTransport(role: .watch)
         var received: [PhoneWatchMessage] = []
         transport.onIncomingMessage = { received.append($0) }
 

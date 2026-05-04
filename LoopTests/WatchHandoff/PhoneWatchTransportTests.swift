@@ -68,7 +68,7 @@ final class PhoneWatchTransportTests: XCTestCase {
         // production code's do/catch swallows it and logs via log.error. The
         // warning at >8KB is also logged before the throw, which is the
         // primary contract this test asserts is reachable.
-        let transport = WCSessionPhoneWatchTransport(session: WCSession.default)
+        let transport = WCSessionPhoneWatchTransport(role: .phone, session: WCSession.default)
         transport.sendApplicationContext(message)
     }
 
@@ -89,7 +89,7 @@ final class PhoneWatchTransportTests: XCTestCase {
                                            lastReadingDate: now),
             activeOverride: nil
         )
-        let transport = WCSessionPhoneWatchTransport(session: WCSession.default)
+        let transport = WCSessionPhoneWatchTransport(role: .phone, session: WCSession.default)
         transport.sendApplicationContext(.algorithmStateSnapshot(snapshot))
     }
 

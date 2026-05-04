@@ -292,7 +292,7 @@ class LoopAppManager: NSObject {
         // B.2.c.1: construct shared transport, hand to both WatchDataManager
         // (which holds the WCSession delegate role) and the coordinator.
         Task { @MainActor in
-            let phoneWatchTransport = WCSessionPhoneWatchTransport()
+            let phoneWatchTransport = WCSessionPhoneWatchTransport(role: .phone)
             self.deviceDataManager.watchManager.phoneWatchTransport = phoneWatchTransport
 
             let phoneWatchCoordinator = PhoneWatchSessionCoordinator(transport: phoneWatchTransport)
