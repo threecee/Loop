@@ -74,8 +74,8 @@ final class WatchSettingsCache {
     }
 
     #if DEBUG
-    /// B.5: test-only helper to clear the singleton between test runs.
-    /// B.8.3: also clears the persisted disk state so each test starts from
+    /// test-only helper to clear the singleton between test runs.
+    /// also clears the persisted disk state so each test starts from
     /// a known baseline. Production never calls this — once a sync arrives,
     /// it stays cached. `#if DEBUG`-guarded (B.5.1) to make accidental
     /// production calls a compile-time error rather than a runtime footgun.

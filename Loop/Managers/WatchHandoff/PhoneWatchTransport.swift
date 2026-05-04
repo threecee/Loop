@@ -33,13 +33,13 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
     private let decoder = JSONDecoder()
     private let log = OSLog(category: "WCSessionPhoneWatchTransport")
 
-    /// B.8.4: shared App Group file used as the file-pointer fallback
+    /// shared App Group file used as the file-pointer fallback
     /// for oversized algorithm-state snapshot payloads. Both phone and
     /// watch resolve the same path via `HandoffSettings.appGroupContainerURL`.
     private static let snapshotFileURL: URL =
         HandoffSettings.appGroupContainerURL.appendingPathComponent("snapshot.json")
 
-    /// B.8.4: monotonically-increasing sequence number persisted in the
+    /// monotonically-increasing sequence number persisted in the
     /// shared App Group UserDefaults so it survives process death. The
     /// watch ignores pointer messages whose sequence is ≤ the highest it
     /// has seen, providing replay/out-of-order safety.
@@ -109,13 +109,13 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
         }
     }
 
-    /// B.8.2 Issue #3: deliver via `WCSession.updateApplicationContext`. The OS
+    /// deliver via `WCSession.updateApplicationContext`. The OS
     /// keeps only the latest payload — repeated calls intentionally overwrite.
     /// Reserve `queueMessage` (transferUserInfo) for non-coalescable events
     /// (modeSwitch, pairingHandoff, manual user actions); use this method for
     /// coalescable state snapshots that should always read "latest only".
     ///
-    /// B.8.4: if a `.algorithmStateSnapshot` payload exceeds the 8 KB
+    /// if a `.algorithmStateSnapshot` payload exceeds the 8 KB
     /// applicationContext budget, write the encoded payload to
     /// `<AppGroup>/snapshot.json` (atomic) and instead deliver a tiny
     /// `.algorithmStateSnapshotPointer(sequence:)` message via
@@ -153,7 +153,7 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
         }
     }
 
-    /// B.8.4: monotonic sequence number for snapshot-pointer messages.
+    /// monotonic sequence number for snapshot-pointer messages.
     /// Persisted in App Group UserDefaults under `sequenceKey` so it
     /// survives phone process death; reset to 0 only if the App Group
     /// container is deleted (full app uninstall).

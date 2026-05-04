@@ -25,7 +25,7 @@ final class HandoffOrchestrator: ObservableObject {
 
     var userDefaults: UserDefaults
 
-    /// B.5 Issue #1: log channel for command-gate effect transitions.
+    /// log channel for command-gate effect transitions.
     private let log = OSLog(category: "HandoffOrchestrator")
 
     private var coordinator: PhoneWatchSessionCoordinator
@@ -36,7 +36,7 @@ final class HandoffOrchestrator: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     private var scheduledTimers: [UUID: Task<Void, Never>] = [:]
 
-    /// B.4 Issue #2: 60s debounce timer for marking phone-stable. When
+    /// 60s debounce timer for marking phone-stable. When
     /// reachability flips on, we wait 60s before declaring "stable since",
     /// to avoid flapping during BLE reconnect storms. If reachability flips
     /// off in the interim, the timer is cancelled and stable-since is cleared.
@@ -49,7 +49,7 @@ final class HandoffOrchestrator: ObservableObject {
     /// — `deinit` only fires at app termination in production.
     private var systemTZObserver: NSObjectProtocol?
 
-    /// B.4 Issue #2: debounce window matches HandoffPolicyEngine.absenceThreshold (60s).
+    /// debounce window matches HandoffPolicyEngine.absenceThreshold (60s).
     /// Tests can override via the optional `phoneStableDebounceOverride` init parameter.
     private static let defaultPhoneStableDebounceSeconds: TimeInterval = 60
     private let phoneStableDebounceSeconds: TimeInterval
@@ -65,12 +65,12 @@ final class HandoffOrchestrator: ObservableObject {
     /// from LoopDataManager / ServicesManager. Returns nil when not yet ready.
     private let settingsSyncProvider: (() -> PhoneWatchSettingsSync?)?
 
-    /// B.8.2 Issue #4: dedup guard. Phone bails on `emitSettingsSync()` when
+    /// dedup guard. Phone bails on `emitSettingsSync()` when
     /// the provider yields a payload byte-identical to the last one we sent.
     /// Cleared in `stop()` so a fresh `start()` always emits at least once.
     private var lastEmittedSync: PhoneWatchSettingsSync?
 
-    /// B.2.e: replaces the previous `lastReceivedPayload` field — accessor
+    /// replaces the previous `lastReceivedPayload` field — accessor
     /// now forwards to ownership's cache (single source of truth).
     var cachedPayload: OmniBLEHandoffPayload? { ownership.cachedPayload }
 
@@ -241,7 +241,7 @@ final class HandoffOrchestrator: ObservableObject {
         handoffState = machine.state
     }
 
-    /// B.4 Issue #2: reachability change handler. On flip-on, schedule a 60s
+    /// reachability change handler. On flip-on, schedule a 60s
     /// debounce → mark phone stable. On flip-off, cancel the debounce and
     /// clear stable-since immediately.
     @MainActor
@@ -267,7 +267,7 @@ final class HandoffOrchestrator: ObservableObject {
         }
     }
 
-    /// B.5 Issue #1: surfaced (internal) so unit tests can directly invoke
+    /// surfaced (internal) so unit tests can directly invoke
     /// the side-effect set under test (e.g. `.stopIssuingPodCommands`)
     /// without having to drive a full state-machine event sequence.
     func execute(_ effects: [HandoffSideEffect]) {
@@ -338,7 +338,7 @@ final class HandoffOrchestrator: ObservableObject {
         }
     }
 
-    /// B.2.e: Fills the pairing-handoff payload with the current PodState
+    /// Fills the pairing-handoff payload with the current PodState
     /// (serialized via OmniBLEHandoffPayload's PropertyListSerialization helper)
     /// before the message goes out over WCSession.
     private func fillPayload(_ template: PhoneWatchPairingHandoff) -> PhoneWatchPairingHandoff {

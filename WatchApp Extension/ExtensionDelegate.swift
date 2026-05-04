@@ -60,20 +60,20 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     private var notifications: [NSObjectProtocol] = []
     private var handoffStateCancellable: AnyCancellable?
 
-    /// B.8.4: shared App Group file used as the file-pointer fallback for
+    /// shared App Group file used as the file-pointer fallback for
     /// oversized algorithm-state snapshot payloads. Mirrors the path used
     /// by `WCSessionPhoneWatchTransport` on the phone side.
     private static let snapshotFileURL: URL =
         HandoffSettings.appGroupContainerURL.appendingPathComponent("snapshot.json")
 
-    /// B.8.4: highest snapshot-pointer sequence the watch has seen this
+    /// highest snapshot-pointer sequence the watch has seen this
     /// process lifetime. Pointer messages with sequence ≤ this are dropped
     /// as out-of-order (or replay). In-memory only — restart resets to 0,
     /// in which case the worst case is the watch reads the file once on
     /// the first post-relaunch pointer, which is benign.
     private var lastSeenSnapshotSequence: UInt64 = 0
 
-    /// B.8.4: dedicated decoder for the pointer→inline rewrap path. Mirrors
+    /// dedicated decoder for the pointer→inline rewrap path. Mirrors
     /// the date-encoding strategy used by `WCSessionPhoneWatchTransport`.
     private let snapshotDecoder: JSONDecoder = {
         let d = JSONDecoder()
@@ -81,7 +81,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         return d
     }()
 
-    /// B.8.4: dedicated encoder for re-wrapping the file-loaded snapshot
+    /// dedicated encoder for re-wrapping the file-loaded snapshot
     /// as an inline `PhoneWatchMessage.algorithmStateSnapshot(_)` so it
     /// can flow through the existing transport dispatch path.
     private let snapshotEncoder: JSONEncoder = {
@@ -469,7 +469,7 @@ extension ExtensionDelegate: WCSessionDelegate {
         updateContext(applicationContext)
     }
 
-    /// B.8.4: dispatch helper for applicationContext-delivered
+    /// dispatch helper for applicationContext-delivered
     /// `phoneWatchMessage` Data. Recognizes the file-pointer fallback case
     /// (`algorithmStateSnapshotPointer`), validates monotonic sequence,
     /// reads the snapshot from the App Group file, re-wraps as inline
@@ -490,7 +490,7 @@ extension ExtensionDelegate: WCSessionDelegate {
         phoneWatchTransport?.handleIncomingMessageData(data, replyHandler: nil)
     }
 
-    /// B.8.4: pointer-message handler. Drops out-of-order/replayed pointers
+    /// pointer-message handler. Drops out-of-order/replayed pointers
     /// (sequence ≤ lastSeen), reads `<AppGroup>/snapshot.json`, re-wraps the
     /// payload as an inline `.algorithmStateSnapshot`, and forwards through
     /// the existing transport dispatch.

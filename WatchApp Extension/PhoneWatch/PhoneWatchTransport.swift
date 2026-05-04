@@ -93,7 +93,7 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
         }
     }
 
-    /// B.8.2 Issue #3: deliver via `WCSession.updateApplicationContext`. The OS
+    /// deliver via `WCSession.updateApplicationContext`. The OS
     /// keeps only the latest payload — repeated calls intentionally overwrite.
     /// Reserve `queueMessage` (transferUserInfo) for non-coalescable events
     /// (modeSwitch, pairingHandoff, manual user actions); use this method for

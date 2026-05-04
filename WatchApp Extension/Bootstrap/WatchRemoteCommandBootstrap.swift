@@ -34,11 +34,11 @@ final class WatchRemoteCommandBootstrap {
     private let settingsProvider: () -> WatchSettingsSnapshot?
     private let supportingStoresProvider: () -> WatchRemoteCommandStores?
 
-    /// B.8.3: tracks the most recent handoff state so `retryIfNeeded()`
+    /// tracks the most recent handoff state so `retryIfNeeded()`
     /// (publisher sink) can short-circuit unless we're in `.watchDriver`.
     private var lastHandoffState: HandoffState = .phoneDriver
 
-    /// B.8.3: subscription to `WatchSettingsCache.shared.publisher`. Holds
+    /// subscription to `WatchSettingsCache.shared.publisher`. Holds
     /// the cancellable so the bootstrap's lifetime governs the subscription.
     private var settingsCancellable: AnyCancellable?
 
@@ -113,7 +113,7 @@ final class WatchRemoteCommandBootstrap {
 
     // MARK: - Private
 
-    /// B.8.3: settings publisher subscription target. Gated on
+    /// settings publisher subscription target. Gated on
     /// `lastHandoffState == .watchDriver` so a settings arrival in any other
     /// state doesn't inappropriately build a manager.
     private func retryIfNeeded() {

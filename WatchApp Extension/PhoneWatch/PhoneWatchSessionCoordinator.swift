@@ -23,15 +23,15 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
     private let clock: () -> Date
     private var heartbeat: HeartbeatScheduler?
 
-    /// B.5 Issue #5: log channel for split-brain detection.
+    /// log channel for split-brain detection.
     private let log = OSLog(category: "PhoneWatchSessionCoordinator")
 
-    /// B.2.d: orchestrator subscribes to incoming non-heartbeat messages
+    /// orchestrator subscribes to incoming non-heartbeat messages
     /// (modeSwitch / pairingHandoff). The coordinator continues to handle
     /// heartbeat internally; modeSwitch / pairingHandoff are forwarded.
     var onHandoffMessage: ((PhoneWatchMessage) -> Void)?
 
-    /// B.2.d: convenience reachability for HandoffPolicyEngine. Mirrors the
+    /// convenience reachability for HandoffPolicyEngine. Mirrors the
     /// underlying transport's WCSession reachability when known, else false.
     var isReachable: Bool {
         // isCounterpartReachable already tracks transport.isReachable updated
@@ -71,12 +71,12 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
 
     // MARK: - Send
 
-    /// B.2.d: queue a mode-switch message (transferUserInfo, fire-and-forget).
+    /// queue a mode-switch message (transferUserInfo, fire-and-forget).
     func sendModeSwitch(_ ms: PhoneWatchModeSwitch) {
         transport.queueMessage(.modeSwitch(ms))
     }
 
-    /// B.2.d: queue a pairing-handoff message (transferUserInfo).
+    /// queue a pairing-handoff message (transferUserInfo).
     func sendPairingHandoff(_ ph: PhoneWatchPairingHandoff) {
         transport.queueMessage(.pairingHandoff(ph))
     }

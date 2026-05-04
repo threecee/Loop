@@ -22,13 +22,13 @@ import os.log
 @MainActor
 final class HandoffOrchestrator: ObservableObject {
 
-    /// B.5 Issue #5: shared accessor populated by ExtensionDelegate at launch.
+    /// shared accessor populated by ExtensionDelegate at launch.
     /// Read by the watch's `PhoneWatchSessionCoordinator` to evaluate
     /// split-brain (i.e. compare local handoffState.currentOwner against
     /// the inbound heartbeat's claimedOwner).
     static weak var shared: HandoffOrchestrator?
 
-    /// B.5 Issue #1: log channel for command-gate effect transitions and
+    /// log channel for command-gate effect transitions and
     /// split-brain detection.
     private let log = OSLog(category: "HandoffOrchestrator")
 
@@ -47,13 +47,13 @@ final class HandoffOrchestrator: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     private var scheduledTimers: [UUID: Task<Void, Never>] = [:]
 
-    /// B.4 Issue #2: 60s debounce timer for marking phone-stable. When
+    /// 60s debounce timer for marking phone-stable. When
     /// reachability flips on, we wait 60s before declaring "stable since",
     /// to avoid flapping during BLE reconnect storms. If reachability flips
     /// off in the interim, the timer is cancelled and stable-since is cleared.
     private var phoneStableDebounce: Task<Void, Never>?
 
-    /// B.4 Issue #2: debounce window matches HandoffPolicyEngine.absenceThreshold (60s).
+    /// debounce window matches HandoffPolicyEngine.absenceThreshold (60s).
     /// Tests can override via the optional `phoneStableDebounceOverride` init parameter.
     private static let defaultPhoneStableDebounceSeconds: TimeInterval = 60
     private let phoneStableDebounceSeconds: TimeInterval
@@ -64,11 +64,11 @@ final class HandoffOrchestrator: ObservableObject {
     // commandsAllowed flag directly.
     let ownership: OmniBLEOwnership
 
-    /// B.2.e: replaces the previous `lastReceivedPayload` field — accessor
+    /// replaces the previous `lastReceivedPayload` field — accessor
     /// now forwards to ownership's cache (single source of truth).
     var cachedPayload: OmniBLEHandoffPayload? { ownership.cachedPayload }
 
-    /// B.6: forwarded accessor for the lazily-constructed OmniBLEPumpManager,
+    /// forwarded accessor for the lazily-constructed OmniBLEPumpManager,
     /// typed as `PumpManager` (LoopKit) since that's what the algorithm enacts on.
     /// Returns nil until the first `.watchDriver` transition triggers
     /// `OmniBLEOwnership.setPumpManager(_:)`. The runtime cast
@@ -202,7 +202,7 @@ final class HandoffOrchestrator: ObservableObject {
         handoffState = machine.state
     }
 
-    /// B.4 Issue #2: reachability change handler. On flip-on, schedule a 60s
+    /// reachability change handler. On flip-on, schedule a 60s
     /// debounce → mark phone stable. On flip-off, cancel the debounce and
     /// clear stable-since immediately.
     @MainActor
@@ -228,7 +228,7 @@ final class HandoffOrchestrator: ObservableObject {
         }
     }
 
-    /// B.5 Issue #1: surfaced (internal) so unit tests can directly invoke
+    /// surfaced (internal) so unit tests can directly invoke
     /// the side-effect set under test (e.g. `.stopIssuingPodCommands`)
     /// without having to drive a full state-machine event sequence.
     func execute(_ effects: [HandoffSideEffect]) {
@@ -284,7 +284,7 @@ final class HandoffOrchestrator: ObservableObject {
         }
     }
 
-    /// B.5 Issue #7: Constructs the watch-side OmniBLEPumpManager from the
+    /// Constructs the watch-side OmniBLEPumpManager from the
     /// most-recent received settings sync (via WatchSettingsCache). Falls
     /// back to .watchSideDefault if no sync has arrived yet (rare — watch
     /// becoming driver before first sync would itself be unusual).
@@ -320,7 +320,7 @@ final class HandoffOrchestrator: ObservableObject {
         return OmniBLEPumpManager(state: state)
     }
 
-    /// B.2.e: Fills the pairing-handoff payload with the current PodState
+    /// Fills the pairing-handoff payload with the current PodState
     /// (serialized via OmniBLEHandoffPayload's PropertyListSerialization helper)
     /// before the message goes out over WCSession.
     private func fillPayload(_ template: PhoneWatchPairingHandoff) -> PhoneWatchPairingHandoff {

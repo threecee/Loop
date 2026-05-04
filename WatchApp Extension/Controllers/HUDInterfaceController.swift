@@ -22,7 +22,7 @@ class HUDInterfaceController: WKInterfaceController {
     private var driverDotPulseTimer: Timer?
 
     @IBOutlet weak var loopHUDImage: WKInterfaceImage!
-    /// B.7: driver indicator overlay positioned on top of loopHUDImage.
+    /// driver indicator overlay positioned on top of loopHUDImage.
     /// Shows when the watch is the current handoff driver; pulses during
     /// transitions. Wired in Interface.storyboard (both ActionHUDController
     /// and ChartHUDController scenes).
@@ -162,7 +162,7 @@ class HUDInterfaceController: WKInterfaceController {
 
     // MARK: - B.7 driver indicator
 
-    /// B.7: subscribes to HandoffOrchestrator.shared.$handoffState and pushes
+    /// subscribes to HandoffOrchestrator.shared.$handoffState and pushes
     /// derived flags to the driverDot overlay. Idempotent — safe to call from
     /// every willActivate (replaces any prior subscription).
     private func subscribeToHandoffState() {
@@ -181,7 +181,7 @@ class HUDInterfaceController: WKInterfaceController {
             }
     }
 
-    /// B.7: updates driverDot visibility + pulse animation based on
+    /// updates driverDot visibility + pulse animation based on
     /// HandoffOrchestrator state. Called from the Combine subscription.
     private func updateDriverDot(isThisDeviceDriving: Bool, isHandoffPending: Bool) {
         driverDot.setHidden(!isThisDeviceDriving)

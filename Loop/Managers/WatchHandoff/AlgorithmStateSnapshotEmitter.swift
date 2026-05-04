@@ -28,7 +28,7 @@ protocol SnapshotTransport: AnyObject {
 /// declaring `extension <Protocol>: <Protocol>`, so we adopt on the class
 /// instead — production code passes the concrete transport here).
 extension WCSessionPhoneWatchTransport: SnapshotTransport {
-    /// B.8.2 Issue #3: routes through `updateApplicationContext` (latest-only,
+    /// routes through `updateApplicationContext` (latest-only,
     /// intentionally overwrites). `transferUserInfo` (via `queueMessage`) is
     /// reserved for non-coalescable events (modeSwitch, pairingHandoff,
     /// manual user actions). AlgorithmStateSnapshot is coalescable state —
