@@ -45,6 +45,7 @@ final class WatchPumpManagerSettingsTests: XCTestCase {
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .watch),
             policyEngine: policyEngine,
             shadowScheduler: ShadowStateScheduler(
+                role: .watch,
                 clock: { [unowned self] in self.clock },
                 fire: { }
             ),

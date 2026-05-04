@@ -432,7 +432,6 @@
 		A9F703752489C9A000C98AD8 /* GlucoseStore+SimulatedCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F703742489C9A000C98AD8 /* GlucoseStore+SimulatedCoreData.swift */; };
 		A9F703772489D8AA00C98AD8 /* PersistentDeviceLog+SimulatedCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F703762489D8AA00C98AD8 /* PersistentDeviceLog+SimulatedCoreData.swift */; };
 		AAC65206E62D4840A5D600D5 /* ExtendedRuntimeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EA43E989364C63872E9437 /* ExtendedRuntimeCoordinator.swift */; };
-		AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */; };
 		AF24CEA23D3F475C93EC8AB4 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */; };
 		B4001CEE28CBBC82002FB414 /* AlertManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4001CED28CBBC82002FB414 /* AlertManagementView.swift */; };
 		B405E35924D2A75B00DD058D /* DerivedAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A966152923EA5A37005D8B29 /* DerivedAssets.xcassets */; };
@@ -698,7 +697,6 @@
 		WB2CA1000000000011 /* OmniBLE.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		WB2CA1000000000012 /* OmniBLE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; };
 		WB2D000000000100021 /* HandoffPolicyEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100001 /* HandoffPolicyEngine.swift */; };
-		WB2D000000000100022 /* ShadowStateScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100002 /* ShadowStateScheduler.swift */; };
 		WB2D000000000100023 /* HandoffOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100003 /* HandoffOrchestrator.swift */; };
 		WB2D000000000100024 /* HandoffPolicyEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100004 /* HandoffPolicyEngineTests.swift */; };
 		WB2D000000000100025 /* ShadowStateSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2D000000000100005 /* ShadowStateSchedulerTests.swift */; };
@@ -1581,7 +1579,6 @@
 		C1F8B1DB223862D500DD66CF /* BolusProgressTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = BolusProgressTableViewCell.xib; sourceTree = "<group>"; };
 		C1FB428B217806A300FAB378 /* StateColorPalette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateColorPalette.swift; sourceTree = "<group>"; };
 		C1FB428E217921D600FAB378 /* PumpManagerUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpManagerUI.swift; sourceTree = "<group>"; };
-		C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShadowStateScheduler.swift; path = "WatchApp Extension/Handoff/ShadowStateScheduler.swift"; sourceTree = SOURCE_ROOT; };
 		D8898032AA9103B8BA09BBBD /* LoopError+Issue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "LoopError+Issue.swift"; sourceTree = "<group>"; };
 		DC2B417993644643920F4455 /* ShadowStateSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShadowStateSchedulerTests.swift; path = "WatchApp ExtensionTests/ShadowStateSchedulerTests.swift"; sourceTree = SOURCE_ROOT; };
 		DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SharedStateBridgeTests.swift; path = "WatchApp ExtensionTests/SharedStateBridgeTests.swift"; sourceTree = SOURCE_ROOT; };
@@ -1689,7 +1686,6 @@
 		WB2CA10000000000F5 /* PhoneWatchSessionCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSessionCoordinatorTests.swift; sourceTree = "<group>"; };
 		WB2CA10000000000F6 /* WatchConnectionStatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectionStatusRow.swift; sourceTree = "<group>"; };
 		WB2D000000000100001 /* HandoffPolicyEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffPolicyEngine.swift; sourceTree = "<group>"; };
-		WB2D000000000100002 /* ShadowStateScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowStateScheduler.swift; sourceTree = "<group>"; };
 		WB2D000000000100003 /* HandoffOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffOrchestrator.swift; sourceTree = "<group>"; };
 		WB2D000000000100004 /* HandoffPolicyEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandoffPolicyEngineTests.swift; sourceTree = "<group>"; };
 		WB2D000000000100005 /* ShadowStateSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShadowStateSchedulerTests.swift; sourceTree = "<group>"; };
@@ -3193,7 +3189,6 @@
 			isa = PBXGroup;
 			children = (
 				9366A91624FB4D489DD2E784 /* HandoffPolicyEngine.swift */,
-				C473C3278AE74F49828ECB29 /* ShadowStateScheduler.swift */,
 				B190D24CF47A434F983A33E1 /* HandoffOrchestrator.swift */,
 			);
 			path = Handoff;
@@ -3206,7 +3201,6 @@
 				WB2CA10000000000F2 /* PhoneWatchSessionCoordinator.swift */,
 				WB2CA10000000000F3 /* HeartbeatScheduler.swift */,
 				WB2D000000000100001 /* HandoffPolicyEngine.swift */,
-				WB2D000000000100002 /* ShadowStateScheduler.swift */,
 				WB2D000000000100003 /* HandoffOrchestrator.swift */,
 				WB2D000000000100008 /* HandoffBlockedError.swift */,
 				WB2D00000000010B801 /* AlgorithmStateSnapshotEmitter.swift */,
@@ -4147,7 +4141,6 @@
 				WB2CA1000000000003 /* HeartbeatScheduler.swift in Sources */,
 				WB2CA1000000000006 /* WatchConnectionStatusRow.swift in Sources */,
 				WB2D000000000100021 /* HandoffPolicyEngine.swift in Sources */,
-				WB2D000000000100022 /* ShadowStateScheduler.swift in Sources */,
 				WB2D000000000100023 /* HandoffOrchestrator.swift in Sources */,
 				WB2D000000000100028 /* HandoffBlockedError.swift in Sources */,
 				WB2D00000000010B821 /* AlgorithmStateSnapshotEmitter.swift in Sources */,
@@ -4443,7 +4436,6 @@
 				WB2D00000000010B823 /* WatchAlgorithmSnapshotCache.swift in Sources */,
 				WB2D00000000010B825 /* WarmUpDecider.swift in Sources */,
 				CB151124CFD54014AACC19B4 /* HandoffPolicyEngine.swift in Sources */,
-				AB6316AFE5C944778FBBB560 /* ShadowStateScheduler.swift in Sources */,
 				049A1126B9804AFFBB289978 /* HandoffOrchestrator.swift in Sources */,
 				894F6DD3243BCBDB00CCE676 /* Environment+SizeClass.swift in Sources */,
 				E98A55F524EEE15A0008715D /* OnOffSelectionController.swift in Sources */,

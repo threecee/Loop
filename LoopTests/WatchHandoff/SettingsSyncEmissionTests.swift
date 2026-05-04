@@ -92,6 +92,7 @@ final class SettingsSyncEmissionTests: XCTestCase {
                 emit: { _ in }
             ),
             shadowScheduler: ShadowStateScheduler(
+                role: .phone,
                 clock: { [unowned self] in self.clock },
                 fire: {}
             ),

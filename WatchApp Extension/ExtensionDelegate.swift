@@ -174,7 +174,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
             settings: settings,
             emit: { _ in }  // wired via orchestrator; placeholder avoids capture cycles at init
         )
-        let scheduler = ShadowStateScheduler(fire: {})  // orchestrator re-wires via setFire in start()
+        let scheduler = ShadowStateScheduler(role: .watch, fire: {})  // orchestrator re-wires via setFire in start()
         let stateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
         let orchestrator = HandoffOrchestrator(
             coordinator: coordinator,

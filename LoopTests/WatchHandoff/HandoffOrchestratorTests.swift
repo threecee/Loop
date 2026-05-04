@@ -53,6 +53,7 @@ final class HandoffOrchestratorTests: XCTestCase {
                                               appGroupDefaults: isolatedDefaults()),
             policyEngine: policyEngine,
             shadowScheduler: ShadowStateScheduler(
+                role: .phone,
                 clock: { [unowned self] in self.clock },
                 fire: { }
             ),
@@ -228,6 +229,7 @@ final class HandoffOrchestratorTests: XCTestCase {
                 emit: { _ in }
             ),
             shadowScheduler: ShadowStateScheduler(
+                role: .phone,
                 clock: { [unowned self] in self.clock },
                 fire: {}
             ),

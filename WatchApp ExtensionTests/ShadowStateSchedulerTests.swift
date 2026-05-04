@@ -20,6 +20,7 @@ final class ShadowStateSchedulerTests: XCTestCase {
 
     private func makeScheduler(intervalSeconds: TimeInterval = 0.5) -> ShadowStateScheduler {
         ShadowStateScheduler(
+            role: .watch,
             interval: intervalSeconds,
             clock: { [unowned self] in self.clock },
             fire: { [unowned self] in self.firedCount += 1 }
