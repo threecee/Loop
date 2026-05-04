@@ -277,6 +277,8 @@
 		631CCA2FE86B6397F34B1EF9 /* placeholder-predicted-hypo.json in Resources */ = {isa = PBXBuildFile; fileRef = B53A30055A8FD963007C15CA /* placeholder-predicted-hypo.json */; };
 		65A87A4BEFD4945EF357AC02 /* LoopCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FFCF21EAE05D00AF44BF /* LoopCore.framework */; };
 		6969CD7061C34FB1B52A2520 /* WatchSettingsCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1FBF47F733B45829957F54F /* WatchSettingsCache.swift */; };
+		B11A00000000000505 /* WatchAPNsRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000005 /* WatchAPNsRegistration.swift */; };
+		B11A00000000000606 /* APNsTokenRegistrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11A00000000000006 /* APNsTokenRegistrationTests.swift */; };
 		69AACEC5CC8F42D288AD3070 /* SharedStateBridgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */; };
 		6B6036285E654E899F014EC7 /* G7SensorKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 217DB84601C04D2EAE8FD956 /* G7SensorKit.framework */; };
 		6D1200C021BC36840A3A5727 /* NightscoutServiceLoadingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 631C894D174F9241F016AEA9 /* NightscoutServiceLoadingTest.swift */; };
@@ -1346,6 +1348,8 @@
 		A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Phase7_WarmingUpTest.swift; path = Phase7_WarmingUpTest.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60004A1B2C3D4 /* LoopWarmingUpBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LoopWarmingUpBadge.swift; path = LoopWarmingUpBadge.swift; sourceTree = "<group>"; };
 		A1FBF47F733B45829957F54F /* WatchSettingsCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchSettingsCache.swift; path = "WatchApp Extension/PhoneWatch/WatchSettingsCache.swift"; sourceTree = SOURCE_ROOT; };
+		B11A00000000000005 /* WatchAPNsRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WatchAPNsRegistration.swift; path = "WatchApp Extension/WatchAPNsRegistration.swift"; sourceTree = SOURCE_ROOT; };
+		B11A00000000000006 /* APNsTokenRegistrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = APNsTokenRegistrationTests.swift; path = "WatchApp ExtensionTests/APNsTokenRegistrationTests.swift"; sourceTree = SOURCE_ROOT; };
 		A20FB8776F6A88FEE34DAF43 /* LoopAlgorithmCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LoopAlgorithmCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A22A82FDA3554D77BC068817 /* WatchApp ExtensionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "WatchApp ExtensionTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A532A33BFC6D4A2FB12B92D2 /* GlucoseReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GlucoseReader.swift; path = "WatchApp Extension/Sensor/GlucoseReader.swift"; sourceTree = SOURCE_ROOT; };
@@ -2104,6 +2108,7 @@
 				B66D1F242E6A5D6500471149 /* InfoPlist.xcstrings */,
 				43A9438D1B926B7B0051FA24 /* ComplicationController.swift */,
 				43A943871B926B7B0051FA24 /* ExtensionDelegate.swift */,
+				B11A00000000000005 /* WatchAPNsRegistration.swift */,
 				43A9438F1B926B7B0051FA24 /* Assets.xcassets */,
 				4328E0121CFBE1B700E199AA /* Controllers */,
 				4328E01F1CFBE2B100E199AA /* Extensions */,
@@ -2832,6 +2837,7 @@
 				WB2D00000000010B806 /* WarmUpDeciderTests.swift */,
 				WB2D00000000010B808 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift */,
 				WB2D000000000B82E2 /* ExtensionDelegateApplicationContextTests.swift */,
+				B11A00000000000006 /* APNsTokenRegistrationTests.swift */,
 			);
 			path = "WatchApp ExtensionTests";
 			sourceTree = "<group>";
@@ -4089,6 +4095,7 @@
 				WB2D00000000010B826 /* WarmUpDeciderTests.swift in Sources */,
 				WB2D00000000010B828 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift in Sources */,
 				WB2D000000000B82F2 /* ExtensionDelegateApplicationContextTests.swift in Sources */,
+				B11A00000000000606 /* APNsTokenRegistrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4310,6 +4317,7 @@
 				43A9438A1B926B7B0051FA24 /* NotificationController.swift in Sources */,
 				439A7945211FE23A0041B75F /* NSUserActivity.swift in Sources */,
 				43A943881B926B7B0051FA24 /* ExtensionDelegate.swift in Sources */,
+				B11A00000000000505 /* WatchAPNsRegistration.swift in Sources */,
 				B10E00000000000201 /* WatchSidePumpManagerFactory.swift in Sources */,
 				43511CEE220FC61700566C63 /* HUDRowController.swift in Sources */,
 				1D3F0F7526D59B6C004A5960 /* Debug.swift in Sources */,

@@ -155,6 +155,11 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
             onSnapshotReceived: { snap in
                 WatchAlgorithmSnapshotCache.shared.update(snap)
             },
+            onAPNsTokenPublishReceived: { publication in
+                // B.11.0: counterpart (phone) published its token; persist
+                // to the watch's App Group APNsTokenStore.
+                APNsTokenStore().save(publication)
+            },
             makeWatchSidePumpManager: WatchSidePumpManagerFactory.make
         )
 
@@ -311,6 +316,20 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         // after WKExtension has the delegate wired up, otherwise the call
         // crashes with "WKExtensionDelegate (null)".
         backgroundPollScheduler?.scheduleNext()
+
+        // B.11.0: register for APNs so caretaker remote commands targeting
+        // the watch can land here when the watch is the BLE driver. The
+        // entitlement was added in B.11.0 Phase 2; the bundle ID was
+        // enabled in the Apple Developer portal in Phase 0 (Carl-action).
+        // The OS calls didRegisterForRemoteNotifications(withDeviceToken:)
+        // below on success, didFailToRegisterForRemoteNotifications on
+        // failure. Sim path falls through with a logged warning since
+        // simulator does not deliver real APNs tokens.
+        #if !targetEnvironment(simulator)
+        WKExtension.shared().registerForRemoteNotifications()
+        #else
+        log.default("APNs registration skipped on simulator (no real token available)")
+        #endif
     }
 
     func applicationDidBecomeActive() {
@@ -327,6 +346,22 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
 
         extendedRuntimeCoordinator?.onScenePhaseChange(.background)
         NotificationCenter.default.post(name: type(of: self).willResignActiveNotification, object: self)
+    }
+
+    // MARK: - WKExtensionDelegate APNs registration (B.11.0)
+
+    func didRegisterForRemoteNotifications(withDeviceToken deviceToken: Data) {
+        log.default("watch didRegisterForRemoteNotifications, %d byte token", deviceToken.count)
+        WatchAPNsRegistration.handleDidRegister(
+            deviceToken: deviceToken,
+            transport: phoneWatchTransport,
+            store: APNsTokenStore()
+        )
+    }
+
+    func didFailToRegisterForRemoteNotificationsWithError(_ error: Error) {
+        log.error("watch didFailToRegisterForRemoteNotifications: %{public}@",
+                  String(describing: error))
     }
 
     // Presumably the main thread?

@@ -299,7 +299,14 @@ class LoopAppManager: NSObject {
             let stack = HandoffStack.assemble(
                 role: .phone,
                 pumpManager: deviceDataManager.pumpManager as? OmniBLEPumpManager,
-                settingsSyncProvider: { [weak self] in self?.currentSettingsSyncOrNil() }
+                settingsSyncProvider: { [weak self] in self?.currentSettingsSyncOrNil() },
+                onAPNsTokenPublishReceived: { publication in
+                    // B.11.0: counterpart (watch) published its token; persist
+                    // to the phone's App Group APNsTokenStore so the phone-side
+                    // RemoteCareUploader (B.11.1) can target the watch when
+                    // the watch is the BLE driver.
+                    APNsTokenStore().save(publication)
+                }
             )
 
             // Wire the transport into WatchDataManager so the WCSession
@@ -520,6 +527,22 @@ class LoopAppManager: NSObject {
             log.default("DeviceToken: %{public}@", token.hexadecimalString)
         }
         settingsManager.remoteNotificationRegistrationDidFinish(result)
+
+        // B.11.0: persist phone-side APNs token to App Group + publish to
+        // the watch over WCSession. The watch's APNsTokenStore gains a
+        // phone-slot entry on receipt; the watch ingests it via
+        // PhoneWatchSessionCoordinator's apnsTokenPublish branch (Phase 5).
+        if case .success(let deviceToken) = result {
+            let publication = APNsTokenPublication(
+                protocolVersion: PhoneWatchProtocol.currentVersion,
+                sentAt: Date(),
+                role: .phone,
+                token: deviceToken,
+                expiresAt: Date().addingTimeInterval(60 * 60 * 24 * 30)
+            )
+            APNsTokenStore().save(publication)
+            deviceDataManager?.watchManager.phoneWatchTransport?.queueMessage(.apnsTokenPublish(publication))
+        }
     }
 
     private func handleRemoteNotificationFromLaunchOptions() {
