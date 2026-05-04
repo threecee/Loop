@@ -9,16 +9,16 @@
 import WatchKit
 import LoopCore
 import LoopKit
-import Combine  // B.7: subscribe to HandoffOrchestrator.$handoffState
+import Combine  // subscribe to HandoffOrchestrator.$handoffState
 import WatchAlgorithmKit  // for WatchAlgorithmDriver.warmUpDidCompleteNotification (B.6 Phase 4a-bis)
 
 class HUDInterfaceController: WKInterfaceController {
     private var activeContextObserver: NSObjectProtocol?
     // B.3.a Phase 7: observer for warm-up completion
     private var warmUpObserver: NSObjectProtocol?
-    // B.7: cancellable for HandoffOrchestrator handoffState subscription
+    // cancellable for HandoffOrchestrator handoffState subscription
     private var handoffStateCancellable: AnyCancellable?
-    // B.7: timer driving the driverDot opacity pulse during handoff transitions
+    // timer driving the driverDot opacity pulse during handoff transitions
     private var driverDotPulseTimer: Timer?
 
     @IBOutlet weak var loopHUDImage: WKInterfaceImage!
@@ -35,7 +35,7 @@ class HUDInterfaceController: WKInterfaceController {
     override func willActivate() {
         super.willActivate()
 
-        // B.7: size the driver dot to roughly half the loop-ring image's
+        // size the driver dot to roughly half the loop-ring image's
         // diameter. The storyboard image is the `circle.fill` SF Symbol whose
         // default rendering is much smaller than we want; setting an explicit
         // point-size config makes it visible at-a-glance.
@@ -70,7 +70,7 @@ class HUDInterfaceController: WKInterfaceController {
             self.loopManager.requestGlucoseBackfillIfNecessary()
         })
 
-        // B.7: subscribe to HandoffOrchestrator state and push driver/handoff-pending
+        // subscribe to HandoffOrchestrator state and push driver/handoff-pending
         // flags to the driverDot overlay.
         subscribeToHandoffState()
     }
@@ -86,7 +86,7 @@ class HUDInterfaceController: WKInterfaceController {
         // title clears even if the controller is not the current page when
         // the first iteration completes.
 
-        // B.7: drop the handoff subscription + timer until next willActivate
+        // drop the handoff subscription + timer until next willActivate
         // so we don't burn cycles updating an off-screen overlay.
         handoffStateCancellable = nil
         stopDriverDotPulse()
@@ -130,7 +130,7 @@ class HUDInterfaceController: WKInterfaceController {
             }
         }()
         loopHUDImage.setLoopImage(isClosedLoop: isClosedLoop, loopState)
-        // B.7: keep the driver dot's tint matched to the loop ring's freshness
+        // keep the driver dot's tint matched to the loop ring's freshness
         // color so it reads as part of the same indicator.
         driverDot.setTintColor(driverDotTintColor(for: loopState))
 

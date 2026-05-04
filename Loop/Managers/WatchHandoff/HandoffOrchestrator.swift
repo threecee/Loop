@@ -54,7 +54,7 @@ final class HandoffOrchestrator: ObservableObject {
     private static let defaultPhoneStableDebounceSeconds: TimeInterval = 60
     private let phoneStableDebounceSeconds: TimeInterval
 
-    // B.2.e: BLE ownership coordinator. Exposed (internal) so the
+    // BLE ownership coordinator. Exposed (internal) so the
     // PhoneWatchSessionCoordinator's split-brain detection (B.5 Issue #5)
     // and the orchestrator unit tests (B.5 Issue #1) can read/write the
     // commandsAllowed flag directly.
@@ -104,7 +104,7 @@ final class HandoffOrchestrator: ObservableObject {
         self.phoneStableDebounceSeconds = phoneStableDebounceOverride
             ?? Self.defaultPhoneStableDebounceSeconds
 
-        // B.5.2 Issue #3b: observe phone-side time-zone changes (iOS posts this
+        // observe phone-side time-zone changes (iOS posts this
         // when the user crosses a zone boundary, when Settings → General → Date
         // & Time changes, or when the carrier reports a TZ change). Trigger a
         // fresh sync emission so the watch picks up the new TimeZone.current
@@ -122,7 +122,7 @@ final class HandoffOrchestrator: ObservableObject {
     }
 
     deinit {
-        // B.5.2 Issue #3b: explicit removal of the closure observer (token-based;
+        // explicit removal of the closure observer (token-based;
         // `removeObserver(self)` would not match it because the observer object
         // is the returned token, not `self`).
         if let observer = systemTZObserver {
@@ -142,12 +142,12 @@ final class HandoffOrchestrator: ObservableObject {
         policyEngine.start()
         shadowScheduler.start()
 
-        // B.4 Issue #2: seed initial owner state for the policy engine. The
+        // seed initial owner state for the policy engine. The
         // iOS state machine starts in .phoneDriver, so the phone is the
         // initial owner.
         policyEngine.markCurrentOwner(.phone)
 
-        // B.4 Issue #2: subscribe to reachability changes. Flip-on starts a
+        // subscribe to reachability changes. Flip-on starts a
         // 60s debounce; flip-off immediately clears stable-since.
         coordinator.$isCounterpartReachable
             .removeDuplicates()
@@ -174,14 +174,14 @@ final class HandoffOrchestrator: ObservableObject {
         phoneStableDebounce?.cancel()
         phoneStableDebounce = nil
         cancellables.removeAll()
-        // B.8.2 Issue #4: clear the dedup cache so a subsequent start()
+        // clear the dedup cache so a subsequent start()
         // always emits at least once (the watch may have lost the cached
         // value across an app restart).
         lastEmittedSync = nil
     }
 
     func userRequestHandoff(to target: HandoffOwner) {
-        // B.4 Issue #2: record the user activity so the policy engine's
+        // record the user activity so the policy engine's
         // 30s user-activity-quiet window kicks in.
         policyEngine.markUserInteractedAt(Date())
         let effects = stateMachine.handle(.userRequestedHandoff(target: target))
@@ -219,7 +219,7 @@ final class HandoffOrchestrator: ObservableObject {
             // inbound. Substantive handling (defensive ignore log) lands in T7.
             break
         case .algorithmStateSnapshotPointer:
-            // B.8.4: snapshot-pointer fallback is phone → watch only; the
+            // snapshot-pointer fallback is phone → watch only; the
             // phone never receives one. No-op to keep the switch exhaustive.
             break
         }
@@ -284,7 +284,7 @@ final class HandoffOrchestrator: ObservableObject {
             case .scheduleTimeout(let id, let delay):
                 scheduleTimeout(id: id, after: delay)
             case .stopIssuingPodCommands:
-                // B.5 Issue #1: gate pod commands during handoff transitions.
+                // gate pod commands during handoff transitions.
                 ownership.commandsAllowed = false
                 log.default("commandsAllowed=false (handoff in progress)")
             case .resumeIssuingPodCommands:
@@ -299,7 +299,7 @@ final class HandoffOrchestrator: ObservableObject {
                 if case .handoffPending(direction: .phoneToWatch, _, _) = state {
                     emitSettingsSync()
                 }
-                // B.4 Issue #2: mark current owner on every state transition
+                // mark current owner on every state transition
                 // so the policy engine knows whose perspective to evaluate from.
                 if let owner = state.currentOwner {
                     policyEngine.markCurrentOwner(owner)
@@ -315,7 +315,7 @@ final class HandoffOrchestrator: ObservableObject {
     func emitSettingsSync() {
         guard let provider = settingsSyncProvider,
               let sync = provider() else { return }
-        // B.8.2 Issue #4: skip if the payload is unchanged since our last
+        // skip if the payload is unchanged since our last
         // emission. PhoneWatchSettingsSync is Equatable, so this is a cheap
         // structural compare that saves CPU + a WCSession queue slot when
         // multiple change-fanout sources fire in quick succession.

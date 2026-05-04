@@ -2,7 +2,7 @@
 //  WarmUpDecider.swift
 //  WatchApp Extension
 //
-//  B.8: pure-function decision invoked once at WatchAlgorithmDriver init.
+// pure-function decision invoked once at WatchAlgorithmDriver init.
 //  Reads the cached snapshot + injected freshness inputs, applies three
 //  independent gates, returns whether to skip warmup or fall back to today's
 //  full warmup behavior.

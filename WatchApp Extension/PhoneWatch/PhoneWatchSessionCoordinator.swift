@@ -103,7 +103,7 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             lastHeartbeatReceivedAt = clock()
             isCounterpartReachable = true
 
-            // B.5 Issue #5: split-brain detection. If we (the watch) think
+            // split-brain detection. If we (the watch) think
             // we're the owner AND the inbound heartbeat says the phone also
             // thinks it's the owner, that's split-brain. Phone-wins
             // arbitration: silently demote ourselves (commands off + emit a
@@ -120,14 +120,14 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             log.default("received mode switch %{public}@ (transition %{public}@)",
                         String(describing: ms.targetMode.rawValue),
                         ms.transitionId.uuidString)
-            // B.2.d: forward to orchestrator (if subscribed).
+            // forward to orchestrator (if subscribed).
             onHandoffMessage?(message)
         case .pairingHandoff(let ph):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ph.protocolVersion) else { return }
             log.default("received pairing handoff for pod %{public}@ (%d bytes)",
                         ph.podId,
                         ph.pairingPayload.count)
-            // B.2.d: forward to orchestrator (if subscribed).
+            // forward to orchestrator (if subscribed).
             onHandoffMessage?(message)
         case .settingsSync(let sync):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: sync.protocolVersion) else { return }
@@ -144,7 +144,7 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
                         String(describing: snap.createdAt))
             WatchAlgorithmSnapshotCache.shared.update(snap)
         case .algorithmStateSnapshotPointer:
-            // B.8.4: ExtensionDelegate.handlePhoneWatchMessageData converts
+            // ExtensionDelegate.handlePhoneWatchMessageData converts
             // pointer messages into inline `.algorithmStateSnapshot` messages
             // (after reading the file from the App Group container) before
             // forwarding them to the transport. So this branch is unreachable

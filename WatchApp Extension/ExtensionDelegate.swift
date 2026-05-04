@@ -141,14 +141,14 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     /// session.activate(). Each component is independent; failure to construct
     /// any one shouldn't prevent the others from running.
     private func bootstrapPhoneWatchStack() {
-        // B.2.c — WCSession transport + coordinator + heartbeat
+        // WCSession transport + coordinator + heartbeat
         let transport = WCSessionPhoneWatchTransport()
         let coordinator = PhoneWatchSessionCoordinator(transport: transport)
         coordinator.start()
         self.phoneWatchTransport = transport
         self.phoneWatchCoordinator = coordinator
 
-        // B.2.a — HealthKit writer + G7 reader (G7 reader needs phone-side state via SharedStateBridge)
+        // HealthKit writer + G7 reader (G7 reader needs phone-side state via SharedStateBridge)
         let writer = HealthKitWriter()
         Task { try? await writer.requestAuthorization() }
         self.healthKitWriter = writer
@@ -162,11 +162,11 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         }
         self.glucoseReader = glucoseReader
 
-        // B.2.b — extended runtime session for prolonged BLE
+        // extended runtime session for prolonged BLE
         let runtime = ExtendedRuntimeCoordinator()
         self.extendedRuntimeCoordinator = runtime
 
-        // B.2.d — handoff orchestrator (subscribes to coordinator's onHandoffMessage)
+        // handoff orchestrator (subscribes to coordinator's onHandoffMessage)
         let appGroupDefaults = HandoffSettings.appGroupDefaults
         let settings = HandoffSettings.load(from: appGroupDefaults)
         let policyEngine = HandoffPolicyEngine(
@@ -185,7 +185,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         )
         orchestrator.start()
         self.handoffOrchestrator = orchestrator
-        // B.5 Issue #5: publish singleton so PhoneWatchSessionCoordinator's
+        // publish singleton so PhoneWatchSessionCoordinator's
         // split-brain detection can read currentOwner + flip ownership.commandsAllowed.
         HandoffOrchestrator.shared = orchestrator
 
@@ -204,7 +204,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         let algorithmBootstrap = WatchAlgorithmBootstrap(
             storesProvider: { [weak self] in self?.makeAlgorithmStoresIfPossible() },
             syncProvider: { WatchSettingsCache.shared.current },
-            // B.6: thread the lazily-constructed OmniBLEPumpManager through to the driver.
+            // thread the lazily-constructed OmniBLEPumpManager through to the driver.
             // [weak] capture avoids a retain cycle through ExtensionDelegate -> bootstrap.
             pumpManagerProvider: { [weak orchestrator] in orchestrator?.pumpManager }
         )
@@ -295,7 +295,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         if #available(watchOSApplicationExtension 5.0, *) {
             INRelevantShortcutStore.default.registerShortcuts()
         }
-        // B.5: check for interrupted dose recovery tripwire on app launch.
+        // check for interrupted dose recovery tripwire on app launch.
         // If a stale entry (>60s old) is found, it gets logged at .error
         // and cleared. Pod history is the source of truth.
         let recoveryDefaults = HandoffSettings.appGroupDefaults
@@ -438,7 +438,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
 extension ExtensionDelegate: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if activationState == .activated {
-            // B.8.2 Issue #3: at activation the OS hands us the last-received
+            // at activation the OS hands us the last-received
             // applicationContext, which under the new routing is the most-recent
             // AlgorithmStateSnapshot. Mirror the didReceiveApplicationContext
             // dispatch so the snapshot reaches the transport at takeover.
@@ -453,7 +453,7 @@ extension ExtensionDelegate: WCSessionDelegate {
 
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         log.default("didReceiveApplicationContext")
-        // B.8.2 Issue #3: forward applicationContext-delivered phoneWatchMessage
+        // forward applicationContext-delivered phoneWatchMessage
         // to the transport. The phone now uses updateApplicationContext
         // (latest-only) for AlgorithmStateSnapshot delivery instead of
         // transferUserInfo, so we reuse the same Data convention the

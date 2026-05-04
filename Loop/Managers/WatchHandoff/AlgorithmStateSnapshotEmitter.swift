@@ -2,12 +2,12 @@
 //  AlgorithmStateSnapshotEmitter.swift
 //  Loop
 //
-//  B.8: builds an AlgorithmStateSnapshot from current Loop state and pushes
+// builds an AlgorithmStateSnapshot from current Loop state and pushes
 //  it over the existing PhoneWatchTransport. Called from
 //  LoopDataManager.loopAlgorithmRunnerDidFinishLoop after every successful
 //  iteration.
 //
-//  B.8.2 Issue #3: delivery routes through updateApplicationContext
+// delivery routes through updateApplicationContext
 //  (latest-only, intentionally overwrites) rather than transferUserInfo
 //  (FIFO queue, can backlog when watch offline). Snapshots are coalescable
 //  state — the watch only needs the freshest payload at takeover, so the

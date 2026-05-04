@@ -14,7 +14,7 @@
 //
 
 import Foundation
-import LoopKit  // B.6: for `PumpManager` (forwarded accessor)
+import LoopKit  // for `PumpManager` (forwarded accessor)
 import OmniBLE
 import Combine
 import os.log
@@ -58,7 +58,7 @@ final class HandoffOrchestrator: ObservableObject {
     private static let defaultPhoneStableDebounceSeconds: TimeInterval = 60
     private let phoneStableDebounceSeconds: TimeInterval
 
-    // B.2.e: BLE ownership coordinator. Exposed (internal) so the
+    // BLE ownership coordinator. Exposed (internal) so the
     // PhoneWatchSessionCoordinator's split-brain detection (B.5 Issue #5)
     // and the orchestrator unit tests (B.5 Issue #1) can read/write the
     // commandsAllowed flag directly.
@@ -118,11 +118,11 @@ final class HandoffOrchestrator: ObservableObject {
         policyEngine.start()
         shadowScheduler.start()
 
-        // B.4 Issue #2: seed initial owner. The watch starts assuming phone
+        // seed initial owner. The watch starts assuming phone
         // is driving until it receives a handoff or detects absence.
         policyEngine.markCurrentOwner(.phone)
 
-        // B.4 Issue #2: subscribe to reachability changes. Flip-on starts a
+        // subscribe to reachability changes. Flip-on starts a
         // 60s debounce; flip-off immediately clears stable-since.
         coordinator.$isCounterpartReachable
             .removeDuplicates()
@@ -145,7 +145,7 @@ final class HandoffOrchestrator: ObservableObject {
     }
 
     func userRequestHandoff(to target: HandoffOwner) {
-        // B.4 Issue #2: record the user activity so the policy engine's
+        // record the user activity so the policy engine's
         // 30s user-activity-quiet window kicks in.
         policyEngine.markUserInteractedAt(Date())
         let effects = stateMachine.handle(.userRequestedHandoff(target: target))
@@ -175,7 +175,7 @@ final class HandoffOrchestrator: ObservableObject {
             if let decoded = try? JSONDecoder().decode(OmniBLEHandoffPayload.self,
                                                        from: ph.pairingPayload) {
                 ownership.cachePayload(decoded)   // B.2.e (replaces lastReceivedPayload assignment)
-                // B.4 Issue #2: mark cached pod state freshness so the policy
+                // mark cached pod state freshness so the policy
                 // engine's takeover safety gate knows the payload is recent.
                 policyEngine.markCachedPodStateAge(Date())
             }
@@ -189,7 +189,7 @@ final class HandoffOrchestrator: ObservableObject {
             // orchestrator has nothing to do here. T9 leaves this as a no-op.
             break
         case .algorithmStateSnapshotPointer:
-            // B.8.4: pointer→inline rewrap happens at the ExtensionDelegate
+            // pointer→inline rewrap happens at the ExtensionDelegate
             // edge before the transport decodes; the watch orchestrator
             // never sees pointers. No-op to keep the switch exhaustive.
             break
@@ -245,7 +245,7 @@ final class HandoffOrchestrator: ObservableObject {
             case .scheduleTimeout(let id, let delay):
                 scheduleTimeout(id: id, after: delay)
             case .stopIssuingPodCommands:
-                // B.5 Issue #1: gate pod commands during handoff transitions.
+                // gate pod commands during handoff transitions.
                 ownership.commandsAllowed = false
                 log.default("commandsAllowed=false (handoff in progress)")
             case .resumeIssuingPodCommands:
@@ -266,13 +266,13 @@ final class HandoffOrchestrator: ObservableObject {
                 // Order: lazy-init pump manager → ownership.update → policy
                 // engine mark → publish handoffState (triggers downstream).
 
-                // B.2.e: lazy-instantiate OmniBLEPumpManager on first .watchDriver
+                // lazy-instantiate OmniBLEPumpManager on first .watchDriver
                 if case .watchDriver = state, ownership.pumpManager == nil {
                     let pm = makeWatchSidePumpManager()  // B.5 Issue #7
                     ownership.setPumpManager(pm)
                 }
                 ownership.update(state: state)   // B.2.e
-                // B.4 Issue #2: mark current owner on every state transition
+                // mark current owner on every state transition
                 // so the policy engine knows whose perspective to evaluate from.
                 if let owner = state.currentOwner {
                     policyEngine.markCurrentOwner(owner)

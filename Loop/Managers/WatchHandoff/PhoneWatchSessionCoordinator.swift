@@ -128,7 +128,7 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             lastHeartbeatReceivedAt = clock()
             isCounterpartReachable = true
 
-            // B.5 Issue #5: split-brain detection (advisory on phone). Phone-wins
+            // split-brain detection (advisory on phone). Phone-wins
             // arbitration means the phone keeps owning if both sides think they
             // own — log a warning but don't demote, since the watch will silently
             // demote on its receipt of our heartbeat.
@@ -140,12 +140,12 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
         case .modeSwitch(let ms):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ms.protocolVersion) else { return }
             NSLog("PhoneWatchSessionCoordinator: received mode switch \(ms.targetMode.rawValue) (transition \(ms.transitionId))")
-            // B.2.d: forward to orchestrator (if subscribed).
+            // forward to orchestrator (if subscribed).
             onHandoffMessage?(message)
         case .pairingHandoff(let ph):
             guard PhoneWatchProtocol.shouldAccept(incomingVersion: ph.protocolVersion) else { return }
             NSLog("PhoneWatchSessionCoordinator: received pairing handoff for pod \(ph.podId) (\(ph.pairingPayload.count) bytes)")
-            // B.2.d: forward to orchestrator (if subscribed).
+            // forward to orchestrator (if subscribed).
             onHandoffMessage?(message)
         case .settingsSync:
             // Settings sync is phone → watch only; the phone never receives one.
@@ -156,7 +156,7 @@ final class PhoneWatchSessionCoordinator: ObservableObject {
             // receives one. No-op to keep the switch exhaustive.
             break
         case .algorithmStateSnapshotPointer:
-            // B.8.4: snapshot-pointer fallback is phone → watch only; the
+            // snapshot-pointer fallback is phone → watch only; the
             // phone never receives one. No-op to keep the switch exhaustive.
             break
         }

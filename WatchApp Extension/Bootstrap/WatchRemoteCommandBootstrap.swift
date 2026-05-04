@@ -55,7 +55,7 @@ final class WatchRemoteCommandBootstrap {
         self.storesProvider = storesProvider
         self.supportingStoresProvider = supportingStoresProvider
         self.settingsProvider = settingsProvider
-        // B.8.3: re-attempt startIfNeeded() on any settings arrival. Gated on
+        // re-attempt startIfNeeded() on any settings arrival. Gated on
         // lastHandoffState == .watchDriver inside retryIfNeeded() so a settings
         // arrival in .phoneDriver doesn't inappropriately build a manager.
         settingsCancellable = WatchSettingsCache.shared.publisher
@@ -75,7 +75,7 @@ final class WatchRemoteCommandBootstrap {
             guard let sync = syncProvider() else { return nil }
             return WatchSettingsSnapshot(fromSync: sync)
         }
-        // B.8.3: re-attempt startIfNeeded() on any settings arrival. Gated on
+        // re-attempt startIfNeeded() on any settings arrival. Gated on
         // lastHandoffState == .watchDriver inside retryIfNeeded() so a settings
         // arrival in .phoneDriver doesn't inappropriately build a manager.
         settingsCancellable = WatchSettingsCache.shared.publisher
@@ -86,7 +86,7 @@ final class WatchRemoteCommandBootstrap {
 
     /// Updates the bootstrap in response to a handoff-state change.
     func update(handoffState: HandoffState) {
-        // B.8.3: record before delegating so retryIfNeeded() (publisher sink)
+        // record before delegating so retryIfNeeded() (publisher sink)
         // gates correctly on the most recent state.
         lastHandoffState = handoffState
         switch handoffState {

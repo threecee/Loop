@@ -131,7 +131,7 @@ public final class WCSessionPhoneWatchTransport: PhoneWatchTransport {
         do {
             let data = try encoder.encode(message)
 
-            // B.8.4: file-pointer fallback for oversized snapshot payloads.
+            // file-pointer fallback for oversized snapshot payloads.
             if case .algorithmStateSnapshot = message,
                data.count > Self.applicationContextSizeBudget {
                 try data.write(to: Self.snapshotFileURL, options: .atomic)

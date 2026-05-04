@@ -2,7 +2,7 @@
 //  HandoffBlockedError.swift
 //  Loop (iOS)
 //
-//  B.5.2 Issue #5b: friendly LocalizedError used by iOS UI sites that
+// friendly LocalizedError used by iOS UI sites that
 //  detect a handoff-blocked condition (the OmniBLE command gate fired
 //  PumpManagerError.uncertainDelivery while HandoffOrchestrator's
 //  ownership.commandsAllowed is false).

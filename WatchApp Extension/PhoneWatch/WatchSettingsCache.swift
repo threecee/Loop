@@ -54,7 +54,7 @@ final class WatchSettingsCache {
     /// avoid sharing the App Group's shared state across runs.
     init(appGroupDefaults: UserDefaults = HandoffSettings.appGroupDefaults) {
         self.appGroupDefaults = appGroupDefaults
-        // B.8.3: hydrate from disk so bootstraps can run before any fresh
+        // hydrate from disk so bootstraps can run before any fresh
         // .settingsSync arrives in this session (e.g., extension relaunch
         // while phone is unreachable).
         if let hydrated = appGroupDefaults.codableValue(forKey: Self.lastGoodKey,
@@ -67,7 +67,7 @@ final class WatchSettingsCache {
     func update(_ sync: PhoneWatchSettingsSync) {
         // B.8.2 dedup guard preserved.
         guard sync != current else { return }
-        // B.8.3: persist BEFORE publishing so any sink that re-reads the
+        // persist BEFORE publishing so any sink that re-reads the
         // disk-backed store on emission sees a consistent value.
         appGroupDefaults.set(codable: sync, forKey: Self.lastGoodKey)
         subject.send(sync)
