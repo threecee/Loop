@@ -47,7 +47,6 @@
 		14B1738128AEDC70006CCD7C /* StatusExtensionContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F70C2111DE900EA006380B7 /* StatusExtensionContext.swift */; };
 		14D906F42A846510006EB79A /* FavoriteFoodsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14D906F32A846510006EB79A /* FavoriteFoodsViewModel.swift */; };
 		15819B2C58907DF558EE06FC /* PredictionInputEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 438D42F81D7C88BC003244B0 /* PredictionInputEffect.swift */; };
-		164451DC31904139A9EF0871 /* PhoneWatchTransportMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 641CF02F2FBE4B84B4CC202D /* PhoneWatchTransportMock.swift */; };
 		1707B11EFCA93F33B455806D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 334165BFE423BFA4E9650446 /* Foundation.framework */; };
 		1776EFB3466545594D60C48C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 091FD4801D540EC2D6AAE6F6 /* Foundation.framework */; };
 		1C36B68452D54780B14928B8 /* OmniBLE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F0 /* OmniBLE.framework */; };
@@ -227,10 +226,8 @@
 		43FCEEA9221A615B0013DD30 /* StatusChartsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FCEEA8221A615B0013DD30 /* StatusChartsManager.swift */; };
 		43FCEEAD221A66780013DD30 /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FCEEAC221A66780013DD30 /* DateFormatter.swift */; };
 		43FCEEB1221A863E0013DD30 /* StatusChartsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FCEEB0221A863E0013DD30 /* StatusChartsManager.swift */; };
-		48F2DBD3AE984404B89EDD58 /* HandoffPolicyEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F24DCAB37AC4B38A4C082D6 /* HandoffPolicyEngineTests.swift */; };
 		4B0CAF3106DB478E083E007C /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; };
 		4B875BF25CCD3FCCA8B979B9 /* LoopError+Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8898032AA9103B8BA09BBBD /* LoopError+Issue.swift */; };
-		4E52BE6D4676405C85EC6CF0 /* ShadowStateSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2B417993644643920F4455 /* ShadowStateSchedulerTests.swift */; };
 		4F08DE8F1E7BB871006741EA /* CollectionType+Loop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F08DE8E1E7BB871006741EA /* CollectionType+Loop.swift */; };
 		4F11D3C020DCBEEC006E072C /* GlucoseBackfillRequestUserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F11D3BF20DCBEEC006E072C /* GlucoseBackfillRequestUserInfo.swift */; };
 		4F11D3C220DD80B3006E072C /* WatchHistoricalGlucose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F11D3C120DD80B3006E072C /* WatchHistoricalGlucose.swift */; };
@@ -429,7 +426,6 @@
 		A9F703752489C9A000C98AD8 /* GlucoseStore+SimulatedCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F703742489C9A000C98AD8 /* GlucoseStore+SimulatedCoreData.swift */; };
 		A9F703772489D8AA00C98AD8 /* PersistentDeviceLog+SimulatedCoreData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9F703762489D8AA00C98AD8 /* PersistentDeviceLog+SimulatedCoreData.swift */; };
 		AAC65206E62D4840A5D600D5 /* ExtendedRuntimeCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60EA43E989364C63872E9437 /* ExtendedRuntimeCoordinator.swift */; };
-		AF24CEA23D3F475C93EC8AB4 /* HandoffOrchestratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */; };
 		B4001CEE28CBBC82002FB414 /* AlertManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4001CED28CBBC82002FB414 /* AlertManagementView.swift */; };
 		B405E35924D2A75B00DD058D /* DerivedAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A966152923EA5A37005D8B29 /* DerivedAssets.xcassets */; };
 		B405E35A24D2B1A400DD058D /* HUDAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4F2C15961E09E94E00E160D4 /* HUDAssets.xcassets */; };
@@ -586,7 +582,6 @@
 		C1FB428F217921D600FAB378 /* PumpManagerUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB428E217921D600FAB378 /* PumpManagerUI.swift */; };
 		C1FB4290217922A100FAB378 /* PumpManagerUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB428E217921D600FAB378 /* PumpManagerUI.swift */; };
 		C87E4647873E45A547B45DC6 /* LoopAlgorithmCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F65A857180A0FF1A84C30F8 /* LoopAlgorithmCore.swift */; };
-		D63090702D924C2C9AEBB689 /* PhoneWatchSessionCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD84A081E0E14A27AE019F82 /* PhoneWatchSessionCoordinatorTests.swift */; };
 		DA8BE8D6A71243569D73BDD2 /* GlucoseReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4EB788C8906424B87D0D8DF /* GlucoseReaderTests.swift */; };
 		DD3DBD292A33AFE9000F8B5B /* IntegralRetrospectiveCorrectionSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3DBD282A33AFE9000F8B5B /* IntegralRetrospectiveCorrectionSelectionView.swift */; };
 		DD62F7C6B1A859BF39C71F3A /* DosingDecisionStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98A55EE24EDD6E60008715D /* DosingDecisionStoreProtocol.swift */; };
@@ -960,7 +955,6 @@
 		0C482251645A52AFF8E9DF32 /* HKUnit+LocalizedString.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "HKUnit+LocalizedString.swift"; path = "HKUnit+LocalizedString.swift"; sourceTree = "<group>"; };
 		0C56AC3C4371558534B519CC /* LoopAlgorithmRunner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoopAlgorithmRunner.swift; sourceTree = "<group>"; };
 		0CB297036FF4DD6B83889E05 /* NightscoutServiceKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; lastKnownFileType = wrapper.framework; path = NightscoutServiceKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HandoffOrchestratorTests.swift; path = "WatchApp ExtensionTests/HandoffOrchestratorTests.swift"; sourceTree = SOURCE_ROOT; };
 		142CB7582A60BF2E0075748A /* EditMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditMode.swift; sourceTree = "<group>"; };
 		142CB75A2A60BFC30075748A /* FavoriteFoodsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteFoodsView.swift; sourceTree = "<group>"; };
 		1452F4A82A851C9400F8B9E4 /* AddEditFavoriteFoodViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditFavoriteFoodViewModel.swift; sourceTree = "<group>"; };
@@ -1027,7 +1021,6 @@
 		3ED3199E2EB65AFE00820BCF /* LocalizedString.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedString.swift; sourceTree = "<group>"; };
 		3ED319A02EB65B4100820BCF /* Bootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bootstrap.swift; sourceTree = "<group>"; };
 		3ED319A22EB65DA300820BCF /* LiveActivityManagerProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManagerProxy.swift; sourceTree = "<group>"; };
-		3F24DCAB37AC4B38A4C082D6 /* HandoffPolicyEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HandoffPolicyEngineTests.swift; path = "WatchApp ExtensionTests/HandoffPolicyEngineTests.swift"; sourceTree = SOURCE_ROOT; };
 		4302F4E01D4E9C8900F0FCAF /* TextFieldTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextFieldTableViewController.swift; sourceTree = "<group>"; };
 		4302F4E21D4EA54200F0FCAF /* InsulinDeliveryTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsulinDeliveryTableViewController.swift; sourceTree = "<group>"; };
 		430B29892041F54A00BA9F93 /* NSUserDefaults.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSUserDefaults.swift; sourceTree = "<group>"; };
@@ -1210,7 +1203,6 @@
 		4FFEDFBE20E5CF22000BFC58 /* ChartHUDController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartHUDController.swift; sourceTree = "<group>"; };
 		60EA43E989364C63872E9437 /* ExtendedRuntimeCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ExtendedRuntimeCoordinator.swift; path = "WatchApp Extension/Lifecycle/ExtendedRuntimeCoordinator.swift"; sourceTree = SOURCE_ROOT; };
 		631C894D174F9241F016AEA9 /* NightscoutServiceLoadingTest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NightscoutServiceLoadingTest.swift; path = "WatchApp ExtensionTests/NightscoutServiceLoadingTest.swift"; sourceTree = SOURCE_ROOT; };
-		641CF02F2FBE4B84B4CC202D /* PhoneWatchTransportMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneWatchTransportMock.swift; path = "WatchApp ExtensionTests/PhoneWatchTransportMock.swift"; sourceTree = SOURCE_ROOT; };
 		69081C1DFF394B528C7ABD90 /* LoopAlgorithmRunnerDelegate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoopAlgorithmRunnerDelegate.swift; sourceTree = "<group>"; };
 		7D23667C21250C7E0028B67D /* LocalizedString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LocalizedString.swift; path = LoopUI/Common/LocalizedString.swift; sourceTree = SOURCE_ROOT; };
 		7D9BEEE62335A6B3005DCFD6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1567,7 +1559,6 @@
 		C1FB428B217806A300FAB378 /* StateColorPalette.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateColorPalette.swift; sourceTree = "<group>"; };
 		C1FB428E217921D600FAB378 /* PumpManagerUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpManagerUI.swift; sourceTree = "<group>"; };
 		D8898032AA9103B8BA09BBBD /* LoopError+Issue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "LoopError+Issue.swift"; sourceTree = "<group>"; };
-		DC2B417993644643920F4455 /* ShadowStateSchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ShadowStateSchedulerTests.swift; path = "WatchApp ExtensionTests/ShadowStateSchedulerTests.swift"; sourceTree = SOURCE_ROOT; };
 		DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SharedStateBridgeTests.swift; path = "WatchApp ExtensionTests/SharedStateBridgeTests.swift"; sourceTree = SOURCE_ROOT; };
 		DD3DBD282A33AFE9000F8B5B /* IntegralRetrospectiveCorrectionSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegralRetrospectiveCorrectionSelectionView.swift; sourceTree = "<group>"; };
 		DDC389F52A2B61750066E2E8 /* ApplicationFactorStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationFactorStrategy.swift; sourceTree = "<group>"; };
@@ -1664,7 +1655,6 @@
 		F5E0BDD827E1D71E0033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Main.strings; sourceTree = "<group>"; };
 		F5E0BDDA27E1D71F0033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
 		F5E0BDE327E1D7230033557E /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
-		FD84A081E0E14A27AE019F82 /* PhoneWatchSessionCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhoneWatchSessionCoordinatorTests.swift; path = "WatchApp ExtensionTests/PhoneWatchSessionCoordinatorTests.swift"; sourceTree = SOURCE_ROOT; };
 		WB2CA10000000000F0 /* OmniBLE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = OmniBLE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		WB2CA10000000000F4 /* PhoneWatchTransportMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchTransportMock.swift; sourceTree = "<group>"; };
 		WB2CA10000000000F5 /* PhoneWatchSessionCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneWatchSessionCoordinatorTests.swift; sourceTree = "<group>"; };
@@ -2824,12 +2814,7 @@
 				3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */,
 				E4EB788C8906424B87D0D8DF /* GlucoseReaderTests.swift */,
 				ABA68CD9C72F40D7972637CA /* GlucoseReadingTests.swift */,
-				13D0A09EEF6C47F38EE8D67C /* HandoffOrchestratorTests.swift */,
-				3F24DCAB37AC4B38A4C082D6 /* HandoffPolicyEngineTests.swift */,
 				0735765BE00241EC9A6096E4 /* HealthKitWriterTests.swift */,
-				FD84A081E0E14A27AE019F82 /* PhoneWatchSessionCoordinatorTests.swift */,
-				641CF02F2FBE4B84B4CC202D /* PhoneWatchTransportMock.swift */,
-				DC2B417993644643920F4455 /* ShadowStateSchedulerTests.swift */,
 				DCA59CCA1C934E3D8FAEED51 /* SharedStateBridgeTests.swift */,
 				E01203786D1373BA05C3B25C /* LoopAlgorithmCoreImportTest.swift */,
 				631C894D174F9241F016AEA9 /* NightscoutServiceLoadingTest.swift */,
@@ -4085,12 +4070,7 @@
 				2FFC656074A640528A5BB726 /* GlucoseCacheTests.swift in Sources */,
 				DA8BE8D6A71243569D73BDD2 /* GlucoseReaderTests.swift in Sources */,
 				7696A6ECE4D349F7917C50BA /* GlucoseReadingTests.swift in Sources */,
-				AF24CEA23D3F475C93EC8AB4 /* HandoffOrchestratorTests.swift in Sources */,
-				48F2DBD3AE984404B89EDD58 /* HandoffPolicyEngineTests.swift in Sources */,
 				963CAA955EC64CD5B6F8E46F /* HealthKitWriterTests.swift in Sources */,
-				D63090702D924C2C9AEBB689 /* PhoneWatchSessionCoordinatorTests.swift in Sources */,
-				164451DC31904139A9EF0871 /* PhoneWatchTransportMock.swift in Sources */,
-				4E52BE6D4676405C85EC6CF0 /* ShadowStateSchedulerTests.swift in Sources */,
 				69AACEC5CC8F42D288AD3070 /* SharedStateBridgeTests.swift in Sources */,
 				7AA69427DFC38A90721A7A9D /* LoopAlgorithmCoreImportTest.swift in Sources */,
 				6D1200C021BC36840A3A5727 /* NightscoutServiceLoadingTest.swift in Sources */,
