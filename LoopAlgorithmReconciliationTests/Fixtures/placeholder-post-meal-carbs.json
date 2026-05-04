@@ -1,1 +1,1719 @@
-{}
+{
+  "capturedAt" : "2026-05-03T14:30:00Z",
+  "expectedOutput" : {
+    "doseRecommendation" : {
+
+    },
+    "predictedGlucose" : [
+      {
+        "quantity" : 128,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T14:30:00Z"
+      },
+      {
+        "quantity" : 131,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T14:35:00Z"
+      },
+      {
+        "quantity" : 133.8971447441955,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T14:40:00Z"
+      },
+      {
+        "quantity" : 137.19948686683938,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T14:45:00Z"
+      },
+      {
+        "quantity" : 141.0098816237362,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T14:50:00Z"
+      },
+      {
+        "quantity" : 145.12256769801348,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T14:55:00Z"
+      },
+      {
+        "quantity" : 149.23779403546206,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:00:00Z"
+      },
+      {
+        "quantity" : 153.35302037291063,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:05:00Z"
+      },
+      {
+        "quantity" : 157.46824671035918,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:10:00Z"
+      },
+      {
+        "quantity" : 161.58347304780776,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:15:00Z"
+      },
+      {
+        "quantity" : 165.6986993852563,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:20:00Z"
+      },
+      {
+        "quantity" : 169.81392572270488,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:25:00Z"
+      },
+      {
+        "quantity" : 173.92915206015346,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:30:00Z"
+      },
+      {
+        "quantity" : 178.04437839760203,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:35:00Z"
+      },
+      {
+        "quantity" : 182.15960473505058,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:40:00Z"
+      },
+      {
+        "quantity" : 186.27483107249913,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:45:00Z"
+      },
+      {
+        "quantity" : 190.39005740994767,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:50:00Z"
+      },
+      {
+        "quantity" : 194.50528374739625,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T15:55:00Z"
+      },
+      {
+        "quantity" : 198.6205100848448,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:00:00Z"
+      },
+      {
+        "quantity" : 202.73573642229337,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:05:00Z"
+      },
+      {
+        "quantity" : 206.85096275974195,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:10:00Z"
+      },
+      {
+        "quantity" : 210.96618909719052,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:15:00Z"
+      },
+      {
+        "quantity" : 215.0814154346391,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:20:00Z"
+      },
+      {
+        "quantity" : 219.19664177208764,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:25:00Z"
+      },
+      {
+        "quantity" : 223.23566021439828,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:30:00Z"
+      },
+      {
+        "quantity" : 227.12226286643303,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:35:00Z"
+      },
+      {
+        "quantity" : 230.8564497281919,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:40:00Z"
+      },
+      {
+        "quantity" : 234.43822079967492,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:45:00Z"
+      },
+      {
+        "quantity" : 237.86757608088203,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:50:00Z"
+      },
+      {
+        "quantity" : 241.14451557181332,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T16:55:00Z"
+      },
+      {
+        "quantity" : 244.26903927246872,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:00:00Z"
+      },
+      {
+        "quantity" : 247.24114718284818,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:05:00Z"
+      },
+      {
+        "quantity" : 250.06083930295185,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:10:00Z"
+      },
+      {
+        "quantity" : 252.7281156327796,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:15:00Z"
+      },
+      {
+        "quantity" : 255.24297617233154,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:20:00Z"
+      },
+      {
+        "quantity" : 257.6054209216075,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:25:00Z"
+      },
+      {
+        "quantity" : 259.81544988060773,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:30:00Z"
+      },
+      {
+        "quantity" : 261.873063049332,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:35:00Z"
+      },
+      {
+        "quantity" : 263.7782604277804,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:40:00Z"
+      },
+      {
+        "quantity" : 265.53104201595295,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:45:00Z"
+      },
+      {
+        "quantity" : 267.1314078138496,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:50:00Z"
+      },
+      {
+        "quantity" : 268.57935782147035,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T17:55:00Z"
+      },
+      {
+        "quantity" : 269.87489203881523,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:00:00Z"
+      },
+      {
+        "quantity" : 271.01801046588434,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:05:00Z"
+      },
+      {
+        "quantity" : 272.0087131026775,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:10:00Z"
+      },
+      {
+        "quantity" : 272.8469999491948,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:15:00Z"
+      },
+      {
+        "quantity" : 273.5328710054363,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:20:00Z"
+      },
+      {
+        "quantity" : 274.06632627140186,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:25:00Z"
+      },
+      {
+        "quantity" : 274.44736574709157,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:30:00Z"
+      },
+      {
+        "quantity" : 274.6759894325054,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:35:00Z"
+      },
+      {
+        "quantity" : 274.75219732764333,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T18:40:00Z"
+      },
+      {
+        "quantity" : 274.75219732764333,
+        "quantityUnit" : "mg\/dL",
+        "startDate" : "2026-05-03T20:40:00Z"
+      }
+    ]
+  },
+  "input" : {
+    "doseRecommendationType" : "tempBasal",
+    "predictionDate" : "2026-05-03T14:30:00Z",
+    "predictionInput" : {
+      "carbEntries" : [
+        {
+          "absorptionTime" : 10800,
+          "quantity" : 30,
+          "startDate" : "2026-05-03T14:00:00Z"
+        }
+      ],
+      "doses" : [
+        {
+          "endDate" : "2026-05-02T22:35:00Z",
+          "startDate" : "2026-05-02T22:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T22:40:00Z",
+          "startDate" : "2026-05-02T22:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T22:45:00Z",
+          "startDate" : "2026-05-02T22:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T22:50:00Z",
+          "startDate" : "2026-05-02T22:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T22:55:00Z",
+          "startDate" : "2026-05-02T22:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:00:00Z",
+          "startDate" : "2026-05-02T22:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:05:00Z",
+          "startDate" : "2026-05-02T23:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:10:00Z",
+          "startDate" : "2026-05-02T23:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:15:00Z",
+          "startDate" : "2026-05-02T23:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:20:00Z",
+          "startDate" : "2026-05-02T23:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:25:00Z",
+          "startDate" : "2026-05-02T23:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:30:00Z",
+          "startDate" : "2026-05-02T23:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:35:00Z",
+          "startDate" : "2026-05-02T23:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:40:00Z",
+          "startDate" : "2026-05-02T23:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:45:00Z",
+          "startDate" : "2026-05-02T23:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:50:00Z",
+          "startDate" : "2026-05-02T23:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-02T23:55:00Z",
+          "startDate" : "2026-05-02T23:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:00:00Z",
+          "startDate" : "2026-05-02T23:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:05:00Z",
+          "startDate" : "2026-05-03T00:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:10:00Z",
+          "startDate" : "2026-05-03T00:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:15:00Z",
+          "startDate" : "2026-05-03T00:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:20:00Z",
+          "startDate" : "2026-05-03T00:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:25:00Z",
+          "startDate" : "2026-05-03T00:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:30:00Z",
+          "startDate" : "2026-05-03T00:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:35:00Z",
+          "startDate" : "2026-05-03T00:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:40:00Z",
+          "startDate" : "2026-05-03T00:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:45:00Z",
+          "startDate" : "2026-05-03T00:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:50:00Z",
+          "startDate" : "2026-05-03T00:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T00:55:00Z",
+          "startDate" : "2026-05-03T00:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:00:00Z",
+          "startDate" : "2026-05-03T00:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:05:00Z",
+          "startDate" : "2026-05-03T01:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:10:00Z",
+          "startDate" : "2026-05-03T01:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:15:00Z",
+          "startDate" : "2026-05-03T01:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:20:00Z",
+          "startDate" : "2026-05-03T01:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:25:00Z",
+          "startDate" : "2026-05-03T01:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:30:00Z",
+          "startDate" : "2026-05-03T01:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:35:00Z",
+          "startDate" : "2026-05-03T01:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:40:00Z",
+          "startDate" : "2026-05-03T01:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:45:00Z",
+          "startDate" : "2026-05-03T01:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:50:00Z",
+          "startDate" : "2026-05-03T01:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T01:55:00Z",
+          "startDate" : "2026-05-03T01:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:00:00Z",
+          "startDate" : "2026-05-03T01:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:05:00Z",
+          "startDate" : "2026-05-03T02:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:10:00Z",
+          "startDate" : "2026-05-03T02:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:15:00Z",
+          "startDate" : "2026-05-03T02:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:20:00Z",
+          "startDate" : "2026-05-03T02:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:25:00Z",
+          "startDate" : "2026-05-03T02:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:30:00Z",
+          "startDate" : "2026-05-03T02:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:35:00Z",
+          "startDate" : "2026-05-03T02:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:40:00Z",
+          "startDate" : "2026-05-03T02:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:45:00Z",
+          "startDate" : "2026-05-03T02:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:50:00Z",
+          "startDate" : "2026-05-03T02:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T02:55:00Z",
+          "startDate" : "2026-05-03T02:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:00:00Z",
+          "startDate" : "2026-05-03T02:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:05:00Z",
+          "startDate" : "2026-05-03T03:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:10:00Z",
+          "startDate" : "2026-05-03T03:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:15:00Z",
+          "startDate" : "2026-05-03T03:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:20:00Z",
+          "startDate" : "2026-05-03T03:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:25:00Z",
+          "startDate" : "2026-05-03T03:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:30:00Z",
+          "startDate" : "2026-05-03T03:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:35:00Z",
+          "startDate" : "2026-05-03T03:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:40:00Z",
+          "startDate" : "2026-05-03T03:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:45:00Z",
+          "startDate" : "2026-05-03T03:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:50:00Z",
+          "startDate" : "2026-05-03T03:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T03:55:00Z",
+          "startDate" : "2026-05-03T03:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:00:00Z",
+          "startDate" : "2026-05-03T03:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:05:00Z",
+          "startDate" : "2026-05-03T04:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:10:00Z",
+          "startDate" : "2026-05-03T04:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:15:00Z",
+          "startDate" : "2026-05-03T04:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:20:00Z",
+          "startDate" : "2026-05-03T04:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:25:00Z",
+          "startDate" : "2026-05-03T04:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:30:00Z",
+          "startDate" : "2026-05-03T04:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:35:00Z",
+          "startDate" : "2026-05-03T04:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:40:00Z",
+          "startDate" : "2026-05-03T04:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:45:00Z",
+          "startDate" : "2026-05-03T04:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:50:00Z",
+          "startDate" : "2026-05-03T04:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T04:55:00Z",
+          "startDate" : "2026-05-03T04:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:00:00Z",
+          "startDate" : "2026-05-03T04:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:05:00Z",
+          "startDate" : "2026-05-03T05:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:10:00Z",
+          "startDate" : "2026-05-03T05:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:15:00Z",
+          "startDate" : "2026-05-03T05:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:20:00Z",
+          "startDate" : "2026-05-03T05:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:25:00Z",
+          "startDate" : "2026-05-03T05:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:30:00Z",
+          "startDate" : "2026-05-03T05:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:35:00Z",
+          "startDate" : "2026-05-03T05:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:40:00Z",
+          "startDate" : "2026-05-03T05:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:45:00Z",
+          "startDate" : "2026-05-03T05:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:50:00Z",
+          "startDate" : "2026-05-03T05:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T05:55:00Z",
+          "startDate" : "2026-05-03T05:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:00:00Z",
+          "startDate" : "2026-05-03T05:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:05:00Z",
+          "startDate" : "2026-05-03T06:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:10:00Z",
+          "startDate" : "2026-05-03T06:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:15:00Z",
+          "startDate" : "2026-05-03T06:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:20:00Z",
+          "startDate" : "2026-05-03T06:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:25:00Z",
+          "startDate" : "2026-05-03T06:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:30:00Z",
+          "startDate" : "2026-05-03T06:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:35:00Z",
+          "startDate" : "2026-05-03T06:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:40:00Z",
+          "startDate" : "2026-05-03T06:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:45:00Z",
+          "startDate" : "2026-05-03T06:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:50:00Z",
+          "startDate" : "2026-05-03T06:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T06:55:00Z",
+          "startDate" : "2026-05-03T06:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:00:00Z",
+          "startDate" : "2026-05-03T06:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:05:00Z",
+          "startDate" : "2026-05-03T07:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:10:00Z",
+          "startDate" : "2026-05-03T07:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:15:00Z",
+          "startDate" : "2026-05-03T07:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:20:00Z",
+          "startDate" : "2026-05-03T07:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:25:00Z",
+          "startDate" : "2026-05-03T07:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:30:00Z",
+          "startDate" : "2026-05-03T07:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:35:00Z",
+          "startDate" : "2026-05-03T07:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:40:00Z",
+          "startDate" : "2026-05-03T07:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:45:00Z",
+          "startDate" : "2026-05-03T07:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:50:00Z",
+          "startDate" : "2026-05-03T07:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T07:55:00Z",
+          "startDate" : "2026-05-03T07:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:00:00Z",
+          "startDate" : "2026-05-03T07:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:05:00Z",
+          "startDate" : "2026-05-03T08:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:10:00Z",
+          "startDate" : "2026-05-03T08:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:15:00Z",
+          "startDate" : "2026-05-03T08:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:20:00Z",
+          "startDate" : "2026-05-03T08:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:25:00Z",
+          "startDate" : "2026-05-03T08:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:30:00Z",
+          "startDate" : "2026-05-03T08:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:35:00Z",
+          "startDate" : "2026-05-03T08:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:40:00Z",
+          "startDate" : "2026-05-03T08:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:45:00Z",
+          "startDate" : "2026-05-03T08:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:50:00Z",
+          "startDate" : "2026-05-03T08:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T08:55:00Z",
+          "startDate" : "2026-05-03T08:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:00:00Z",
+          "startDate" : "2026-05-03T08:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:05:00Z",
+          "startDate" : "2026-05-03T09:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:10:00Z",
+          "startDate" : "2026-05-03T09:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:15:00Z",
+          "startDate" : "2026-05-03T09:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:20:00Z",
+          "startDate" : "2026-05-03T09:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:25:00Z",
+          "startDate" : "2026-05-03T09:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:30:00Z",
+          "startDate" : "2026-05-03T09:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:35:00Z",
+          "startDate" : "2026-05-03T09:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:40:00Z",
+          "startDate" : "2026-05-03T09:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:45:00Z",
+          "startDate" : "2026-05-03T09:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:50:00Z",
+          "startDate" : "2026-05-03T09:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T09:55:00Z",
+          "startDate" : "2026-05-03T09:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:00:00Z",
+          "startDate" : "2026-05-03T09:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:05:00Z",
+          "startDate" : "2026-05-03T10:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:10:00Z",
+          "startDate" : "2026-05-03T10:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:15:00Z",
+          "startDate" : "2026-05-03T10:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:20:00Z",
+          "startDate" : "2026-05-03T10:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:25:00Z",
+          "startDate" : "2026-05-03T10:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:30:00Z",
+          "startDate" : "2026-05-03T10:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:35:00Z",
+          "startDate" : "2026-05-03T10:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:40:00Z",
+          "startDate" : "2026-05-03T10:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:45:00Z",
+          "startDate" : "2026-05-03T10:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:50:00Z",
+          "startDate" : "2026-05-03T10:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T10:55:00Z",
+          "startDate" : "2026-05-03T10:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:00:00Z",
+          "startDate" : "2026-05-03T10:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:05:00Z",
+          "startDate" : "2026-05-03T11:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:10:00Z",
+          "startDate" : "2026-05-03T11:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:15:00Z",
+          "startDate" : "2026-05-03T11:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:20:00Z",
+          "startDate" : "2026-05-03T11:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:25:00Z",
+          "startDate" : "2026-05-03T11:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:30:00Z",
+          "startDate" : "2026-05-03T11:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:35:00Z",
+          "startDate" : "2026-05-03T11:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:40:00Z",
+          "startDate" : "2026-05-03T11:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:45:00Z",
+          "startDate" : "2026-05-03T11:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:50:00Z",
+          "startDate" : "2026-05-03T11:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T11:55:00Z",
+          "startDate" : "2026-05-03T11:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:00:00Z",
+          "startDate" : "2026-05-03T11:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:05:00Z",
+          "startDate" : "2026-05-03T12:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:10:00Z",
+          "startDate" : "2026-05-03T12:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:15:00Z",
+          "startDate" : "2026-05-03T12:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:20:00Z",
+          "startDate" : "2026-05-03T12:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:25:00Z",
+          "startDate" : "2026-05-03T12:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:30:00Z",
+          "startDate" : "2026-05-03T12:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:35:00Z",
+          "startDate" : "2026-05-03T12:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:40:00Z",
+          "startDate" : "2026-05-03T12:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:45:00Z",
+          "startDate" : "2026-05-03T12:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:50:00Z",
+          "startDate" : "2026-05-03T12:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T12:55:00Z",
+          "startDate" : "2026-05-03T12:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:00:00Z",
+          "startDate" : "2026-05-03T12:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:05:00Z",
+          "startDate" : "2026-05-03T13:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:10:00Z",
+          "startDate" : "2026-05-03T13:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:15:00Z",
+          "startDate" : "2026-05-03T13:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:20:00Z",
+          "startDate" : "2026-05-03T13:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:25:00Z",
+          "startDate" : "2026-05-03T13:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:30:00Z",
+          "startDate" : "2026-05-03T13:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:35:00Z",
+          "startDate" : "2026-05-03T13:30:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:40:00Z",
+          "startDate" : "2026-05-03T13:35:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:45:00Z",
+          "startDate" : "2026-05-03T13:40:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:50:00Z",
+          "startDate" : "2026-05-03T13:45:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T13:55:00Z",
+          "startDate" : "2026-05-03T13:50:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T14:00:00Z",
+          "startDate" : "2026-05-03T13:55:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T14:05:00Z",
+          "startDate" : "2026-05-03T14:00:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T14:10:00Z",
+          "startDate" : "2026-05-03T14:05:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T14:15:00Z",
+          "startDate" : "2026-05-03T14:10:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T14:20:00Z",
+          "startDate" : "2026-05-03T14:15:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T14:25:00Z",
+          "startDate" : "2026-05-03T14:20:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        },
+        {
+          "endDate" : "2026-05-03T14:30:00Z",
+          "startDate" : "2026-05-03T14:25:00Z",
+          "type" : "basal",
+          "unit" : "U",
+          "value" : 0.08333333333333333
+        }
+      ],
+      "glucoseHistory" : [
+        {
+          "quantity" : 95,
+          "startDate" : "2026-05-03T13:35:00Z"
+        },
+        {
+          "quantity" : 98,
+          "startDate" : "2026-05-03T13:40:00Z"
+        },
+        {
+          "quantity" : 101,
+          "startDate" : "2026-05-03T13:45:00Z"
+        },
+        {
+          "quantity" : 104,
+          "startDate" : "2026-05-03T13:50:00Z"
+        },
+        {
+          "quantity" : 107,
+          "startDate" : "2026-05-03T13:55:00Z"
+        },
+        {
+          "quantity" : 110,
+          "startDate" : "2026-05-03T14:00:00Z"
+        },
+        {
+          "quantity" : 113,
+          "startDate" : "2026-05-03T14:05:00Z"
+        },
+        {
+          "quantity" : 116,
+          "startDate" : "2026-05-03T14:10:00Z"
+        },
+        {
+          "quantity" : 119,
+          "startDate" : "2026-05-03T14:15:00Z"
+        },
+        {
+          "quantity" : 122,
+          "startDate" : "2026-05-03T14:20:00Z"
+        },
+        {
+          "quantity" : 125,
+          "startDate" : "2026-05-03T14:25:00Z"
+        },
+        {
+          "quantity" : 128,
+          "startDate" : "2026-05-03T14:30:00Z"
+        }
+      ],
+      "settings" : {
+        "basal" : [
+          {
+            "endDate" : "2026-05-03T20:30:00Z",
+            "startDate" : "2026-05-02T14:30:00Z",
+            "value" : 1
+          }
+        ],
+        "carbRatio" : [
+          {
+            "endDate" : "2026-05-03T20:30:00Z",
+            "startDate" : "2026-05-02T14:30:00Z",
+            "value" : 10
+          }
+        ],
+        "maximumBasalRatePerHour" : 4,
+        "maximumBolus" : 10,
+        "sensitivity" : [
+          {
+            "endDate" : "2026-05-03T20:30:00Z",
+            "startDate" : "2026-05-02T14:30:00Z",
+            "value" : 50
+          }
+        ],
+        "suspendThreshold" : {
+          "unit" : "mg\/dL",
+          "value" : 70
+        },
+        "target" : [
+          {
+            "endDate" : "2026-05-03T20:30:00Z",
+            "startDate" : "2026-05-02T14:30:00Z",
+            "value" : {
+              "maxValue" : 120,
+              "minValue" : 100
+            }
+          }
+        ]
+      }
+    }
+  },
+  "name" : "post-meal-carbs"
+}

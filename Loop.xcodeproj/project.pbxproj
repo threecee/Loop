@@ -684,6 +684,7 @@
 		F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */; };
 		F80D5B397E144FA5BC24D470 /* SharedStateBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED129A39903141C6880F7BB7 /* SharedStateBridge.swift */; };
 		F97119FBB15A39EE62A0C9C9 /* LoopAlgorithmRunnerCaptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314754816B026AB26EA37A2 /* LoopAlgorithmRunnerCaptureTests.swift */; };
+		B84A0001000000000000A001 /* ReconciliationFixtureGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84A0002000000000000A001 /* ReconciliationFixtureGenerator.swift */; };
 		F9F549BD6A9F6BF2020BFCB9 /* CarbStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D380224EADF36005E2F50 /* CarbStoreProtocol.swift */; };
 		FFB618C2C280468C86D228FB /* GlucoseCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AF9E04978641A187D17125 /* GlucoseCache.swift */; };
 		WB2CA1000000000001 /* PhoneWatchTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F1 /* PhoneWatchTransport.swift */; };
@@ -1284,6 +1285,7 @@
 		7E69CFFB2A16A77E00203CBD /* ResetLoopManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetLoopManager.swift; sourceTree = "<group>"; };
 		80F864E52433BF5D0026EC26 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8314754816B026AB26EA37A2 /* LoopAlgorithmRunnerCaptureTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoopAlgorithmRunnerCaptureTests.swift; sourceTree = "<group>"; };
+		B84A0002000000000000A001 /* ReconciliationFixtureGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReconciliationFixtureGenerator.swift; sourceTree = "<group>"; };
 		83AA4AFC96E2BE1D43C5BD62 /* WatchRemoteCommandBootstrap.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchRemoteCommandBootstrap.swift; path = WatchRemoteCommandBootstrap.swift; sourceTree = "<group>"; };
 		84AA81D22A4A27A3000B658B /* LoopWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopWidgets.swift; sourceTree = "<group>"; };
 		84AA81D52A4A28AF000B658B /* WidgetBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBackground.swift; sourceTree = "<group>"; };
@@ -1922,6 +1924,7 @@
 				C1D476B32A8ED179002C1C87 /* LoopAlgorithmTests.swift */,
 				8314754816B026AB26EA37A2 /* LoopAlgorithmRunnerCaptureTests.swift */,
 				E78167ABF468C3D65EEEE147 /* ReconciliationTests.swift */,
+				B84A0002000000000000A001 /* ReconciliationFixtureGenerator.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -4549,6 +4552,7 @@
 				E93E86B224DDE21D00FF40C8 /* MockCarbStore.swift in Sources */,
 				F97119FBB15A39EE62A0C9C9 /* LoopAlgorithmRunnerCaptureTests.swift in Sources */,
 				F4EF2C98D2257C1300C4FA11 /* ReconciliationTests.swift in Sources */,
+				B84A0001000000000000A001 /* ReconciliationFixtureGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
