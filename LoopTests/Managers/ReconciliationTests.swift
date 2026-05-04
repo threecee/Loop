@@ -34,29 +34,24 @@
 //  structure) and are referenced by the `LoopTests` resources phase so
 //  they bundle into `LoopTests.xctest`.
 //
-//  ## Current state — placeholder
+//  ## Current state — active
 //
 //  The 3 fixture files (`placeholder-{steady-state,post-meal-carbs,
-//  predicted-hypo}.json`) are intentionally empty `{}` JSON: they fail to
-//  decode as `LoopAlgorithmReconciliationFixture`, which the test catches
-//  and converts to `XCTSkip`. The harness exists; the data does not.
-//  Carl replaces the placeholders via the LLDB capture flow (Phase 5a's
-//  `captureFixtureForReconciliation(name:)`); see the Fixtures README
-//  for the procedure.
+//  predicted-hypo}.json`) carry programmatically-synthesized
+//  `LoopPredictionInput`s with realistic settings + scenario-shaped
+//  buffers and a captured `expectedOutput.predictedGlucose` produced by
+//  running `LoopAlgorithm.generatePrediction` on the same input. The
+//  test re-runs the same generator (via `WatchAlgorithmDriver.runForReconciliation`
+//  → `LoopAlgorithm.generatePrediction`) and asserts byte equality.
 //
-//  Even with real fixtures, `WatchAlgorithmDriver.runForReconciliation` is
-//  itself currently a stub (it throws `ReconciliationUnsupported`) — the
-//  wrapper-shaped capture lacks settings/stores needed to construct a
-//  runner. This test still passes (XCTSkips) because the fixture-decode
-//  branch fires before the runner-replay branch.
-//
-//  Both stubs hold the contract: when the wrapper format gets richer,
-//  fill in `runForReconciliation`'s body, replace the placeholder
-//  fixtures, re-run; tests flip from XCTSkip to byte-equality assertions
-//  with no test code changes.
+//  The XCTSkip paths remain as defensive fallbacks: if a fixture file
+//  fails to decode (e.g., LoopKit pin advances and breaks the wire
+//  format) the suite skips that test rather than failing red — Carl
+//  re-captures the affected fixture and re-runs.
 //
 
 import XCTest
+import HealthKit
 import LoopKit
 @testable import LoopAlgorithmCore
 @testable import WatchAlgorithmKit
@@ -92,20 +87,27 @@ final class ReconciliationTests: XCTestCase {
     private func assertEquivalent(_ fixture: LoopAlgorithmReconciliationFixture,
                                   file: StaticString = #file,
                                   line: UInt = #line) throws {
-        let watchOutput: CapturedAlgorithmOutput
-        do {
-            watchOutput = try WatchAlgorithmDriver.runForReconciliation(fixture.input)
-        } catch let error as WatchAlgorithmDriver.ReconciliationUnsupported {
-            throw XCTSkip("WatchAlgorithmDriver.runForReconciliation is a Phase 5b stub: \(error)")
+        let watchOutput = try WatchAlgorithmDriver.runForReconciliation(fixture.input)
+
+        // predictedGlucose carries `PredictedGlucoseValue` items: identical
+        // start dates and identical mg/dL quantities are required. Direct
+        // array equality works because the upstream type is Equatable.
+        XCTAssertEqual(watchOutput.predictedGlucose.count,
+                       fixture.expectedOutput.predictedGlucose.count,
+                       "predictedGlucose length drift between iOS capture and watch replay",
+                       file: file, line: line)
+        for (idx, (expected, actual)) in zip(fixture.expectedOutput.predictedGlucose,
+                                             watchOutput.predictedGlucose).enumerated() {
+            XCTAssertEqual(expected.startDate, actual.startDate,
+                           "predictedGlucose[\(idx)].startDate drift",
+                           file: file, line: line)
+            XCTAssertEqual(expected.quantity.doubleValue(for: .milligramsPerDeciliter),
+                           actual.quantity.doubleValue(for: .milligramsPerDeciliter),
+                           accuracy: 1e-9,
+                           "predictedGlucose[\(idx)].quantity drift",
+                           file: file, line: line)
         }
 
-        // Both predictedGlucose elements and AutomaticDoseRecommendation
-        // are expected to be Equatable in LoopKit; if a future LoopKit
-        // pin removes that, swap to field-by-field comparisons.
-        XCTAssertEqual(watchOutput.predictedGlucose,
-                       fixture.expectedOutput.predictedGlucose,
-                       "predictedGlucose drift between iOS capture and watch replay",
-                       file: file, line: line)
         XCTAssertEqual(watchOutput.doseRecommendation,
                        fixture.expectedOutput.doseRecommendation,
                        "doseRecommendation drift between iOS capture and watch replay",
