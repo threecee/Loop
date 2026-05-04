@@ -88,6 +88,7 @@
 		2C47787E7286BF548617916E /* HKUnit+LocalizedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C482251645A52AFF8E9DF32 /* HKUnit+LocalizedString.swift */; };
 		2CCA6A8E7E60C1A9E04A5D8F /* BackgroundPollScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DBACE90FE46C046D7C944F5 /* BackgroundPollScheduler.swift */; };
 		2FFC656074A640528A5BB726 /* GlucoseCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3262CDD92B6247D38B974054 /* GlucoseCacheTests.swift */; };
+		3426CED8DE01DBC9C7CD4CEC /* TokenRotationPropagationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4399104D30D388AAE501CDED /* TokenRotationPropagationTests.swift */; };
 		38427E2F72593F1C7CAE926E /* LoopAlgorithmRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C56AC3C4371558534B519CC /* LoopAlgorithmRunner.swift */; };
 		38DF13981D282D91F0AE31B8 /* LoopAlgorithmCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F65A857180A0FF1A84C30F8 /* LoopAlgorithmCore.swift */; };
 		3ED3198A2EB659E600820BCF /* GlucoseLiveActivityConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED319882EB659E600820BCF /* GlucoseLiveActivityConfiguration.swift */; };
@@ -1096,6 +1097,7 @@
 		439706E522D2E84900C81566 /* PredictionSettingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredictionSettingTableViewCell.swift; sourceTree = "<group>"; };
 		439897341CD2F7DE00223065 /* NSTimeInterval.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSTimeInterval.swift; sourceTree = "<group>"; };
 		439897361CD2F80600223065 /* AnalyticsServicesManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AnalyticsServicesManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		4399104D30D388AAE501CDED /* TokenRotationPropagationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TokenRotationPropagationTests.swift; sourceTree = "<group>"; };
 		439A7941211F631C0041B75F /* RootNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootNavigationController.swift; sourceTree = "<group>"; };
 		439A7943211FE22F0041B75F /* NSUserActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSUserActivity.swift; sourceTree = "<group>"; };
 		439BED291E76093C00B0AED5 /* CGMManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CGMManager.swift; sourceTree = "<group>"; };
@@ -3196,6 +3198,7 @@
 				WB2D000000000100007 /* SettingsSyncEmissionTests.swift */,
 				WB2D00000000010B802 /* AlgorithmStateSnapshotEmitterTests.swift */,
 				WB2D000000000B82E1 /* PhoneWatchTransportTests.swift */,
+				4399104D30D388AAE501CDED /* TokenRotationPropagationTests.swift */,
 			);
 			path = WatchHandoff;
 			sourceTree = "<group>";
@@ -4519,6 +4522,7 @@
 				B84A0001000000000000A001 /* ReconciliationFixtureGenerator.swift in Sources */,
 				B85AAA0002000000F0000000 /* PredictionInputEffectTests.swift in Sources */,
 				BD4C39DED97D9F36F6CB9CBF /* LoopRemoteCareUploaderTests.swift in Sources */,
+				3426CED8DE01DBC9C7CD4CEC /* TokenRotationPropagationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
