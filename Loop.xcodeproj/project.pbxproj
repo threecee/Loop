@@ -463,6 +463,7 @@
 		B4FEEF7D24B8A71F00A8DF9B /* DeviceDataManager+DeviceStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FEEF7C24B8A71F00A8DF9B /* DeviceDataManager+DeviceStatus.swift */; };
 		B5D000000001 /* WatchDoseRecoveryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D000000002 /* WatchDoseRecoveryStore.swift */; };
 		B5D000000003 /* WatchPumpManagerSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D000000004 /* WatchPumpManagerSettingsTests.swift */; };
+		B10H000000005 /* PhoneWatchTransportMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10H000000006 /* PhoneWatchTransportMock.swift */; };
 		B66D1F212E6A5D6500471149 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F202E6A5D6500471149 /* InfoPlist.xcstrings */; };
 		B66D1F232E6A5D6500471149 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F222E6A5D6500471149 /* InfoPlist.xcstrings */; };
 		B66D1F252E6A5D6500471149 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B66D1F242E6A5D6500471149 /* InfoPlist.xcstrings */; };
@@ -1434,6 +1435,7 @@
 		B53A30055A8FD963007C15CA /* placeholder-predicted-hypo.json */ = {isa = PBXFileReference; fileEncoding = 4; includeInIndex = 1; lastKnownFileType = text.json; path = "placeholder-predicted-hypo.json"; sourceTree = "<group>"; };
 		B5D000000002 /* WatchDoseRecoveryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDoseRecoveryStore.swift; sourceTree = "<group>"; };
 		B5D000000004 /* WatchPumpManagerSettingsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchPumpManagerSettingsTests.swift; path = WatchPumpManagerSettingsTests.swift; sourceTree = "<group>"; };
+		B10H000000006 /* PhoneWatchTransportMock.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PhoneWatchTransportMock.swift; path = PhoneWatchTransportMock.swift; sourceTree = "<group>"; };
 		B66D1F202E6A5D6500471149 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		B66D1F222E6A5D6500471149 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		B66D1F242E6A5D6500471149 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -2825,6 +2827,7 @@
 				A1B2C3D4E5F60002A1B2C3D4 /* Phase7_WarmingUpTest.swift */,
 				B6E5F6010002B6E5F6010002 /* WatchAlgorithmDriverTests.swift */,
 				B5D000000004 /* WatchPumpManagerSettingsTests.swift */,
+				B10H000000006 /* PhoneWatchTransportMock.swift */,
 				WB2D00000000010B804 /* WatchAlgorithmSnapshotCacheTests.swift */,
 				WB2D00000000010B806 /* WarmUpDeciderTests.swift */,
 				WB2D00000000010B808 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift */,
@@ -4081,6 +4084,7 @@
 				A1B2C3D4E5F60001A1B2C3D4 /* Phase7_WarmingUpTest.swift in Sources */,
 				B6E5F6010001B6E5F6010001 /* WatchAlgorithmDriverTests.swift in Sources */,
 				B5D000000003 /* WatchPumpManagerSettingsTests.swift in Sources */,
+				B10H000000005 /* PhoneWatchTransportMock.swift in Sources */,
 				WB2D00000000010B824 /* WatchAlgorithmSnapshotCacheTests.swift in Sources */,
 				WB2D00000000010B826 /* WarmUpDeciderTests.swift in Sources */,
 				WB2D00000000010B828 /* WatchAlgorithmDriverSnapshotFlowEndToEndTests.swift in Sources */,

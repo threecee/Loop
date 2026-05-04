@@ -292,54 +292,53 @@ class LoopAppManager: NSObject {
         // B.2.c.1: construct shared transport, hand to both WatchDataManager
         // (which holds the WCSession delegate role) and the coordinator.
         Task { @MainActor in
-            let phoneWatchTransport = WCSessionPhoneWatchTransport(role: .phone)
-            self.deviceDataManager.watchManager.phoneWatchTransport = phoneWatchTransport
-
-            let phoneWatchCoordinator = PhoneWatchSessionCoordinator(role: .phone, transport: phoneWatchTransport)
-            PhoneWatchSessionCoordinator.shared = phoneWatchCoordinator
-            self.phoneWatchCoordinator = phoneWatchCoordinator
-            phoneWatchCoordinator.start()
-
-            // B.2.d: instantiate and start handoff orchestrator + policy + scheduler.
-            let appGroupDefaults = HandoffSettings.appGroupDefaults
-            let handoffSettings = HandoffSettings.load(from: appGroupDefaults)
-            let stateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .phone)
-            let policyEngine = HandoffPolicyEngine(
+            // B.10: HandoffStack.assemble(role:) replaces the hand-built
+            // 6-component bootstrap chain. Phone passes pumpManager +
+            // settingsSyncProvider; nil for the three watch-only closures
+            // (settings-sync receive, snapshot receive, lazy pump-manager).
+            let stack = HandoffStack.assemble(
                 role: .phone,
-                coordinator: self.phoneWatchCoordinator,
-                settings: handoffSettings,
-                emit: { _ in /* wired via orchestrator */ }
+                pumpManager: deviceDataManager.pumpManager as? OmniBLEPumpManager,
+                settingsSyncProvider: { [weak self] in self?.currentSettingsSyncOrNil() }
             )
-            let scheduler = ShadowStateScheduler(role: .phone, fire: { /* wired via orchestrator */ })
-            let orchestrator = HandoffOrchestrator(
-                role: .phone,
-                coordinator: self.phoneWatchCoordinator,
-                stateMachine: stateMachine,
-                policyEngine: policyEngine,
-                shadowScheduler: scheduler,
-                userDefaults: appGroupDefaults,
-                pumpManager: deviceDataManager.pumpManager as? OmniBLEPumpManager,   // B.2.e
-                settingsSyncProvider: { [weak self] in self?.currentSettingsSyncOrNil() }   // B.4 Issue #3
-            )
-            HandoffOrchestrator.shared = orchestrator
-            // B.10: wire orchestrator into the lifted coordinator so it can
-            // populate heartbeat.claimedOwner and trigger split-brain demotion
-            // without a direct module dependency from OmniBLE back to Loop.
-            phoneWatchCoordinator.orchestratorAccessor = orchestrator
-            orchestrator.start()
-            self.phoneWatchHandoffOrchestrator = orchestrator
 
-            // B.8.2 Issue #1: reverse-wire the orchestrator into LoopDataManager so
-            // every settings mutation fans out to the watch handoff pipeline (mirrors
-            // the algorithmStateSnapshotEmitter wire-up below).
-            self.deviceDataManager?.loopManager?.watchHandoffOrchestrator = orchestrator
+            // Wire the transport into WatchDataManager so the WCSession
+            // delegate forwards incoming messageData/userInfo into the
+            // coordinator via this transport.
+            self.deviceDataManager.watchManager.phoneWatchTransport = stack.transport
 
-            // B.8: wire the algorithm-state snapshot emitter into LoopDataManager.
-            // Use the concrete WCSessionPhoneWatchTransport already constructed
-            // for the coordinator — SnapshotTransport conformance lives on the
-            // concrete class, not on the PhoneWatchTransport protocol.
+            // Publish module singletons that other components locate by
+            // .shared (kept here, not in the factory, so the factory can be
+            // exercised in unit tests without polluting global state).
+            PhoneWatchSessionCoordinator.shared = stack.coordinator
+            HandoffOrchestrator.shared = stack.orchestrator
+
+            // B.10: wire orchestrator into the coordinator so it can
+            // populate heartbeat.claimedOwner and trigger split-brain
+            // demotion without a back-edge module dependency from OmniBLE
+            // to Loop.
+            stack.coordinator.orchestratorAccessor = stack.orchestrator
+
+            // Start the stack components in dependency order.
+            stack.coordinator.start()
+            stack.orchestrator.start()
+
+            // Retain references on self for lifecycle + observation.
+            self.phoneWatchCoordinator = stack.coordinator
+            self.phoneWatchHandoffOrchestrator = stack.orchestrator
+
+            // B.8.2 Issue #1: reverse-wire the orchestrator into
+            // LoopDataManager so every settings mutation fans out to the
+            // watch handoff pipeline.
+            self.deviceDataManager?.loopManager?.watchHandoffOrchestrator = stack.orchestrator
+
+            // B.8: wire the algorithm-state snapshot emitter into
+            // LoopDataManager. Uses the concrete
+            // WCSessionPhoneWatchTransport from the assembled stack —
+            // SnapshotTransport conformance lives on the concrete class,
+            // not on the PhoneWatchTransport protocol.
             let snapshotEmitter = AlgorithmStateSnapshotEmitter(
-                transport: phoneWatchTransport,
+                transport: stack.transport,
                 stateProvider: { [weak self] in
                     self?.currentSnapshotStateOrNil()
                 }

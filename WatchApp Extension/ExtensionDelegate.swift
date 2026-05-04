@@ -141,23 +141,40 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     /// session.activate(). Each component is independent; failure to construct
     /// any one shouldn't prevent the others from running.
     private func bootstrapPhoneWatchStack() {
-        // WCSession transport + coordinator + heartbeat
-        let transport = WCSessionPhoneWatchTransport(role: .watch)
-        let coordinator = PhoneWatchSessionCoordinator(
+        // B.10: HandoffStack.assemble(role:) replaces the hand-built
+        // 6-component bootstrap chain. Watch passes nil for phone-only
+        // params (pumpManager, settingsSyncProvider) and supplies the
+        // three watch-only closures: cache-write hooks for settings-sync
+        // and snapshot inbound messages, plus the lazy pump-manager
+        // factory used on first .watchDriver transition.
+        let stack = HandoffStack.assemble(
             role: .watch,
-            transport: transport,
-            // B.10: closure injection for watch-only cache writes — keeps
-            // WatchSettingsCache + WatchAlgorithmSnapshotCache out of OmniBLE.
             onSettingsSyncReceived: { sync in
                 WatchSettingsCache.shared.update(sync)
             },
             onSnapshotReceived: { snap in
                 WatchAlgorithmSnapshotCache.shared.update(snap)
-            }
+            },
+            makeWatchSidePumpManager: WatchSidePumpManagerFactory.make
         )
-        coordinator.start()
-        self.phoneWatchTransport = transport
-        self.phoneWatchCoordinator = coordinator
+
+        // B.10: wire orchestrator into the coordinator so it can populate
+        // heartbeat.claimedOwner and trigger split-brain demotion without
+        // a back-edge module dependency from OmniBLE to the watch.
+        stack.coordinator.orchestratorAccessor = stack.orchestrator
+
+        // Start the stack components in dependency order.
+        stack.coordinator.start()
+        stack.orchestrator.start()
+
+        // Retain references on self for lifecycle + delegate forwarding.
+        self.phoneWatchTransport = stack.transport
+        self.phoneWatchCoordinator = stack.coordinator
+        self.handoffOrchestrator = stack.orchestrator
+
+        // Publish singleton so SwiftUI views, ExtendedRuntimeCoordinator, and
+        // ad-hoc readers can locate the orchestrator after launch.
+        HandoffOrchestrator.shared = stack.orchestrator
 
         // HealthKit writer + G7 reader (G7 reader needs phone-side state via SharedStateBridge)
         let writer = HealthKitWriter()
@@ -173,49 +190,14 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         }
         self.glucoseReader = glucoseReader
 
-        // extended runtime session for prolonged BLE
+        // extended runtime session for prolonged BLE; gated on watch-is-driver
+        // by subscribing the coordinator to the orchestrator's handoffState.
         let runtime = ExtendedRuntimeCoordinator()
         self.extendedRuntimeCoordinator = runtime
-
-        // handoff orchestrator (subscribes to coordinator's onHandoffMessage)
-        let appGroupDefaults = HandoffSettings.appGroupDefaults
-        let settings = HandoffSettings.load(from: appGroupDefaults)
-        let policyEngine = HandoffPolicyEngine(
-            role: .watch,
-            coordinator: coordinator,
-            settings: settings,
-            emit: { _ in }  // wired via orchestrator; placeholder avoids capture cycles at init
-        )
-        let scheduler = ShadowStateScheduler(role: .watch, fire: {})  // orchestrator re-wires via setFire in start()
-        let stateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
-        let orchestrator = HandoffOrchestrator(
-            role: .watch,
-            coordinator: coordinator,
-            stateMachine: stateMachine,
-            policyEngine: policyEngine,
-            shadowScheduler: scheduler,
-            userDefaults: appGroupDefaults,
-            // B.10: closure injection for watch-only lazy pump-manager
-            // construction. Body lives in WatchSidePumpManagerFactory so
-            // unit tests can call it directly without going through the
-            // orchestrator's notifyUI path.
-            makeWatchSidePumpManager: WatchSidePumpManagerFactory.make
-        )
-        // B.10: wire orchestrator into the lifted coordinator so it can
-        // populate heartbeat.claimedOwner and trigger split-brain demotion
-        // without a direct module dependency from OmniBLE back to the watch.
-        coordinator.orchestratorAccessor = orchestrator
-        orchestrator.start()
-        self.handoffOrchestrator = orchestrator
-        // publish singleton so SwiftUI views, ExtendedRuntimeCoordinator, and
-        // ad-hoc readers can locate the orchestrator after launch.
-        HandoffOrchestrator.shared = orchestrator
-        // efficiency: gate the extended-runtime session on watch-is-driver
-        // by subscribing the coordinator to the orchestrator's handoffState.
-        runtime.bind(to: orchestrator)
+        runtime.bind(to: stack.orchestrator)
 
         // B.3.a Phase 5: watch self-driving bootstraps
-        bootstrapWatchSelfDrivingStack(orchestrator: orchestrator)
+        bootstrapWatchSelfDrivingStack(orchestrator: stack.orchestrator)
     }
 
     /// B.3.a Phase 5: construct the algorithm + remote-command bootstraps and
