@@ -69,7 +69,7 @@ struct WatchHandoffSection: View {
         switch orchestrator.handoffState {
         case .phoneDriver: return "Phone is driving"
         case .watchDriver: return "Watch is driving"
-        case .handoffPending(let direction, _, _):
+        case .handoffPending(let direction, _, _, _):
             return direction == .phoneToWatch
                 ? "Handing off to watch…"
                 : "Taking back from watch…"
