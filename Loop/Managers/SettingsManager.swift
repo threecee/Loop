@@ -14,6 +14,7 @@ import HealthKit
 import Combine
 import LoopCore
 import LoopKitUI
+import OmniBLE
 import os.log
 
 
@@ -211,7 +212,10 @@ class SettingsManager {
 // MARK: - SettingsStoreDelegate
 extension SettingsManager: SettingsStoreDelegate {
     func settingsStoreHasUpdatedSettingsData(_ settingsStore: SettingsStore) {
-        remoteDataServicesManager?.triggerUpload(for: .settings)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        // proxyUpload is MainActor-isolated; this delegate method is called
+        // from the store's serial queue, so we hop to MainActor.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .settings) }
     }
 }
 

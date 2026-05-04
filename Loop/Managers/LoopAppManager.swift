@@ -806,7 +806,8 @@ extension LoopAppManager: TemporaryScheduleOverrideHistoryDelegate {
     func temporaryScheduleOverrideHistoryDidUpdate(_ history: TemporaryScheduleOverrideHistory) {
         UserDefaults.appGroup?.overrideHistory = history
 
-        deviceDataManager.remoteDataServicesManager.triggerUpload(for: .overrides)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .overrides) }
     }
 }
 

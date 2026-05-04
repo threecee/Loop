@@ -19,6 +19,7 @@ import OmniBLE  // for HandoffState
 import WatchAlgorithmKit  // for WatchAlgorithmStores, WatchSettingsSnapshot, WatchAlgorithmDriver (B.6 Phase 4a-bis)
 @testable import WatchApp_Extension
 
+@MainActor
 final class Phase5_BootstrapsTest: XCTestCase {
 
     // MARK: - Helpers

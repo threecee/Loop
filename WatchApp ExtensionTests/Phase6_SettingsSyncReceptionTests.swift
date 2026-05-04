@@ -15,6 +15,7 @@ import OmniBLE  // for PhoneWatchSettingsSync, HandoffState
 import WatchAlgorithmKit  // for WatchSettingsSnapshot (B.6 Phase 4a-bis)
 @testable import WatchApp_Extension
 
+@MainActor
 final class Phase6_SettingsSyncReceptionTests: XCTestCase {
 
     // MARK: - B.8.3 helper: isolated UserDefaults suite per test

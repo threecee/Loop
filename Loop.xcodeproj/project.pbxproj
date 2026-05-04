@@ -226,6 +226,7 @@
 		43FCEEA9221A615B0013DD30 /* StatusChartsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FCEEA8221A615B0013DD30 /* StatusChartsManager.swift */; };
 		43FCEEAD221A66780013DD30 /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FCEEAC221A66780013DD30 /* DateFormatter.swift */; };
 		43FCEEB1221A863E0013DD30 /* StatusChartsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FCEEB0221A863E0013DD30 /* StatusChartsManager.swift */; };
+		4A773C5C2684B8A1ED9110A9 /* LoopRemoteCareUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DDC7DF2F3401904BC3EF489 /* LoopRemoteCareUploader.swift */; };
 		4B0CAF3106DB478E083E007C /* WatchAlgorithmKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6F100000011 /* WatchAlgorithmKit.framework */; };
 		4B875BF25CCD3FCCA8B979B9 /* LoopError+Issue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8898032AA9103B8BA09BBBD /* LoopError+Issue.swift */; };
 		4F08DE8F1E7BB871006741EA /* CollectionType+Loop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F08DE8E1E7BB871006741EA /* CollectionType+Loop.swift */; };
@@ -4415,6 +4416,7 @@
 				503149FBE22CF89F3553A3A7 /* WatchRemoteCommandBootstrap.swift in Sources */,
 				2CCA6A8E7E60C1A9E04A5D8F /* BackgroundPollScheduler.swift in Sources */,
 				A1B2C3D4E5F60003A1B2C3D4 /* LoopWarmingUpBadge.swift in Sources */,
+				4A773C5C2684B8A1ED9110A9 /* LoopRemoteCareUploader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,6 +11,7 @@ import LoopKit
 import LoopKitUI
 import LoopCore
 import Combine
+import OmniBLE
 
 class ServicesManager {
 
@@ -294,7 +295,8 @@ extension ServicesManager: ServiceDelegate {
         }
         
         try await servicesManagerDelegate?.enactOverride(name: name, duration: duration, remoteAddress: remoteAddress)
-        await remoteDataServicesManager.triggerUpload(for: .overrides)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        await MainActor.run { HandoffOrchestrator.shared?.proxyUpload(for: .overrides) }
     }
     
     enum OverrideActionError: LocalizedError {
@@ -314,14 +316,16 @@ extension ServicesManager: ServiceDelegate {
     
     func cancelRemoteOverride() async throws {
         try await servicesManagerDelegate?.cancelCurrentOverride()
-        await remoteDataServicesManager.triggerUpload(for: .overrides)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        await MainActor.run { HandoffOrchestrator.shared?.proxyUpload(for: .overrides) }
     }
     
     func deliverRemoteCarbs(amountInGrams: Double, absorptionTime: TimeInterval?, foodType: String?, startDate: Date?) async throws {
         do {
             try await servicesManagerDelegate?.deliverCarbs(amountInGrams: amountInGrams, absorptionTime: absorptionTime, foodType: foodType, startDate: startDate)
             await NotificationManager.sendRemoteCarbEntryNotification(amountInGrams: amountInGrams)
-            await remoteDataServicesManager.triggerUpload(for: .carb)
+            // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+            await MainActor.run { HandoffOrchestrator.shared?.proxyUpload(for: .carb) }
             analyticsServicesManager.didAddCarbs(source: "Remote", amount: amountInGrams)
         } catch {
             await NotificationManager.sendRemoteCarbEntryFailureNotification(for: error, amountInGrams: amountInGrams)
@@ -346,7 +350,8 @@ extension ServicesManager: ServiceDelegate {
             
             try await servicesManagerDosingDelegate?.deliverBolus(amountInUnits: amountInUnits)
             await NotificationManager.sendRemoteBolusNotification(amount: amountInUnits)
-            await remoteDataServicesManager.triggerUpload(for: .dose)
+            // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+            await MainActor.run { HandoffOrchestrator.shared?.proxyUpload(for: .dose) }
             analyticsServicesManager.didBolus(source: "Remote", units: amountInUnits)
         } catch {
             await NotificationManager.sendRemoteBolusFailureNotification(for: error, amountInUnits: amountInUnits)

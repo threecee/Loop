@@ -30,6 +30,13 @@ final class WatchRemoteCommandBootstrap {
     /// inspect this to assert the gating logic.
     private(set) var nightscoutService: NightscoutService?
 
+    /// B.11.1: RemoteCareUploader registered with HandoffOrchestrator
+    /// when the watch is driver. Owned here (lifetime tracks the
+    /// bootstrap's RDSM); orchestrator holds a weak reference. Cleared
+    /// on `tearDown()` so a phone-driver state doesn't keep a stale
+    /// uploader pointed at a torn-down RDSM.
+    private(set) var remoteCareUploader: LoopRemoteCareUploader?
+
     private let storesProvider: () -> WatchAlgorithmStores?
     private let settingsProvider: () -> WatchSettingsSnapshot?
     private let supportingStoresProvider: () -> WatchRemoteCommandStores?
@@ -61,7 +68,9 @@ final class WatchRemoteCommandBootstrap {
         settingsCancellable = WatchSettingsCache.shared.publisher
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.retryIfNeeded() }
+            .sink { [weak self] _ in
+                MainActor.assumeIsolated { self?.retryIfNeeded() }
+            }
     }
 
     /// B.3.a Phase 6 convenience init: takes a `PhoneWatchSettingsSync`
@@ -81,10 +90,17 @@ final class WatchRemoteCommandBootstrap {
         settingsCancellable = WatchSettingsCache.shared.publisher
             .compactMap { $0 }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.retryIfNeeded() }
+            .sink { [weak self] _ in
+                MainActor.assumeIsolated { self?.retryIfNeeded() }
+            }
     }
 
     /// Updates the bootstrap in response to a handoff-state change.
+    /// B.11.1: now `@MainActor` because `startIfNeeded()` mutates
+    /// `HandoffOrchestrator.shared` (a MainActor-isolated property). The
+    /// caller (`ExtensionDelegate`) already dispatches on main queue, so
+    /// no callers break.
+    @MainActor
     func update(handoffState: HandoffState) {
         // record before delegating so retryIfNeeded() (publisher sink)
         // gates correctly on the most recent state.
@@ -116,11 +132,13 @@ final class WatchRemoteCommandBootstrap {
     /// settings publisher subscription target. Gated on
     /// `lastHandoffState == .watchDriver` so a settings arrival in any other
     /// state doesn't inappropriately build a manager.
+    @MainActor
     private func retryIfNeeded() {
         guard case .watchDriver = lastHandoffState else { return }
         startIfNeeded()
     }
 
+    @MainActor
     private func startIfNeeded() {
         guard manager == nil else { return }
         guard let settings = settingsProvider(),
@@ -157,9 +175,28 @@ final class WatchRemoteCommandBootstrap {
 
         self.manager = mgr
         self.nightscoutService = svc
+
+        // B.11.1: register the watch-side RemoteCareUploader with the
+        // orchestrator. Same wrapper class as iOS — the static-link path
+        // (B.3.a Phase 3) makes NightscoutServiceKit available here, so we
+        // reuse LoopRemoteCareUploader unchanged. The orchestrator's role
+        // gate + quiesce-on-handoff semantics now apply to the watch's
+        // upload triggers.
+        let uploader = LoopRemoteCareUploader(
+            triggerUpload: { [weak mgr] type in
+                mgr?.triggerUpload(for: type)
+            })
+        self.remoteCareUploader = uploader
+        HandoffOrchestrator.shared?.remoteCareUploader = uploader
     }
 
+    @MainActor
     private func tearDown() {
+        // B.11.1: clear orchestrator's weak reference and our owned
+        // reference so a phone-driver state doesn't keep a stale uploader
+        // pointed at a torn-down RDSM.
+        HandoffOrchestrator.shared?.remoteCareUploader = nil
+        remoteCareUploader = nil
         manager = nil
         nightscoutService = nil
     }

@@ -13,6 +13,7 @@ import LoopKit
 import LoopKitUI
 import LoopCore
 import LoopTestingKit
+import OmniBLE
 import UserNotifications
 import Combine
 
@@ -220,6 +221,12 @@ final class DeviceDataManager {
 
     var remoteDataServicesManager: RemoteDataServicesManager { return servicesManager.remoteDataServicesManager }
 
+    /// B.11.1: RemoteCareUploader wrapper bridging RDSM to OmniBLE's
+    /// RemoteCareUploader protocol. Owned here (not by the orchestrator)
+    /// so its lifetime tracks DeviceDataManager. The orchestrator holds
+    /// a weak reference.
+    private var remoteCareUploader: LoopRemoteCareUploader?
+
     var criticalEventLogExportManager: CriticalEventLogExportManager!
 
     var crashRecoveryManager: CrashRecoveryManager
@@ -419,7 +426,21 @@ final class DeviceDataManager {
         )
 
         settingsManager.remoteDataServicesManager = remoteDataServicesManager
-        
+
+        // B.11.1: construct the RemoteCareUploader wrapper and register it
+        // with HandoffOrchestrator. The wrapper translates OmniBLE's
+        // RemoteCareUploadType to Loop's RemoteDataType and forwards to RDSM.
+        // HandoffOrchestrator owns role-gating and quiesce-on-handoff.
+        let uploader = LoopRemoteCareUploader(
+            triggerUpload: { [weak remoteDataServicesManager] type in
+                remoteDataServicesManager?.triggerUpload(for: type)
+            })
+        self.remoteCareUploader = uploader
+        // HandoffOrchestrator is MainActor-isolated; DDM init runs on main
+        // (initialized from LoopAppManager which is also main-bound), but
+        // the compiler requires the explicit hop in this nonisolated init.
+        Task { @MainActor in HandoffOrchestrator.shared?.remoteCareUploader = uploader }
+
         servicesManager = ServicesManager(
             pluginManager: pluginManager,
             alertManager: alertManager,
@@ -1275,14 +1296,18 @@ extension DeviceDataManager: PumpManagerOnboardingDelegate {
 // MARK: - AlertStoreDelegate
 extension DeviceDataManager: AlertStoreDelegate {
     func alertStoreHasUpdatedAlertData(_ alertStore: AlertStore) {
-        remoteDataServicesManager.triggerUpload(for: .alert)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        // proxyUpload is MainActor-isolated; delegate called from store
+        // serial queue, so we hop to MainActor.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .alert) }
     }
 }
 
 // MARK: - CarbStoreDelegate
 extension DeviceDataManager: CarbStoreDelegate {
     func carbStoreHasUpdatedCarbData(_ carbStore: CarbStore) {
-        remoteDataServicesManager.triggerUpload(for: .carb)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .carb) }
     }
 
     func carbStore(_ carbStore: CarbStore, didError error: CarbStore.CarbStoreError) {}
@@ -1291,35 +1316,43 @@ extension DeviceDataManager: CarbStoreDelegate {
 // MARK: - DoseStoreDelegate
 extension DeviceDataManager: DoseStoreDelegate {
     func doseStoreHasUpdatedPumpEventData(_ doseStore: DoseStore) {
-        remoteDataServicesManager.triggerUpload(for: .pumpEvent)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .pumpEvent) }
     }
 }
 
 // MARK: - DosingDecisionStoreDelegate
 extension DeviceDataManager: DosingDecisionStoreDelegate {
     func dosingDecisionStoreHasUpdatedDosingDecisionData(_ dosingDecisionStore: DosingDecisionStore) {
-        remoteDataServicesManager.triggerUpload(for: .dosingDecision)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        // The dosing decision IS the algorithm output; the proxy is a
+        // pre-RDSM filter, not an interceptor — payload shape and timing
+        // unchanged from pre-B.11.1 baseline.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .dosingDecision) }
     }
 }
 
 // MARK: - GlucoseStoreDelegate
 extension DeviceDataManager: GlucoseStoreDelegate {
     func glucoseStoreHasUpdatedGlucoseData(_ glucoseStore: GlucoseStore) {
-        remoteDataServicesManager.triggerUpload(for: .glucose)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .glucose) }
     }
 }
 
 // MARK: - InsulinDeliveryStoreDelegate
 extension DeviceDataManager: InsulinDeliveryStoreDelegate {
     func insulinDeliveryStoreHasUpdatedDoseData(_ insulinDeliveryStore: InsulinDeliveryStore) {
-        remoteDataServicesManager.triggerUpload(for: .dose)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .dose) }
     }
 }
 
 // MARK: - CgmEventStoreDelegate
 extension DeviceDataManager: CgmEventStoreDelegate {
     func cgmEventStoreHasUpdatedData(_ cgmEventStore: LoopKit.CgmEventStore) {
-        remoteDataServicesManager.triggerUpload(for: .cgmEvent)
+        // B.11.1: route through HandoffOrchestrator for role-gating + quiesce.
+        Task { @MainActor in HandoffOrchestrator.shared?.proxyUpload(for: .cgmEvent) }
     }
 }
 
