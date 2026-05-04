@@ -60,7 +60,11 @@ final class HandoffPolicyEngine {
         ticker = Task { [weak self] in
             while !Task.isCancelled {
                 await MainActor.run { self?.evaluateNow() }
-                try? await Task.sleep(nanoseconds: 1_000_000_000)
+                // efficiency: drop tick from 1Hz to 5s. The coarsest threshold the
+                // engine checks (60s heartbeat absence) is 12× the new tick — still
+                // well within responsiveness budget. 60× over-sampling on watchOS
+                // was a battery drain.
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
             }
         }
     }
