@@ -181,6 +181,7 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         let appGroupDefaults = HandoffSettings.appGroupDefaults
         let settings = HandoffSettings.load(from: appGroupDefaults)
         let policyEngine = HandoffPolicyEngine(
+            role: .watch,
             coordinator: coordinator,
             settings: settings,
             emit: { _ in }  // wired via orchestrator; placeholder avoids capture cycles at init

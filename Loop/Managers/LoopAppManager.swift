@@ -305,6 +305,7 @@ class LoopAppManager: NSObject {
             let handoffSettings = HandoffSettings.load(from: appGroupDefaults)
             let stateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .phone)
             let policyEngine = HandoffPolicyEngine(
+                role: .phone,
                 coordinator: self.phoneWatchCoordinator,
                 settings: handoffSettings,
                 emit: { _ in /* wired via orchestrator */ }

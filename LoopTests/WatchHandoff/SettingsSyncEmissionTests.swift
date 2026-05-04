@@ -87,6 +87,7 @@ final class SettingsSyncEmissionTests: XCTestCase {
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone,
                                               appGroupDefaults: isolatedDefaults()),
             policyEngine: HandoffPolicyEngine(
+                role: .phone,
                 coordinator: stub,
                 settings: HandoffSettings(),
                 clock: { [unowned self] in self.clock },

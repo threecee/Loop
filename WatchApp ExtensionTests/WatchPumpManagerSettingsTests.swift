@@ -36,6 +36,7 @@ final class WatchPumpManagerSettingsTests: XCTestCase {
 
         let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
         let policyEngine = HandoffPolicyEngine(
+            role: .watch,
             coordinator: stub,
             settings: HandoffSettings(),
             clock: { [unowned self] in self.clock },

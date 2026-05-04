@@ -43,6 +43,7 @@ final class HandoffOrchestratorTests: XCTestCase {
 
         let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
         policyEngine = HandoffPolicyEngine(
+            role: .phone,
             coordinator: stub,
             settings: HandoffSettings(),
             clock: { [unowned self] in self.clock },
@@ -224,6 +225,7 @@ final class HandoffOrchestratorTests: XCTestCase {
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone,
                                               appGroupDefaults: isolatedDefaults()),
             policyEngine: HandoffPolicyEngine(
+                role: .phone,
                 coordinator: stub,
                 settings: HandoffSettings(),
                 clock: { [unowned self] in self.clock },

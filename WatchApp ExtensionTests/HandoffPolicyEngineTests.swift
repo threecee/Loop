@@ -26,6 +26,7 @@ final class HandoffPolicyEngineTests: XCTestCase {
             lastHeartbeatReceivedAt: lastHeartbeat
         )
         return HandoffPolicyEngine(
+            role: .watch,
             coordinator: stubCoordinator,
             settings: HandoffSettings(mode: mode),
             clock: { [unowned self] in self.clock },

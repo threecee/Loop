@@ -43,6 +43,7 @@ final class HandoffOrchestratorTests: XCTestCase {
 
         let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
         policyEngine = HandoffPolicyEngine(
+            role: .watch,
             coordinator: stub,
             settings: HandoffSettings(),
             clock: { [unowned self] in self.clock },
