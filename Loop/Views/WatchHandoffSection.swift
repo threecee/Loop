@@ -13,6 +13,7 @@
 //
 
 import SwiftUI
+import OmniBLE
 
 struct WatchHandoffSection: View {
     @ObservedObject var orchestrator: HandoffOrchestrator

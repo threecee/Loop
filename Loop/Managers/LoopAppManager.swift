@@ -312,6 +312,7 @@ class LoopAppManager: NSObject {
             )
             let scheduler = ShadowStateScheduler(role: .phone, fire: { /* wired via orchestrator */ })
             let orchestrator = HandoffOrchestrator(
+                role: .phone,
                 coordinator: self.phoneWatchCoordinator,
                 stateMachine: stateMachine,
                 policyEngine: policyEngine,

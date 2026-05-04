@@ -50,6 +50,7 @@ final class HandoffOrchestratorTests: XCTestCase {
             emit: { _ in }
         )
         orchestrator = HandoffOrchestrator(
+            role: .phone,
             coordinator: coordinator,
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone,
                                               appGroupDefaults: isolatedDefaults()),
@@ -221,6 +222,7 @@ final class HandoffOrchestratorTests: XCTestCase {
     ) -> HandoffOrchestrator {
         let stub = HandoffStubCoordinator(isReachable: true, lastHeartbeatReceivedAt: nil)
         return HandoffOrchestrator(
+            role: .phone,
             coordinator: coordinator,
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .phone,
                                               appGroupDefaults: isolatedDefaults()),

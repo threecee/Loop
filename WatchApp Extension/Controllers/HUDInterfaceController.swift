@@ -10,6 +10,7 @@ import WatchKit
 import LoopCore
 import LoopKit
 import Combine  // subscribe to HandoffOrchestrator.$handoffState
+import OmniBLE  // for HandoffOrchestrator (lifted in B.10)
 import WatchAlgorithmKit  // for WatchAlgorithmDriver.warmUpDidCompleteNotification (B.6 Phase 4a-bis)
 
 class HUDInterfaceController: WKInterfaceController {

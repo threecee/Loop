@@ -43,6 +43,7 @@ final class WatchPumpManagerSettingsTests: XCTestCase {
             emit: { _ in }
         )
         orchestrator = HandoffOrchestrator(
+            role: .watch,
             coordinator: coordinator,
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .watch),
             policyEngine: policyEngine,
@@ -52,6 +53,7 @@ final class WatchPumpManagerSettingsTests: XCTestCase {
                 fire: { }
             ),
             userDefaults: UserDefaults(suiteName: "test.watchpumpsettings.\(UUID())")!,
+            makeWatchSidePumpManager: WatchSidePumpManagerFactory.make,
             phoneStableDebounceOverride: 0.05
         )
     }
@@ -85,7 +87,7 @@ final class WatchPumpManagerSettingsTests: XCTestCase {
         )
         WatchSettingsCache.shared.update(sync)
 
-        let pm = orchestrator.makeWatchSidePumpManager()
+        let pm = WatchSidePumpManagerFactory.make()
         // BasalSchedule.entries is internal to OmniBLE, but rateAt(offset:) is
         // public — use it to verify the helper's mapping landed.
         XCTAssertEqual(pm.state.basalSchedule.rateAt(offset: 0), 1.5,
@@ -99,7 +101,7 @@ final class WatchPumpManagerSettingsTests: XCTestCase {
     /// the construction itself is non-fatal).
     func test_makeWatchSidePumpManager_fallsBackToDefaultWhenCacheEmpty() {
         WatchSettingsCache.shared.resetForTesting()
-        let pm = orchestrator.makeWatchSidePumpManager()
+        let pm = WatchSidePumpManagerFactory.make()
         // .watchSideDefault uses an empty BasalSchedule. We can't safely call
         // rateAt(offset:) on an empty schedule (it fatalErrors), so verify
         // the schedule's rawValue reflects empty entries instead.

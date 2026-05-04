@@ -16,6 +16,7 @@ import LoopKit
 import LoopKitUI
 import LoopTestingKit
 import LoopUI
+import OmniBLE
 import SwiftCharts
 import os.log
 import Combine

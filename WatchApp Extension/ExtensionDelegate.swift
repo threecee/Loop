@@ -189,11 +189,17 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
         let scheduler = ShadowStateScheduler(role: .watch, fire: {})  // orchestrator re-wires via setFire in start()
         let stateMachine = HandoffStateMachine(initialState: .phoneDriver, role: .watch)
         let orchestrator = HandoffOrchestrator(
+            role: .watch,
             coordinator: coordinator,
             stateMachine: stateMachine,
             policyEngine: policyEngine,
             shadowScheduler: scheduler,
-            userDefaults: appGroupDefaults
+            userDefaults: appGroupDefaults,
+            // B.10: closure injection for watch-only lazy pump-manager
+            // construction. Body lives in WatchSidePumpManagerFactory so
+            // unit tests can call it directly without going through the
+            // orchestrator's notifyUI path.
+            makeWatchSidePumpManager: WatchSidePumpManagerFactory.make
         )
         // B.10: wire orchestrator into the lifted coordinator so it can
         // populate heartbeat.claimedOwner and trigger split-brain demotion

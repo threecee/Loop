@@ -50,6 +50,7 @@ final class HandoffOrchestratorTests: XCTestCase {
             emit: { _ in }
         )
         orchestrator = HandoffOrchestrator(
+            role: .watch,
             coordinator: coordinator,
             stateMachine: HandoffStateMachine(initialState: .phoneDriver, role: .watch,
                                               appGroupDefaults: isolatedDefaults()),
