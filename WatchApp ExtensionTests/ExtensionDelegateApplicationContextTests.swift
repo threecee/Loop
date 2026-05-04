@@ -59,8 +59,12 @@ final class ExtensionDelegateApplicationContextTests: XCTestCase {
             activeOverride: nil
         )
         let message = PhoneWatchMessage.algorithmStateSnapshot(snapshot)
+        // Wire format is `.secondsSince1970` on both transport sides (B.8.2
+        // mechanical migration from `.iso8601`). The fixture must match —
+        // otherwise the transport's internal decoder throws and the message
+        // never reaches `onIncomingMessage`.
         let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
+        encoder.dateEncodingStrategy = .secondsSince1970
         let data = try! encoder.encode(message)
         let context: [String: Any] = ["phoneWatchMessage": data]
 
