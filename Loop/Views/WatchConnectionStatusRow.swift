@@ -11,6 +11,7 @@
 //
 
 import SwiftUI
+import OmniBLE
 
 struct WatchConnectionStatusRow: View {
     @ObservedObject var coordinator: PhoneWatchSessionCoordinator

@@ -378,3 +378,23 @@ extension HandoffOrchestrator: WatchHandoffNotifying {
         }
     }
 }
+
+// MARK: - B.10: PhoneWatchOrchestratorAccessor conformance
+
+/// Lets the OmniBLE-side `PhoneWatchSessionCoordinator` read the orchestrator's
+/// current handoff state (for heartbeat.claimedOwner population) and trigger
+/// split-brain demotion without a direct module dependency back from OmniBLE
+/// to Loop. Phone side: `splitBrainDemoteSelf()` is unreachable in practice
+/// (the phone-side branch of the split-brain switch only logs an advisory),
+/// but conforming for symmetry keeps the wire-up identical on both sides.
+extension HandoffOrchestrator: PhoneWatchOrchestratorAccessor {
+    var currentHandoffState: HandoffState { handoffState }
+
+    func splitBrainDemoteSelf() {
+        // Phone side: not invoked by the lifted coordinator's switch — kept
+        // as a defensive no-op to satisfy the protocol. If it ever fires,
+        // demote to a `.phone` request which is the correct outcome regardless.
+        ownership.commandsAllowed = false
+        userRequestHandoff(to: .phone)
+    }
+}

@@ -34,6 +34,7 @@ final class HandoffOrchestratorTests: XCTestCase {
         clock = Date(timeIntervalSince1970: 1_700_000_000)
         coordinatorTransport = MockPhoneWatchTransport()
         coordinator = PhoneWatchSessionCoordinator(
+            role: .phone,
             transport: coordinatorTransport,
             appBuildNumber: "TEST",
             clock: { [unowned self] in self.clock }

@@ -27,6 +27,7 @@ final class WatchPumpManagerSettingsTests: XCTestCase {
 
         coordinatorTransport = MockPhoneWatchTransport()
         coordinator = PhoneWatchSessionCoordinator(
+            role: .watch,
             transport: coordinatorTransport,
             appBuildNumber: "TEST",
             clock: { [unowned self] in self.clock }

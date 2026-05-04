@@ -59,6 +59,7 @@ final class SettingsSyncEmissionTests: XCTestCase {
         clock = Date(timeIntervalSince1970: 1_700_000_000)
         transport = MockPhoneWatchTransport()
         coordinator = PhoneWatchSessionCoordinator(
+            role: .phone,
             transport: transport,
             appBuildNumber: "TEST",
             clock: { [unowned self] in self.clock }

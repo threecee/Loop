@@ -24,6 +24,7 @@ final class PhoneWatchSessionCoordinatorTests: XCTestCase {
         phoneTransport.peer = watchTransport
         watchTransport.peer = phoneTransport
         watchCoordinator = PhoneWatchSessionCoordinator(
+            role: .watch,
             transport: watchTransport,
             appBuildNumber: "TEST",
             clock: { [unowned self] in self.currentTime }

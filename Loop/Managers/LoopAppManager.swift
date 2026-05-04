@@ -295,7 +295,7 @@ class LoopAppManager: NSObject {
             let phoneWatchTransport = WCSessionPhoneWatchTransport(role: .phone)
             self.deviceDataManager.watchManager.phoneWatchTransport = phoneWatchTransport
 
-            let phoneWatchCoordinator = PhoneWatchSessionCoordinator(transport: phoneWatchTransport)
+            let phoneWatchCoordinator = PhoneWatchSessionCoordinator(role: .phone, transport: phoneWatchTransport)
             PhoneWatchSessionCoordinator.shared = phoneWatchCoordinator
             self.phoneWatchCoordinator = phoneWatchCoordinator
             phoneWatchCoordinator.start()
@@ -320,6 +320,10 @@ class LoopAppManager: NSObject {
                 settingsSyncProvider: { [weak self] in self?.currentSettingsSyncOrNil() }   // B.4 Issue #3
             )
             HandoffOrchestrator.shared = orchestrator
+            // B.10: wire orchestrator into the lifted coordinator so it can
+            // populate heartbeat.claimedOwner and trigger split-brain demotion
+            // without a direct module dependency from OmniBLE back to Loop.
+            phoneWatchCoordinator.orchestratorAccessor = orchestrator
             orchestrator.start()
             self.phoneWatchHandoffOrchestrator = orchestrator
 

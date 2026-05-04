@@ -143,7 +143,18 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
     private func bootstrapPhoneWatchStack() {
         // WCSession transport + coordinator + heartbeat
         let transport = WCSessionPhoneWatchTransport(role: .watch)
-        let coordinator = PhoneWatchSessionCoordinator(transport: transport)
+        let coordinator = PhoneWatchSessionCoordinator(
+            role: .watch,
+            transport: transport,
+            // B.10: closure injection for watch-only cache writes — keeps
+            // WatchSettingsCache + WatchAlgorithmSnapshotCache out of OmniBLE.
+            onSettingsSyncReceived: { sync in
+                WatchSettingsCache.shared.update(sync)
+            },
+            onSnapshotReceived: { snap in
+                WatchAlgorithmSnapshotCache.shared.update(snap)
+            }
+        )
         coordinator.start()
         self.phoneWatchTransport = transport
         self.phoneWatchCoordinator = coordinator
@@ -183,10 +194,14 @@ final class ExtensionDelegate: NSObject, WKExtensionDelegate {
             shadowScheduler: scheduler,
             userDefaults: appGroupDefaults
         )
+        // B.10: wire orchestrator into the lifted coordinator so it can
+        // populate heartbeat.claimedOwner and trigger split-brain demotion
+        // without a direct module dependency from OmniBLE back to the watch.
+        coordinator.orchestratorAccessor = orchestrator
         orchestrator.start()
         self.handoffOrchestrator = orchestrator
-        // publish singleton so PhoneWatchSessionCoordinator's
-        // split-brain detection can read currentOwner + flip ownership.commandsAllowed.
+        // publish singleton so SwiftUI views, ExtendedRuntimeCoordinator, and
+        // ad-hoc readers can locate the orchestrator after launch.
         HandoffOrchestrator.shared = orchestrator
         // efficiency: gate the extended-runtime session on watch-is-driver
         // by subscribing the coordinator to the orchestrator's handoffState.
