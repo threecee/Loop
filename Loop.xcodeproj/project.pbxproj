@@ -501,6 +501,8 @@
 		B6F100000044 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43F5C2C81B929C09003EB13D /* HealthKit.framework */; };
 		B70705022A00000000000007 /* LoopStateViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70705012A00000000000007 /* LoopStateViewTests.swift */; };
 		B83000000001 /* WatchAlgorithmBootstrapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B83000000002 /* WatchAlgorithmBootstrapTests.swift */; };
+		B84A0001000000000000A001 /* ReconciliationFixtureGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84A0002000000000000A001 /* ReconciliationFixtureGenerator.swift */; };
+		B85AAA0002000000F0000000 /* PredictionInputEffectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B85AAA0001000000F0000000 /* PredictionInputEffectTests.swift */; };
 		B8D100000001 /* WarmUpDecision.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8D100000002 /* WarmUpDecision.swift */; };
 		BCE0D1D6CD31C643DD469207 /* Phase4_RemoteDataServicesManagerImportTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0373D98687AA42291417F37 /* Phase4_RemoteDataServicesManagerImportTest.swift */; };
 		BD0E9F31DE3DB654047A29DC /* LoopAlgorithmReconciliationFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 083F0EBC357920F44DB22F42 /* LoopAlgorithmReconciliationFixture.swift */; };
@@ -684,7 +686,6 @@
 		F724222767E5479082AABF2F /* Phase6_SettingsSyncReceptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F570244F6C2D44B5A1C768DC /* Phase6_SettingsSyncReceptionTests.swift */; };
 		F80D5B397E144FA5BC24D470 /* SharedStateBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED129A39903141C6880F7BB7 /* SharedStateBridge.swift */; };
 		F97119FBB15A39EE62A0C9C9 /* LoopAlgorithmRunnerCaptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8314754816B026AB26EA37A2 /* LoopAlgorithmRunnerCaptureTests.swift */; };
-		B84A0001000000000000A001 /* ReconciliationFixtureGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84A0002000000000000A001 /* ReconciliationFixtureGenerator.swift */; };
 		F9F549BD6A9F6BF2020BFCB9 /* CarbStoreProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D380224EADF36005E2F50 /* CarbStoreProtocol.swift */; };
 		FFB618C2C280468C86D228FB /* GlucoseCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89AF9E04978641A187D17125 /* GlucoseCache.swift */; };
 		WB2CA1000000000001 /* PhoneWatchTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = WB2CA10000000000F1 /* PhoneWatchTransport.swift */; };
@@ -1285,7 +1286,6 @@
 		7E69CFFB2A16A77E00203CBD /* ResetLoopManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResetLoopManager.swift; sourceTree = "<group>"; };
 		80F864E52433BF5D0026EC26 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8314754816B026AB26EA37A2 /* LoopAlgorithmRunnerCaptureTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoopAlgorithmRunnerCaptureTests.swift; sourceTree = "<group>"; };
-		B84A0002000000000000A001 /* ReconciliationFixtureGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReconciliationFixtureGenerator.swift; sourceTree = "<group>"; };
 		83AA4AFC96E2BE1D43C5BD62 /* WatchRemoteCommandBootstrap.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchRemoteCommandBootstrap.swift; path = WatchRemoteCommandBootstrap.swift; sourceTree = "<group>"; };
 		84AA81D22A4A27A3000B658B /* LoopWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopWidgets.swift; sourceTree = "<group>"; };
 		84AA81D52A4A28AF000B658B /* WidgetBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetBackground.swift; sourceTree = "<group>"; };
@@ -1487,6 +1487,8 @@
 		B6F22EF92E95A03C00CCA05F /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Intents.strings; sourceTree = "<group>"; };
 		B70705012A00000000000007 /* LoopStateViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopStateViewTests.swift; sourceTree = "<group>"; };
 		B83000000002 /* WatchAlgorithmBootstrapTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WatchAlgorithmBootstrapTests.swift; path = WatchAlgorithmBootstrapTests.swift; sourceTree = "<group>"; };
+		B84A0002000000000000A001 /* ReconciliationFixtureGenerator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReconciliationFixtureGenerator.swift; sourceTree = "<group>"; };
+		B85AAA0001000000F0000000 /* PredictionInputEffectTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PredictionInputEffectTests.swift; sourceTree = "<group>"; };
 		B8D100000002 /* WarmUpDecision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WarmUpDecision.swift; sourceTree = "<group>"; };
 		C1004DEF2981F5B700B8CF94 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C1004DFD2981F67A00B8CF94 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -2432,6 +2434,7 @@
 				8968B113240C55F10074BB48 /* LoopSettingsTests.swift */,
 				E93E86AC24DDE02C00FF40C8 /* Mock Stores */,
 				WB2CA10000000000A1 /* WatchHandoff */,
+				B85AAA0001000000F0000000 /* PredictionInputEffectTests.swift */,
 			);
 			path = LoopTests;
 			sourceTree = "<group>";
@@ -4553,6 +4556,7 @@
 				F97119FBB15A39EE62A0C9C9 /* LoopAlgorithmRunnerCaptureTests.swift in Sources */,
 				F4EF2C98D2257C1300C4FA11 /* ReconciliationTests.swift in Sources */,
 				B84A0001000000000000A001 /* ReconciliationFixtureGenerator.swift in Sources */,
+				B85AAA0002000000F0000000 /* PredictionInputEffectTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

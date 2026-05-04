@@ -87,7 +87,10 @@ extension TimeInterval {
 
 extension LoopSettings {
     var loopAlgorithmCore_enabledEffects: PredictionInputEffect {
-        PredictionInputEffect.all
+        // B.8.5: delegate to canonical `PredictionInputEffect.allEnabled`.
+        // Same constant the iOS-side `LoopSettings.enabledEffects` returns
+        // when `LoopConstants.retrospectiveCorrectionEnabled` is true (today: always).
+        PredictionInputEffect.allEnabled
     }
 }
 

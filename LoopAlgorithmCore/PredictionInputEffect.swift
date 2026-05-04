@@ -57,3 +57,12 @@ public struct PredictionInputEffect: OptionSet {
         }
     }
 }
+
+public extension PredictionInputEffect {
+    /// B.8.5: canonical "all effects enabled" constant. Both
+    /// `LoopSettings.enabledEffects` (iOS) and
+    /// `LoopSettings.loopAlgorithmCore_enabledEffects` (LoopAlgorithmCore)
+    /// delegate here. Replaces two duplicated `.all` returns + a
+    /// `LoopConstants.retrospectiveCorrectionEnabled`-gated subtraction.
+    static let allEnabled: PredictionInputEffect = .all
+}
